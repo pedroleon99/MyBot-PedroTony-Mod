@@ -1,0 +1,31 @@
+# MyBot.run AUTOIT .gitignore file
+
+# Global Files
+/.project
+*.log
+*.orig
+
+# Global Folders
+[Tt]emplates/
+[Tt]emp/
+[Bb]ackup/
+
+# Obsolete Files and Folders
+[Ll]oots/
+[Aa]llTowns/
+
+# ignore test strategies
+[Ss]trategies/[Tt]est*.ini
+[Ss]trategies/[Ss]trategy 2016*.ini
+
+# Debug
+[Ll]ib/[Dd]ebug/
+[Ll]ib/[Tt]est.txt
+EnableMBRDebug.txt
+
+# SQL (not in use)
+*.sqlite3
+*.db
+
+# Release files
+!TestVersion*.txt
