@@ -14,13 +14,13 @@
 ; ===============================================================================================================================
 
 Local $aAttackTypeString[$mf8FPinWheelRight + 1] = ["Random", _
-		"Four Finger Standard", _
-		"Four Finger Spiral Left", _
-		"Four Finger Spiral Right", _
-		"Eight Finger Blossom", _
-		"Eight Finger Implosion", _
-		"Eight Finger Pin Wheel Spiral Left", _
-		"Eight Finger Pin Wheel Spiral Right"]
+													"Four Finger Standard", _
+													"Four Finger Spiral Left", _
+													"Four Finger Spiral Right", _
+													"Eight Finger Blossom", _
+													"Eight Finger Implosion", _
+													"Eight Finger Pin Wheel Spiral Left", _
+													"Eight Finger Pin Wheel Spiral Right"]
 
 Func multiFingerSetupVecors($multiStyle, ByRef $dropVectors, $listInfoDeploy)
 	Switch $multiStyle

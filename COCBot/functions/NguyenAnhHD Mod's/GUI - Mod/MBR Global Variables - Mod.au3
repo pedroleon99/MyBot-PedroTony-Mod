@@ -22,24 +22,21 @@ Global Enum $eCCSpell = $eHaSpell + 1
 
 ;Variables for SwitchAcc Mode - DEMEN
 Global $profile = $sProfilePath & "\Profile.ini"
-Global $aconfig[8]
 Global $ichkSwitchAcc = 0
 Global $ichkTrain = 0
 
-Global $icmbTotalCoCAcc		; 1 = 1 account, 2 = 2 accounts
-Global $nTotalCoCAcc = 6
-Global $ichkSmartSwitch = 1
+Global $icmbTotalCoCAcc
+Global $nTotalCoCAcc = 8
+Global $ichkSmartSwitch
 
-Global $ichkCloseTraining = 0
+Global $ichkCloseTraining
 
 Global $nCurProfile = 1
 Global $ProfileList
 Global $nTotalProfile = 1
 
-Global $ProfileType			; Type of the Current Profile, 1 = active, 2 = donate, 3 = idle
 Global $aProfileType[8]		; Type of the all Profiles, 1 = active, 2 = donate, 3 = idle
 
-Global $MatchProfileAcc		; Account match with Current Profile
 Global $aMatchProfileAcc[8]	; Accounts match with All Profiles
 
 Global $DonateSwitchCounter = 0
@@ -53,12 +50,7 @@ Global $aUpdateRemainTrainTime[8]
 Global $nNexProfile
 Global $nMinRemainTrain
 
-Global $aCCRemainTime[8]
-Global $aUpdateCCRemainTime[8]
-Global $nMinCCRemain
-Global $nNexProfileReqCC
-
-Global $aAccPosY[6]
+Global $aLocateAccConfig[8], $aAccPosY[8]
 
 ; Adding QuickTrainCombo - DEMEN
 Global 	$iRadio_Army12, $iRadio_Army123
@@ -81,7 +73,53 @@ Global $oldModversmessage = "" ;warning message for old bot
 Global $ichkAutoHide ; AutoHide mode enabled disabled
 Global $ichkAutoHideDelay
 
-; CSV Speed
-Global $cmbCSVSpeed[2] = [$LB, $DB]
-Global $icmbCSVSpeed[2] = [$LB, $DB]
-Global $Divider
+; CSV Deployment Speed Mod
+Global $isldSelectedCSVSpeed[$iModeCount], $iCSVSpeeds[19]
+$isldSelectedCSVSpeed[$DB] = 4
+$isldSelectedCSVSpeed[$LB] = 4
+$iCSVSpeeds[0] = .1
+$iCSVSpeeds[1] = .25
+$iCSVSpeeds[2] = .5
+$iCSVSpeeds[3] = .75
+$iCSVSpeeds[4] = 1
+$iCSVSpeeds[5] = 1.25
+$iCSVSpeeds[6] = 1.5
+$iCSVSpeeds[7] = 1.75
+$iCSVSpeeds[8] = 2
+$iCSVSpeeds[9] = 2.25
+$iCSVSpeeds[10] = 2.5
+$iCSVSpeeds[11] = 2.75
+$iCSVSpeeds[12] = 3
+$iCSVSpeeds[13] = 5
+$iCSVSpeeds[14] = 8
+$iCSVSpeeds[15] = 10
+$iCSVSpeeds[16] = 20
+$iCSVSpeeds[17] = 50
+$iCSVSpeeds[18] = 99
+
+Global $ichkDontRemoveTroops = 0
+#cs
+; SmartUpgrade
+Global $ichkSmartUpgrade
+Global $ichkIgnoreTH, $ichkIgnoreKing, $ichkIgnoreQueen, $ichkIgnoreWarden, $ichkIgnoreCC, $ichkIgnoreLab
+Global $ichkIgnoreBarrack, $ichkIgnoreDBarrack, $ichkIgnoreFactory, $ichkIgnoreDFactory, $ichkIgnoreGColl, $ichkIgnoreEColl, $ichkIgnoreDColl
+Global $iSmartMinGold, $iSmartMinElixir, $iSmartMinDark
+Global $upgradeAvailable = 0
+Global $SufficentRessources = 0
+Global $CanUpgrade = 0
+Global $upgradeX = 0, $upgradeY = 0
+Global $zerosX = 0, $zerosY = 0
+Global $zerosHere = 0
+Global $sBldgText, $sBldgLevel, $aString
+Global $upgradeName[3] = ["", "", ""]
+Global $UpgradeCost
+Global $TypeFound = 0
+Global $SmartMinGold, $SmartMinElixir, $SmartMinDark
+Global $UpgradeDuration
+Global $canContinueLoop = 1
+Global $YtoDelete = 100
+
+;Trsorerie
+Global $ichkTrap, $iChkCollect, $ichkTombstones, $ichkCleanYard, $itxtTreasuryGold, $itxtTreasuryElixir, $itxtTreasuryDark, $ichkCollectTresory, $chkCollectTresory
+Global $chkCollectTresoryGold, $ichkCollectTresoryGold, $chkCollectTresoryElixir, $ichkCollectTresoryElixir, $chkCollectTresoryDark, $ichkCollectTresoryDark, $ichkTRFull
+#ce
