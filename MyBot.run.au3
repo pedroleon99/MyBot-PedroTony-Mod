@@ -35,8 +35,8 @@ ProcessSetPriority(@AutoItPID, $PROCESS_ABOVENORMAL)
 Global $iBotLaunchTime = 0
 Local $hBotLaunchTime = TimerInit()
 
-Global $sBotVersion = "v6.5.1" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it is also use on Checkversion()
-Global $sModversion = "v1.8" ;<== Just Change This to Version Number
+Global $sBotVersion = "v6.5.2" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it is also use on Checkversion()
+Global $sModversion = "v1.9" ;<== Just Change This to Version Number
 Global $sModSupportUrl = "https://drive.google.com/file/d/0BxtxwQwk8kUaRzhCRGRZWUhsaEk/view?usp=sharing" ;<== Our Website Link Or Link Download
 Global $sModDownloadUrl ="https://github.com/pedroleon99/MyBot-PedroTony-Mod/releases"
 
@@ -344,7 +344,6 @@ Func runBot() ;Bot that runs everything in order
 					If Unbreakable() = True Then ContinueLoop
 				EndIf
 			EndIf
-;~			SmartUpgrade()
 			Local $aRndFuncList = ['Laboratory', 'UpgradeHeroes', 'UpgradeBuilding']
 			While 1
 				If $RunState = False Then Return

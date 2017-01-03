@@ -73,12 +73,12 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 		Case 3 ;All sides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			SetLog("Attacking on all sides", $COLOR_INFO)
 			$nbSides = 4
-		Case 4 ;Multi Finger Attack ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			SetLog("Attacking Multi Finger Attack style", $COLOR_INFO)
-			$nbSides = 6
-		Case 5 ;Four Fingers Classic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		Case 4 ;Four Fingers Classic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			SetLog("Attacking Four Fingers Classic fight style", $COLOR_INFO)
 			$nbSides = 5
+		Case 5 ;Multi Finger Attack ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			SetLog("Attacking Multi Finger Attack style", $COLOR_INFO)
+			$nbSides = 6
 		Case 6 ;DE Side - Live Base only ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			SetLog("Attacking on Dark Elixir Side.", $COLOR_INFO)
 			$nbSides = 1
@@ -144,49 +144,26 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 
 	; Four Fingers Classic
 	ElseIf $nbSides = 5 Then
-		Local $listInfoDeploy[21][5] = [[$eGole,  $nbSides, 1, 1, 2], _
+		Local $listInfoDeploy[21][5] = [[$eGiant, $nbSides, 1, 1, 2], _
+						[$eGole,  $nbSides, 1, 1, 2], _
 						[$eLava,  $nbSides, 1, 1, 2], _
-						[$eGiant, $nbSides, 1, 1, 2], _
-						[$eDrag,  $nbSides, 1, 1, 2], _
-						[$eBall,  $nbSides, 1, 1, 2], _
-						[$eBabyD, $nbSides, 1, 1, 1], _
+						[$eBarb,  $nbSides, 1, 1, 0], _
+						[$eWall,  $nbSides, 1, 1, 2], _
 						[$eHogs,  $nbSides, 1, 1, 2], _
 						[$eValk,  $nbSides, 1, 1, 2], _
 						[$eBowl,  $nbSides, 1, 1, 0], _
-						[$eMine,  $nbSides, 1, 1, 0], _
-						["CC",           1, 1, 1, 1], _
-						[$eBarb,  $nbSides, 1, 1, 0], _
-						["HEROES",       1, 2, 1, 1], _
-						[$eWall,  $nbSides, 1, 1, 2], _
 						[$eArch,  $nbSides, 1, 1, 0], _
-						[$eWiza,  $nbSides, 1, 1, 2], _
-						[$eMini,  $nbSides, 1, 1, 0], _
-						[$eWitc,  $nbSides, 1, 1, 2], _
 						[$eGobl,  $nbSides, 1, 1, 0], _
-						[$ePekk,  $nbSides, 1, 1, 2]]
-
-	; Multi Finger Attack by rulesss
-	ElseIf $nbSides = 6 Then
-		Local $listInfoDeploy[21][6] = [[$eGole,  $nbSides, 1, 1, 2], _
-						[$eLava,  $nbSides, 1, 1, 2], _
-						[$eGiant, $nbSides, 1, 1, 2], _
+						[$eMine,  $nbSides, 1, 1, 0], _
+						[$ePekk,  $nbSides, 1, 1, 2], _
 						[$eDrag,  $nbSides, 1, 1, 2], _
 						[$eBall,  $nbSides, 1, 1, 2], _
 						[$eBabyD, $nbSides, 1, 1, 1], _
-						[$eHogs,  $nbSides, 1, 1, 2], _
-						[$eValk,  $nbSides, 1, 1, 2], _
-						[$eBowl,  $nbSides, 1, 1, 0], _
-						[$eMine,  $nbSides, 1, 1, 0], _
-						["CC",           1, 1, 1, 1], _
-						[$eBarb,  $nbSides, 1, 1, 0], _
-						["HEROES",       1, 2, 1, 1], _
-						[$eWall,  $nbSides, 1, 1, 2], _
-						[$eArch,  $nbSides, 1, 1, 0], _
 						[$eWiza,  $nbSides, 1, 1, 2], _
-						[$eMini,  $nbSides, 1, 1, 0], _
 						[$eWitc,  $nbSides, 1, 1, 2], _
-						[$eGobl,  $nbSides, 1, 1, 0], _
-						[$ePekk,  $nbSides, 1, 1, 2]]
+						[$eMini,  $nbSides, 1, 1, 0], _
+						["CC",           1, 1, 1, 1], _
+						["HEROES",       1, 2, 1, 1]]
 
 	Else
 		If $debugSetlog = 1 Then SetLog("listdeploy standard for attack", $COLOR_DEBUG)
@@ -263,7 +240,7 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 	$DeployHeroesPosition[0] = -1
 	$DeployHeroesPosition[1] = -1
 
-	If $iChkDeploySettings[$iMatchMode] = 4 And  $iMatchMode = $DB Then
+	If $iChkDeploySettings[$iMatchMode] = 5 And  $iMatchMode = $DB Then
 		SetLog(_PadStringCenter("Multi Finger Attack", 50, "="), $COLOR_BLUE)
 		launchMultiFinger($listInfoDeploy, $CC, $King, $Queen, $Warden)
 	Else

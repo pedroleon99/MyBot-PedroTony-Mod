@@ -35,4 +35,3 @@
 
 #include "..\Mod's\AutoHide.au3"
 #include "..\Mod's\SimpleQuickTrain.au3"
-;#include "..\Mod's\SmartUpgrade.au3"

@@ -98,28 +98,3 @@ $iCSVSpeeds[17] = 50
 $iCSVSpeeds[18] = 99
 
 Global $ichkDontRemoveTroops = 0
-#cs
-; SmartUpgrade
-Global $ichkSmartUpgrade
-Global $ichkIgnoreTH, $ichkIgnoreKing, $ichkIgnoreQueen, $ichkIgnoreWarden, $ichkIgnoreCC, $ichkIgnoreLab
-Global $ichkIgnoreBarrack, $ichkIgnoreDBarrack, $ichkIgnoreFactory, $ichkIgnoreDFactory, $ichkIgnoreGColl, $ichkIgnoreEColl, $ichkIgnoreDColl
-Global $iSmartMinGold, $iSmartMinElixir, $iSmartMinDark
-Global $upgradeAvailable = 0
-Global $SufficentRessources = 0
-Global $CanUpgrade = 0
-Global $upgradeX = 0, $upgradeY = 0
-Global $zerosX = 0, $zerosY = 0
-Global $zerosHere = 0
-Global $sBldgText, $sBldgLevel, $aString
-Global $upgradeName[3] = ["", "", ""]
-Global $UpgradeCost
-Global $TypeFound = 0
-Global $SmartMinGold, $SmartMinElixir, $SmartMinDark
-Global $UpgradeDuration
-Global $canContinueLoop = 1
-Global $YtoDelete = 100
-
-;Trsorerie
-Global $ichkTrap, $iChkCollect, $ichkTombstones, $ichkCleanYard, $itxtTreasuryGold, $itxtTreasuryElixir, $itxtTreasuryDark, $ichkCollectTresory, $chkCollectTresory
-Global $chkCollectTresoryGold, $ichkCollectTresoryGold, $chkCollectTresoryElixir, $ichkCollectTresoryElixir, $chkCollectTresoryDark, $ichkCollectTresoryDark, $ichkTRFull
-#ce

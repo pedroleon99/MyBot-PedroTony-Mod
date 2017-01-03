@@ -14,13 +14,15 @@ Func SimpleQuickTrain()
 
 	Setlog("Simple Quick Train")
 
+	IsWaitingForConnection()
+
 	Local $CheckTroop[4] = [810, 186, 0xCFCFC8, 15] ; the gray background
 	Local $CheckTroop1[4] = [390, 130, 0x78BE2B, 15] ; the Green Arrow on Troop Training tab
 
 	If $Runstate = False Then Return
 
 	If IsTrainPage() And ISArmyWindow(False, $TrainTroopsTAB) = False Then OpenTrainTabNumber($TrainTroopsTAB)
-	If _Sleep(1500) Then Return
+	If _Sleep(250) Then Return
 	If ISArmyWindow(True, $TrainTroopsTAB) = False Then Return
 
 	Local $ArmyCamp = GetOCRCurrent(48, 160)
@@ -70,7 +72,7 @@ Func SimpleQuickTrain()
 
 
 	If IsTrainPage() And ISArmyWindow(False, $BrewSpellsTAB) = False Then OpenTrainTabNumber($BrewSpellsTAB)
-	If _Sleep(1500) Then Return
+	If _Sleep(250) Then Return
 	If ISArmyWindow(True, $BrewSpellsTAB) = False Then Return
 
 	Local $SpellCamp = GetOCRCurrent(48, 160)
