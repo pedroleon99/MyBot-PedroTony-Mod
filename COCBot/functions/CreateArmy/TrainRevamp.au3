@@ -13,12 +13,6 @@
 ; Example .......: No
 ; ===============================================================================================================================
 
-Global Enum $ArmyTAB, $TrainTroopsTAB, $BrewSpellsTAB, $QuickTrainTAB
-Global $checkSpells = False
-Global $fullcastlespells = False
-Global $fullcastletroops = False
-Global $ErrorReadCamp = True
-
 Func TrainRevamp()
 	StartGainCost()
 
@@ -26,8 +20,6 @@ Func TrainRevamp()
 		TrainRevampOldStyle()
 		Return
 	EndIf
-
-	IsWaitingForConnection()
 
 	If $debugsetlogTrain = 1 Then Setlog(" - Initial Quick train Function")
 
@@ -45,16 +37,17 @@ Func TrainRevamp()
 	EndIf
 
 	;Load Troop and Spell counts in "Cur"
-	CheckExistentArmy("Troops")
-	CheckExistentArmy("Spells")
+	;CheckExistentArmy("Troops")
+	;CheckExistentArmy("Spells")
 	CountNumberDarkSpells() ; needed value for spell donate
 
 	If $Runstate = False Then Return
 
-	If $ichkDontRemoveTroops = 1 Then
+	If $ichkSimpleQuickTrain = 1 Then			;	SimpleQuickTrain - Demen
+		If $bDonationEnabled = True And $ichkTrainDonated = 1 Then MakingDonatedTroops()
 		SimpleQuickTrain()
-	Else
-		If $ichkDontRemoveTroops = 0 And ($IsFullArmywithHeroesAndSpells = True) Or ($CurCamp = 0 And $FirstStart) Then
+	Else										;	SimpleQuickTrain - Demen
+		If ($IsFullArmywithHeroesAndSpells = True) Or ($CurCamp = 0 And $FirstStart) Then
 
 			If $IsFullArmywithHeroesAndSpells Then Setlog(" - Your Army is Full, let's make troops before Attack!", $COLOR_BLUE)
 			If ($CurCamp = 0 And $FirstStart) Then
@@ -102,28 +95,29 @@ Func CheckCamp($NeedOpenArmy = False, $CloseCheckCamp = False)
 		If _Sleep(500) Then Return
 	EndIf
 	Local $Num = 0
-	Local $Num2 = 0									;============= Adding QuickTrainCombo - DEMEN
-	Local $Num3 = 0									;============= Adding QuickTrainCombo - DEMEN
 	If GUICtrlRead($hRadio_Army1) = $GUI_CHECKED Then $Num = 1
 	If GUICtrlRead($hRadio_Army2) = $GUI_CHECKED Then $Num = 2
 	If GUICtrlRead($hRadio_Army3) = $GUI_CHECKED Then $Num = 3
-	If GUICtrlRead($hRadio_Army12) = $GUI_CHECKED Then			;============= Adding QuickTrainCombo - DEMEN
-		$Num = 1
-		$Num2 = 2
-	EndIf
-	If GUICtrlRead($hRadio_Army123) = $GUI_CHECKED Then			;============= Adding QuickTrainCombo - DEMEN
-		$Num = 1
-		$Num2 = 2
-		$Num3 = 3
-	EndIf
 	Local $ReturnCamp = TestMaxCamp()
 
 	If $ReturnCamp = 1 Then
 		OpenTrainTabNumber($QuickTrainTAB)
 		If _Sleep(1000) Then Return
-		TrainArmyNumber($Num)
-		If $Num2 = 2 Then TrainArmyNumber($Num2)				;============= Adding QuickTrainCombo - DEMEN
-		If $Num3 = 3 Then TrainArmyNumber($Num3)				;============= Adding QuickTrainCombo - DEMEN
+		If $Num > 0 Then
+			TrainArmyNumber($Num)
+		Else
+			Setlog(" » Quick Train Combo Army", $COLOR_ORANGE)
+			If $Runstate = False Then Return
+			If ISArmyWindow(True, $QuickTrainTAB) Then
+				For $i = 1 to 3
+					Setlog(" » Train Army Number: " & $i, $COLOR_ORANGE)
+					Click(817, 248 + 118*$i)
+					If $i = 2 And GUICtrlRead($hRadio_Army12)  = $GUI_CHECKED Then ExitLoop
+				Next
+			Else
+				Setlog(" » Error Clicking On Army! You are not on Quick Train Window", $COLOR_RED)
+			EndIf
+		EndIf
 		If _Sleep(700) Then Return
 	EndIf
 	If $ReturnCamp = 0 Then
@@ -159,10 +153,9 @@ Func TestMaxCamp()
 EndFunc   ;==>TestMaxCamp
 
 Func TrainRevampOldStyle()
-
-	IsWaitingForConnection()
-
 	If $debugsetlogTrain = 1 Then Setlog(" - Initial Custom train Function")
+
+	Local $setlog = True
 
 	;If $bDonateTrain = -1 Then SetbDonateTrain()
 	If $bActiveDonate = -1 Then PrepareDonateCC()
@@ -178,8 +171,10 @@ Func TrainRevampOldStyle()
 
 	If ThSnipesSkiptrain() Then Return
 
+	If $IsFullArmywithHeroesAndSpells Then $setlog = False
+
 	If $Runstate = False Then Return
-	Local $rWhatToTrain = WhatToTrain(True) ; r in First means Result! Result of What To Train Function
+	Local $rWhatToTrain = WhatToTrain($setlog) ; r in First means Result! Result of What To Train Function
 	Local $rRemoveExtraTroops = RemoveExtraTroops($rWhatToTrain)
 
 	If $rRemoveExtraTroops = 1 Or $rRemoveExtraTroops = 2 Then
@@ -245,7 +240,7 @@ Func CheckArmySpellCastel()
 	SetLog(" - Army Window Opened!", $COLOR_ACTION1)
 	If _Sleep(250) Then Return
 	If $Runstate = False Then Return
-	checkArmyCamp(False, False)
+	checkArmyCamp(False, False) ; CheckExistentArmy (troops and spells )
 
 	If $debugsetlogTrain = 1 Then $debugOcr = 1
 	Local $sSpells = getArmyCampCap(99, 313) ; OCR read Spells trained and total
@@ -295,8 +290,8 @@ Func CheckArmySpellCastel()
 		Return
 	EndIf
 
-	Setlog(" - Army Camp: " & $CurCamp & "/" & $TotalCamp, $COLOR_GREEN) ; coc-ms
-	If $aGetSpellsSize[0] <> "" And $aGetSpellsSize[1] <> "" Then Setlog(" - Spells: " & $aGetSpellsSize[0] & "/" & $aGetSpellsSize[1], $COLOR_GREEN) ; coc-ms
+	;Setlog(" - Army Camp: " & $CurCamp & "/" & $TotalCamp, $COLOR_GREEN) ; coc-ms
+	;If $aGetSpellsSize[0] <> "" And $aGetSpellsSize[1] <> "" Then Setlog(" - Spells: " & $aGetSpellsSize[0] & "/" & $aGetSpellsSize[1], $COLOR_GREEN) ; coc-ms
 	If $aGetCastleSize[0] <> "" And $aGetCastleSize[1] <> "" Then Setlog(" - Clan Castle: " & $aGetCastleSize[0] & "/" & $aGetCastleSize[1], $COLOR_GREEN) ; coc-ms
 
 	; If Drop Trophy with Heroes is checked and a Hero is Available or under the trophies range, then set $bFullArmyHero to True
@@ -779,67 +774,6 @@ Func BrewUsingWhatToTrain($Spell, $Quantity) ; it's job is a bit different with 
 	EndSelect
 EndFunc   ;==>BrewUsingWhatToTrain
 
-Func CheckForSantaSpell()
-	If $isSantaSpellAvailable = -1 Then ; Check if santa spell variable is not set YET
-		ForceCaptureRegion()
-		Local $_IsSantaSpellPixel[4] = [65, 510 + $midOffsetY, 0x7C0427, 40]
-
-		Local $rPixelCheck = _CheckPixel($_IsSantaSpellPixel, True)
-
-		If $rPixelCheck = True Then
-			$isSantaSpellAvailable = 1 ; Santa Spell is Available, Set value to prevent to check each time
-			SetLog("Setting new coords for Spells due to Santa's Surprise Spell", $COLOR_INFO)
-			; Difference between each spell column is 98, And between each row is 101
-
-			; change Y value of Brewing Rage spell Coz with Santa Spell, Rage is in Second Row
-			$TrainRSpell[1] += 101 ; Y
-			$FullRSpell[1] += 101 ; Y
-
-			; change X and Y value of Brewing Heal spell Coz with Santa Spell, Heal is in First Row and Second Column
-			$TrainHSpell[0] += 98 ; X
-			$FullHSpell[0] += 98 ; X
-			$TrainHSpell[1] -= 101 ; Y
-			$FullHSpell[1] -= 101 ; Y
-
-			; change X and Y value of Brewing Jump spell Coz with Santa Spell, Jump is in First Row and Third Column
-			$TrainJSpell[0] += 98 ; X
-			$FullJSpell[0] += 98 ; X
-			$TrainJSpell[1] -= 101 ; Y
-			$FullJSpell[1] -= 101 ; Y
-
-			; change Y value of Brewing Freeze spell Coz with Santa Spell, Freeze is in Second Row
-			$TrainFSpell[1] += 101 ; Y
-			$FullFSpell[1] += 101 ; Y
-
-			; change X and Y value of Brewing Clone spell Coz with Santa Spell, Clone is in First Row and Fourth Column
-			$TrainCSpell[0] += 98 ; X
-			$FullCSpell[0] += 98 ; X
-			$TrainCSpell[1] -= 101 ; Y
-			$FullCSpell[1] -= 101 ; Y
-
-
-			; Dark Spells, Dark Spells just X values are Changed, orders are same
-			; Without Santa's Surprise spell, the distance between Regular Spells and Dark Spells was 12, BUT now is 8, 12 - 8 = 4, So 98 - 4 = 94
-			$TrainPSpell[0] += 94 ; X
-			$FullPSpell[0] += 94 ; X
-
-			$TrainESpell[0] += 94 ; X
-			$FullESpell[0] += 94 ; X
-
-			$TrainHaSpell[0] += 94 ; X
-			$FullHaSpell[0] += 94 ; X
-
-			$TrainSkSpell[0] += 94 ; X
-			$FullSkSpell[0] += 94 ; X
-
-		Else
-			; Set the value to false to prevent check for santa spell each time
-			$isSantaSpellAvailable = 0
-		EndIf
-	EndIf
-	Return True
-EndFunc   ;==>CheckForSantaSpell
-
 Func TotalSpellsToBrewInGUI()
 	Local $ToReturn = 0
 	If $iTotalCountSpell = 0 Then Return $ToReturn
@@ -949,29 +883,30 @@ Func IsGUICheckedForSpell($Spell, $Mode)
 EndFunc   ;==>IsGUICheckedForSpell
 
 Func DragIfNeeded($Troop)
-	Local Const $pos = GetTrainPos(Eval("e" & $Troop))
-	Local $sLogText = Default
-	If $debugsetlogTrain = 1 Then $sLogText = NameOfTroop(Eval("e" & $Troop))
+
 	If $Runstate = False Then Return
+	Local $rCheckPixel = False
 
 	If IsDarkTroop($Troop) Then
-		Local $rCheckPixel = _CheckPixel($pos, $bCapturePixel, Default, $sLogText)
-		For $i = 1 To 4
+		If _ColorCheck(_GetPixelColor(834, 403, True), Hex(0xD3D3CB, 6), 5) then $rCheckPixel = True
+		If $debugsetlogTrain then Setlog("$rCheckPixel Dark Troops: " & $rCheckPixel)
+		For $i = 1 To 3
 			If $rCheckPixel = False Then
-				ClickDrag(616, 445 + $midOffsetY, 400, 445 + $midOffsetY, 2000)
+				ClickDrag(715, 445 + $midOffsetY, 220, 445 + $midOffsetY, 2000)
 				If _Sleep(1500) Then Return
-				$rCheckPixel = _CheckPixel($pos, $bCapturePixel, Default, $sLogText)
+				If _ColorCheck(_GetPixelColor(834, 403, True), Hex(0xD3D3CB, 6), 5) then $rCheckPixel = True
 			Else
 				Return True
 			EndIf
 		Next
 	Else
-		Local $rCheckPixel = _CheckPixel($pos, $bCapturePixel, Default, $sLogText)
-		For $i = 1 To 4
+		If _ColorCheck(_GetPixelColor(22, 403, True), Hex(0xD3D3CB, 6), 5) then $rCheckPixel = True
+		If $debugsetlogTrain then Setlog("$rCheckPixel Normal Troops: " & $rCheckPixel)
+		For $i = 1 To 3
 			If $rCheckPixel = False Then
-				ClickDrag(400, 445 + $midOffsetY, 616, 445 + $midOffsetY, 2000)
+				ClickDrag(220, 445 + $midOffsetY, 725, 445 + $midOffsetY, 2000)
 				If _Sleep(1500) Then Return
-				$rCheckPixel = _CheckPixel($pos, $bCapturePixel, Default, $sLogText)
+				If _ColorCheck(_GetPixelColor(22, 403, True), Hex(0xD3D3CB, 6), 5) then $rCheckPixel = True
 			Else
 				Return True
 			EndIf
@@ -1089,12 +1024,12 @@ Func RemoveExtraTroops($toRemove)
 		$rGetSlotNumber = GetSlotNumber() ; Get all available Slot numbers with troops assigned on them
 		$rGetSlotNumberSpells = GetSlotNumber(True)
 
-		SetLog("Troops To Remove: ", $COLOR_GREEN)
 		$CounterToRemove = 0
 		; Loop through Troops needed to get removed Just to write some Logs
 		For $i = 0 To (UBound($toRemove) - 1)
 			If IsSpellToBrew($toRemove[$i][0]) Then ExitLoop
 			$CounterToRemove += 1
+			If $CounterToRemove = 1 then SetLog("Troops To Remove: ", $COLOR_GREEN)
 			SetLog("  " & NameOfTroop(Eval("e" & $toRemove[$i][0])) & ": " & $toRemove[$i][1] & "x", $COLOR_GREEN)
 		Next
 
@@ -1365,13 +1300,18 @@ Func WhatToTrain($ReturnExtraTroopsOnly = False, $showlog = True)
 	If ISArmyWindow(False, $ArmyTAB) = False Then OpenTrainTabNumber($ArmyTAB)
 	Local $ToReturn[1][2] = [["Arch", 0]]
 
+	; Get Current available troops
+	CheckExistentArmy("Troops", $showlog) ; Update the $Cur variables
+	CheckExistentArmy("Spells", $showlog) ; Update the $Cur variables
+
 	If $IsFullArmywithHeroesAndSpells And $ReturnExtraTroopsOnly = False Then
 		If $CommandStop = 3 Or $CommandStop = 0 Then
 			If $FirstStart Then $FirstStart = False
 			Return $ToReturn
 		EndIf
-		Setlog(" - Your Army is Full, let's make troops before Attack!")
-		; Elixir Troops
+		If $showlog then Setlog(" - Your Army is Full, let's make troops before Attack!")
+
+		; Troops
 		For $i = 0 To (UBound($TroopName) - 1)
 			If Number(Eval($TroopName[$i] & "Comp")) > 0 Then
 				$ToReturn[UBound($ToReturn) - 1][0] = $TroopName[$i]
@@ -1379,16 +1319,7 @@ Func WhatToTrain($ReturnExtraTroopsOnly = False, $showlog = True)
 				ReDim $ToReturn[UBound($ToReturn) + 1][2]
 			EndIf
 		Next
-		#CS		This Codes Not Needed With New 'True' Train Order and new Training System ;)
-			; Dark Troops
-			For $i = 0 To (UBound($TroopDarkName) - 1)
-			If Number(Eval($TroopDarkName[$i] & "Comp")) > 0 Then
-			$ToReturn[UBound($ToReturn) - 1][0] = $TroopDarkName[$i]
-			$ToReturn[UBound($ToReturn) - 1][1] = Number(Eval($TroopDarkName[$i] & "Comp"))
-			ReDim $ToReturn[UBound($ToReturn) + 1][2]
-			EndIf
-			Next
-		#CE
+
 		; Spells
 		For $i = 0 To (UBound($SpellName) - 1)
 			If $Runstate = False Then Return
@@ -1415,13 +1346,9 @@ Func WhatToTrain($ReturnExtraTroopsOnly = False, $showlog = True)
 		Return $ToReturn
 	EndIf
 
-	; Get Current available troops
-	CheckExistentArmy("Troops", $showlog)
-	CheckExistentArmy("Spells", $showlog)
-
 	Switch $ReturnExtraTroopsOnly
 		Case False
-			; Check Elixir Troops needed quantity to Train
+			; Check Troops needed quantity to Train
 			For $i = 0 To (UBound($TroopName) - 1)
 				If $Runstate = False Then Return
 				If Number(Eval($TroopName[$i] & "Comp")) > 0 Then
@@ -1430,18 +1357,6 @@ Func WhatToTrain($ReturnExtraTroopsOnly = False, $showlog = True)
 					ReDim $ToReturn[UBound($ToReturn) + 1][2]
 				EndIf
 			Next
-
-			#CS		This Codes Not Needed With New 'True' Train Order and new Training System ;)
-				; Check DARK Elixir Troops needed quantity to Train
-				For $i = 0 To (UBound($TroopDarkName) - 1)
-				If $Runstate = False Then Return
-				If Number(Eval($TroopDarkName[$i] & "Comp")) > 0 Then
-				$ToReturn[UBound($ToReturn) - 1][0] = $TroopDarkName[$i]
-				$ToReturn[UBound($ToReturn) - 1][1] = Number(Number(Eval($TroopDarkName[$i] & "Comp")) - Number(Eval("Cur" & $TroopDarkName[$i])))
-				ReDim $ToReturn[UBound($ToReturn) + 1][2]
-				EndIf
-				Next
-			#CE
 
 			; Check Spells needed quantity to Brew
 			For $i = 0 To (UBound($SpellName) - 1)
@@ -1454,7 +1369,7 @@ Func WhatToTrain($ReturnExtraTroopsOnly = False, $showlog = True)
 				EndIf
 			Next
 		Case Else
-			; Check Elixir Troops Extra Quantity
+			; Check Troops Extra Quantity
 			For $i = 0 To (UBound($TroopName) - 1)
 				If $Runstate = False Then Return
 				If Number(Eval("Cur" & $TroopName[$i])) > 0 Then
@@ -1465,20 +1380,6 @@ Func WhatToTrain($ReturnExtraTroopsOnly = False, $showlog = True)
 					EndIf
 				EndIf
 			Next
-
-			#CS		This Codes Not Needed With New 'True' Train Order and new Training System ;)
-				; Check DARK Elixir Troops Extra Quantity
-				For $i = 0 To (UBound($TroopDarkName) - 1)
-				If $Runstate = False Then Return
-				If Number(Eval("Cur" & $TroopDarkName[$i])) > 0 Then
-				If StringInStr(Number(Number(Eval($TroopDarkName[$i] & "Comp")) - Number(Eval("Cur" & $TroopDarkName[$i]))), "-") > 0 Then
-				$ToReturn[UBound($ToReturn) - 1][0] = $TroopDarkName[$i]
-				$ToReturn[UBound($ToReturn) - 1][1] = StringReplace(Number(Number(Eval($TroopDarkName[$i] & "Comp")) - Number(Eval("Cur" & $TroopDarkName[$i]))), "-", "")
-				ReDim $ToReturn[UBound($ToReturn) + 1][2]
-				EndIf
-				EndIf
-				Next
-			#CE
 
 			; Check Spells Extra Quantity
 			For $i = 0 To (UBound($SpellName) - 1)
@@ -1535,7 +1436,7 @@ Func TestSpellsCoords()
 	$Runstate = True
 
 	Local $iCount = 1
-	CheckForSantaSpell()
+	;CheckForSantaSpell()
 	TrainIt($eLSpell, $iCount, 300)
 	TrainIt($eHSpell, $iCount, 300)
 	TrainIt($eRSpell, $iCount, 300)
@@ -1950,8 +1851,8 @@ Func OpenTrainTabNumber($Num)
 		If _Sleep(1500) Then Return
 		If ISArmyWindow(False, $Num) Then
 			Setlog(" - Opened the " & $Message[$Num], $COLOR_ACTION1)
-			If $Num = $BrewSpellsTAB Then CheckForSantaSpell() ; Can be Deleted after DEC (in 2017 :P)
-			If $Num = $TrainTroopsTAB Then ICEWizardDetection() ; Can be Deleted after DEC (in 2017 :P)
+			;If $Num = $BrewSpellsTAB Then CheckForSantaSpell() ; Can be Deleted after DEC (in 2017 :P)
+			;If $Num = $TrainTroopsTAB Then ICEWizardDetection() ; Can be Deleted after DEC (in 2017 :P)
 		EndIf
 	Else
 		Setlog(" - Error Clicking On " & ($Num >= 0 And $Num < UBound($Message)) ? ($Message[$Num]) : ("Not selectable") & " Tab!!!", $COLOR_RED)
@@ -1969,7 +1870,7 @@ Func TrainArmyNumber($Num)
 		; _ColorCheck($nColor1, $nColor2, $sVari = 5, $Ignore = "")
 		If _ColorCheck(_GetPixelColor($a_TrainArmy[$Num][0], $a_TrainArmy[$Num][1], True), Hex($a_TrainArmy[$Num][2], 6), $a_TrainArmy[$Num][3]) Then
 			Click($a_TrainArmy[$Num][0], $a_TrainArmy[$Num][1], 1)
-			SetLog(" - Making the Army " & $Num + 1, $COLOR_INFO)
+			SetLog("Making the Army " & $Num + 1, $COLOR_INFO)
 			If _Sleep(1000) Then Return
 		Else
 			Setlog(" - Error Clicking On Army: " & $Num + 1 & "| Pixel was :" & _GetPixelColor($a_TrainArmy[$Num][0], $a_TrainArmy[$Num][1], True), $COLOR_ORANGE)
@@ -2316,17 +2217,6 @@ Func IIf($Condition, $IfTrue, $IfFalse)
 	EndIf
 EndFunc   ;==>IIf
 
-Func _ArryRemoveBlanks(ByRef $Array)
-	$Counter = 0
-	For $i = 0 To UBound($Array) - 1
-		If $Array[$i] <> "" Then
-			$Array[$Counter] = $Array[$i]
-			$Counter += 1
-		EndIf
-	Next
-	ReDim $Array[$Counter]
-EndFunc   ;==>_ArryRemoveBlanks
-
 Func ValidateSearchArmyResult($result, $index = 0)
 	If IsArray($result) Then
 		If UBound($result) > 0 Then
@@ -2452,43 +2342,3 @@ Func ThSnipesSkiptrain()
 		Return False ; 	Proceeds as usual
 	EndIf
 EndFunc   ;==>ThSnipesSkiptrain
-
-Func ICEWizardDetection()
-
-	If $_CheckIceWizardSlot Then
-		If _ColorCheck(_GetPixelColor(358, 492, True), Hex(0x007b97, 6), 15) And _ ; d0b097
-				_ColorCheck(_GetPixelColor(358, 512, True), Hex(0xd0b097, 6), 15) Then
-			Setlog("Detected Ice Wizard Troop!")
-			; With Ice Wizard
-			$TrainHeal = $TrainHeal_ICE
-			$TrainDrag = $TrainDrag_ICE
-			$TrainPekk = $TrainPekk_ICE
-			$TrainBabyD = $TrainBabyD_ICE
-			$TrainMine = $TrainMine_ICE
-
-			; With Ice Wizard
-			$FullHeal = $FullHeal_ICE
-			$FullDrag = $FullDrag_ICE
-			$FullPekk = $FullPekk_ICE
-			$FullBabyD = $FullBabyD_ICE
-			$FullMine = $FullMine_ICE
-		Else
-		    SetLog("Ice Wizard Troop not detected!")
-			; Without Ice Wizard
-			$TrainHeal = $TrainHeal_Normal
-			$TrainDrag = $TrainDrag_Normal
-			$TrainPekk = $TrainPekk_Normal
-			$TrainBabyD = $TrainBabyD_Normal
-			$TrainMine = $TrainMine_Normal
-
-			; Without Ice Wizard
-			$FullHeal = $FullHeal_Normal
-			$FullDrag = $FullDrag_Normal
-			$FullPekk = $FullPekk_Normal
-			$FullBabyD = $FullBabyD_Normal
-			$FullMine = $FullMine_Normal
-		EndIf
-		$_CheckIceWizardSlot = False
-	Endif
-
-EndFunc   ;==>ICEWizardDetection

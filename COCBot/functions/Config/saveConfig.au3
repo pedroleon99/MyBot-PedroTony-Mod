@@ -339,7 +339,7 @@ Func saveConfig() ;Saves the controls settings to the config
 		$ichkDonateAllCustomB = 0
 	EndIf
 
-	; Extra Alphabets, Cyrillic, Chinese.
+	; Extra Alphabets, Cyrillic, Chinese, Persian.
 	If GUICtrlRead($chkExtraAlphabets) = $GUI_CHECKED Then
 		$ichkExtraAlphabets = 1
 	Else
@@ -349,6 +349,11 @@ Func saveConfig() ;Saves the controls settings to the config
 		$ichkExtraChinese = 1
 	Else
 		$ichkExtraChinese = 0
+	EndIf
+	If GUICtrlRead($chkExtraPersian) = $GUI_CHECKED Then
+		$ichkExtraPersian = 1
+	Else
+		$ichkExtraPersian = 0
 	EndIf
 
 
@@ -1068,6 +1073,34 @@ Func saveConfig() ;Saves the controls settings to the config
 		$iChkSmartAttack[$LB][2] = 0
 	EndIf
 
+	; SuperXP
+	If GUICtrlRead($chkEnableSuperXP) = $GUI_CHECKED Then
+		$ichkEnableSuperXP = 1
+	Else
+		$ichkEnableSuperXP = 0
+	EndIf
+	If GUICtrlRead($rbSXTraining) = $GUI_CHECKED Then
+		$irbSXTraining = 1
+	Else
+		$irbSXTraining = 2
+	EndIf
+	IniWrite($config, "attack", "MaxXptoGain", GUICtrlRead($txtMaxXPtoGain))
+	If GUICtrlRead($chkSXBK) = $GUI_CHECKED Then
+		$ichkSXBK = $HERO_KING
+	Else
+		$ichkSXBK = $HERO_NOHERO
+	EndIf
+	If GUICtrlRead($chkSXAQ) = $GUI_CHECKED Then
+		$ichkSXAQ = $HERO_QUEEN
+	Else
+		$ichkSXAQ = $HERO_NOHERO
+	EndIf
+	If GUICtrlRead($chkSXGW) = $GUI_CHECKED Then
+		$ichkSXGW = $HERO_WARDEN
+	Else
+		$ichkSXGW = $HERO_NOHERO
+	EndIf
+
 	; attackcsv gui -> variables--------------------------------------------------------
 	Local $indexofscript = _GUICtrlComboBox_GetCurSel($cmbScriptNameDB)
 	Local $scriptname
@@ -1107,7 +1140,7 @@ Func saveConfig() ;Saves the controls settings to the config
 	;General Settings--------------------------------------------------------------------------
 
 	Local $hFile = -1
-	If $ichkExtraAlphabets = 1 Or $ichkExtraChinese = 1 Then $hFile = FileOpen($config, $FO_UTF16_LE + $FO_OVERWRITE)
+	If $ichkExtraAlphabets = 1 Or $ichkExtraChinese = 1 Or $ichkExtraPersian = 1 Then $hFile = FileOpen($config, $FO_UTF16_LE + $FO_OVERWRITE)
 
 	IniWriteS($config, "general", "version", GetVersionNormalized($sBotVersion))
 	IniWriteS($config, "general", "cmbProfile", _GUICtrlComboBox_GetCurSel($cmbProfile))
@@ -1254,6 +1287,8 @@ Func saveConfig() ;Saves the controls settings to the config
 	IniWriteS($config, "search", "DBWeakXBow", $iCmbWeakXBow[$DB])
 	IniWriteS($config, "search", "DBWeakInferno", $iCmbWeakInferno[$DB])
 	IniWriteS($config, "search", "DBWeakEagle", $iCmbWeakEagle[$DB])
+	IniWriteS($config, "search", "DBWeakAirDefense", $iCmbWeakAirDefense[$DB])
+
 	IniWriteS($config, "search", "DBCheckMortar", $iChkMaxMortar[$DB])
 	IniWriteS($config, "search", "DBCheckWizTower", $iChkMaxWizTower[$DB])
 	IniWriteS($config, "search", "DBCheckAirDefense", $iChkMaxAirDefense[$DB])
@@ -1383,6 +1418,8 @@ Func saveConfig() ;Saves the controls settings to the config
 	IniWriteS($config, "search", "ABWeakXBow", $iCmbWeakXBow[$LB])
 	IniWriteS($config, "search", "ABWeakInferno", $iCmbWeakInferno[$LB])
 	IniWriteS($config, "search", "ABWeakEagle", $iCmbWeakEagle[$LB])
+	IniWriteS($config, "search", "ABWeakAirDefense", $iCmbWeakAirDefense[$LB])
+
 	IniWriteS($config, "search", "ABCheckMortar", $iChkMaxMortar[$LB])
 	IniWriteS($config, "search", "ABCheckWizTower", $iChkMaxWizTower[$LB])
 	IniWriteS($config, "search", "ABCheckAirDefense", $iChkMaxAirDefense[$LB])
@@ -1455,6 +1492,13 @@ Func saveConfig() ;Saves the controls settings to the config
 	IniWriteS($config, "attack", "$chkABAttackNearElixirCollector", $iChkSmartAttack[$LB][1])
 	IniWriteS($config, "attack", "$chkABAttackNearDarkElixirDrill", $iChkSmartAttack[$LB][2])
 	IniWriteS($config, "attack", "ABSmartAttackDeploy", $iCmbSmartDeploy[$LB])
+
+	; SuperXP
+	IniWriteS($config, "attack", "EnableSuperXP", $ichkEnableSuperXP)
+	IniWriteS($config, "attack", "SXTraining", $irbSXTraining)
+	IniWriteS($config, "attack", "SXBK", $ichkSXBK)
+	IniWriteS($config, "attack", "SXAQ", $ichkSXAQ)
+	IniWriteS($config, "attack", "SXGW", $ichkSXGW)
 
 	If GUICtrlRead($chkDBKingAttack) = $GUI_CHECKED Then
 		IniWriteS($config, "attack", "DBKingAtk", $HERO_KING)
@@ -2045,10 +2089,11 @@ Func saveConfig() ;Saves the controls settings to the config
 
 	IniWriteS($config, "donate", "txtBlacklist", StringReplace($sTxtBlacklist, @CRLF, "|"))
 
-	; Extra Alphabets, Cyrillic, Chinese
+	; Extra Alphabets, Cyrillic, Chinese, Persian
 
 	IniWriteS($config, "donate", "chkExtraAlphabets", $ichkExtraAlphabets)
 	IniWriteS($config, "donate", "chkExtraChinese", $ichkExtraChinese)
+	IniWriteS($config, "donate", "chkExtraPersian", $ichkExtraPersian)
 
 	;Troop and Spells Settings--------------------------------------------------------------------------
 	Local $tempTroop
@@ -2522,10 +2567,7 @@ Func saveConfig() ;Saves the controls settings to the config
 	;Multilanguage
 	IniWriteS($config, "other", "language", $sLanguage)
 
-	If $ichkExtraAlphabets = 1 Or $ichkExtraChinese = 1 Then FileClose($config)
-
-	SaveStatChkTownHall() ;call function save stats
-	SaveStatChkDeadBase() ;call function save stats
+	If $ichkExtraAlphabets = 1 Or $ichkExtraChinese = 1 Or $ichkExtraPersian = 1 Then FileClose($config)
 
 	IniWriteS($config, "attack", "ScriptDB", $scmbDBScriptName)
 	IniWriteS($config, "attack", "ScriptAB", $scmbABScriptName)

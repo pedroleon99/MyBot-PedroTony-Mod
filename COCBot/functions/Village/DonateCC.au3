@@ -219,6 +219,17 @@ Func DonateCC($Check = False)
 					If _Sleep($iDelayDonateCC2) Then ExitLoop
 				EndIf
 
+					; Chat Request using IMGLOC: Persian alphabet / one paragraph
+				If $ichkExtraPersian = 1 Then
+					Setlog("Using OCR to read the Persian alphabet..", $COLOR_ACTION)
+					If $ClanString = "" Then
+						$ClanString = getChatStringPersian(30, $DonatePixel[1] - 31)
+					Else
+						$ClanString &= " " & getChatStringPersian(30, $DonatePixel[1] - 31)
+					EndIf
+					If _Sleep($iDelayDonateCC2) Then ExitLoop
+				EndIf
+
 				If $ClanString = "" Or $ClanString = " " Then
 					SetLog("Unable to read Chat Request!", $COLOR_ERROR)
 					$bDonate = True
@@ -585,6 +596,13 @@ Func DonateCC($Check = False)
 	WEnd
 
 	If _Sleep($iDelayDonateCC2) Then Return
+
+; SimpleQuickTrain - Demen
+	If $bDonationEnabled = True And $ichkSimpleQuickTrain = 1 And $ichkTrainDonated = 1 Then
+		If OpenArmyWindow() = False Then Return
+		MakingDonatedTroops()
+	EndIf
+; SimpleQuickTrain - Demen
 
 EndFunc   ;==>DonateCC
 

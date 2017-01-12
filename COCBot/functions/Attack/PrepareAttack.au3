@@ -81,14 +81,13 @@ Func PrepareAttack($pMatchMode, $Remaining = False) ;Assigns troops
 				;If $debugsetlog=1 Then Setlog("examine troop " &  NameOfTroop($TroopKind) & " -> special troop",$COLOR_DEBUG1)
 				$atkTroops[$i][0] = $troopKind
 				If IsSpecialTroopToBeUsed($pMatchMode, $TroopKind) then
-					$troopsnumber += 1
 					;If $debugSetlog=1 Then Setlog("for matchmode = " & $pMatchMode & " and troop " & $TroopKind & " " & NameOfTroop($TroopKind) & " USE",$COLOR_DEBUG1)
 					;Setlog ("troopsnumber = " & $troopsnumber & "+1")
 					$atkTroops[$i][0] = $aTemp[$i][0]
 					$atkTroops[$i][1] = $aTemp[$i][1]
 					If $atkTroops[$i][0] = $eKing or $atkTroops[$i][0] = $eQueen or $atkTroops[$i][0] = $eWarden then $atkTroops[$i][1] = 1
 					$troopKind = $aTemp[$i][1]
-					$troopsnumber +=  1
+					$troopsnumber += $aTemp[$i][1]
 				Else
 					;If $debugSetlog=1 Then Setlog("for matchmode = " & $pMatchMode & " and troop " & $TroopKind & " " & NameOfTroop($TroopKind) & " DISCARD",$COLOR_DEBUG1)
 					If $debugSetlog = 1 Then Setlog("Discard use hero/poison " & $troopKind &  " " & NameOfTroop($troopKind), $COLOR_ERROR)

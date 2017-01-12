@@ -950,88 +950,88 @@ $z += 20
 
 	GUICtrlCreateIcon($pIconLib, $eIcnBarbarian, $x + 60, $y, 32, 32)
 	$lblDonQ[1] = GUICtrlCreateLabel("0", $x + 25, $z, 30, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnArcher, $x + 130, $y, 32, 32)
 	$lblDonQ[2] = GUICtrlCreateLabel("0", $x + 90, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnGiant, $x + 200, $y, 32, 32)
 	$lblDonQ[3] = GUICtrlCreateLabel("0", $x + 160, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnGoblin, $x + 270, $y, 32, 32)
 	$lblDonQ[4] = GUICtrlCreateLabel("0", $x + 230, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnWallBreaker, $x + 340, $y, 32, 32)
 	$lblDonQ[5] = GUICtrlCreateLabel("0", $x + 300, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnBalloon, $x + 410, $y, 32, 32)
-	$lblDonQ[6] = GUICtrlCreateLabel("0", $x + 370, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	$lblDonQ[7] = GUICtrlCreateLabel("0", $x + 370, $z, 35, 20, $SS_RIGHT)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 $y += 35
 $z += 35
 
 	GUICtrlCreateIcon($pIconLib, $eIcnWizard, $x + 60, $y, 32, 32)
-	$lblDonQ[7] = GUICtrlCreateLabel("0", $x + 25, $z, 30, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	$lblDonQ[6] = GUICtrlCreateLabel("0", $x + 25, $z, 30, 20, $SS_RIGHT)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnHealer, $x + 130, $y, 32, 32)
 	$lblDonQ[8] = GUICtrlCreateLabel("0", $x + 90, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnDragon, $x + 200, $y, 32, 32)
 	$lblDonQ[9] = GUICtrlCreateLabel("0", $x + 160, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnPekka, $x + 270, $y, 32, 32)
 	$lblDonQ[10] = GUICtrlCreateLabel("0", $x + 230, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnBabyDragon, $x + 340, $y, 32, 32)
 	$lblDonQ[11] = GUICtrlCreateLabel("0", $x + 300, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnMiner, $x + 410, $y, 32, 32)
 	$lblDonQ[12] = GUICtrlCreateLabel("0", $x + 370, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 $y += 50
 $z += 50
 
 	GUICtrlCreateIcon($pIconLib, $eIcnMinion, $x + 60, $y, 32, 32)
 	$lblDonQ[13] = GUICtrlCreateLabel("0", $x + 25, $z, 30, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnHogRider, $x + 130, $y, 32, 32)
 	$lblDonQ[14] = GUICtrlCreateLabel("0", $x + 90, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnValkyrie, $x + 200, $y, 32, 32)
 	$lblDonQ[15] = GUICtrlCreateLabel("0", $x + 160, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnGolem, $x + 270, $y, 32, 32)
-	$lblDonQ[16] = GUICtrlCreateLabel("0", $x + 230, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	$lblDonQ[17] = GUICtrlCreateLabel("0", $x + 230, $z, 35, 20, $SS_RIGHT)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnWitch, $x + 340, $y, 32, 32)
-	$lblDonQ[17] = GUICtrlCreateLabel("0", $x + 300, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	$lblDonQ[16] = GUICtrlCreateLabel("0", $x + 300, $z, 35, 20, $SS_RIGHT)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnLavaHound, $x +410, $y, 32, 32)
 	$lblDonQ[18] = GUICtrlCreateLabel("0", $x + 370, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 $y += 35
 $z += 35
 
 	GUICtrlCreateIcon($pIconLib, $eIcnBowler, $x + 60, $y, 32, 32)
 	$lblDonQ[19] = GUICtrlCreateLabel("0", $x + 25, $z, 30, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 $x += 26
 $y += 45
@@ -1059,19 +1059,19 @@ $z += 20
 
 	GUICtrlCreateIcon($pIconLib, $eIcnPoisonSpell, $x + 60, $y, 32, 32)
 	$lblDonQ[20] = GUICtrlCreateLabel("0", $x + 20, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnEarthQuakeSpell, $x + 130, $y, 32, 32)
 	$lblDonQ[21] = GUICtrlCreateLabel("0", $x + 90, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnHasteSpell, $x + 200, $y, 32, 32)
 	$lblDonQ[22] = GUICtrlCreateLabel("0", $x + 160, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 	GUICtrlCreateIcon($pIconLib, $eIcnSkeletonSpell, $x + 270, $y, 32, 32)
 	$lblDonQ[23] = GUICtrlCreateLabel("0", $x + 230, $z, 35, 20, $SS_RIGHT)
-	GUICtrlSetFont(-1, 11, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
+	GUICtrlSetFont(-1, 7, $FW_BOLD, Default, "Arial", $CLEARTYPE_QUALITY)
 
 $x -= 40
 $x -= 2

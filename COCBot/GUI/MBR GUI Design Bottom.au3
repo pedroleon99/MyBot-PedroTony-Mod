@@ -22,7 +22,7 @@ Local $btnColor = False
 ;~ Buttons
 Local $y_bottom = 0 ; 515
 Local $x = 10, $y = $y_bottom + 10
-$grpButtons = GUICtrlCreateGroup("https://mybot.run " & GetTranslated(602,0, "- freeware bot -"), $x - 5, $y - 10, 190, 108)
+$grpButtons = GUICtrlCreateGroup("https://mybot.run " & GetTranslated(602,0, "- freeware bot -"), $x - 5, $y - 10, 190, 110)
 	$btnStart = GUICtrlCreateButton(GetTranslated(602,1, "Start Bot"), $x, $y + 2 +5, 90, 40-5)
 		$txtTip = GetTranslated(602,30, "Use this to START the bot.")
 		_GUICtrlSetTip(-1, $txtTip)
@@ -70,10 +70,12 @@ $grpButtons = GUICtrlCreateGroup("https://mybot.run " & GetTranslated(602,0, "- 
 		_GUICtrlSetTip(-1, $txtTip)
 		GUICtrlSetOnEvent(-1, "chkBackground")
 		GUICtrlSetState(-1, (($AndroidAdbScreencap = True) ? ($GUI_CHECKED) : ($GUI_UNCHECKED)))
-	$CheckVersionConfig = GUICtrlCreateButton(GetTranslated(602,32, "Check"), $x + 95, $y + 70, 40, -1)
-		$txtTip = GetTranslated(602,33, "Use this to check version Mod.")
+	$btnDebug = GUICtrlCreateButton(GetTranslated(602,100, "Debug"), $x + 93, $y + 70, 40, -1)
+		$txtTip = GetTranslated(602,101, "Use this to make a zip with necessary folders to report a issue!.")
 		_GUICtrlSetTip(-1, $txtTip)
-		IF $btnColor Then GUICtrlSetBkColor(-1, 0x22C4F5)
+		GUICtrlSetBkColor(-1, 0xf7754e)
+		;GUICtrlSetState(-1, $GUI_DISABLE)
+		GUICtrlSetOnEvent($btnDebug, "btnReport")
 	$ModSupportConfig = GUICtrlCreateButton(GetTranslated(602,34, "Support"), $x + 135, $y + 70, 45, -1)
 		$txtTip = GetTranslated(602,35, "Support Mod Mybot All Versions.")
 		_GUICtrlSetTip(-1, $txtTip)
@@ -95,7 +97,24 @@ If $AndroidAdbScreencap = True Then chkBackground() ; update background mode GUI
 
 $pic2arrow = GUICtrlCreateIcon($pIconLib, $eIcn2Arrow, $x + 190, $y + 10, 48, 48)
 
-$lblVersion = GUICtrlCreateLabel($sBotVersion, 200, $y + 60, 60, 17, $SS_CENTER)
+$THLevels004 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV04.ico",-1, $x + 187, $y + 0, 64, 64)
+	GUICtrlSetState(-1,$GUI_HIDE)
+$THLevels005 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV05.ico",-1, $x + 187, $y + 0, 64, 64)
+	GUICtrlSetState(-1,$GUI_HIDE)
+$THLevels006 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV06.ico",-1, $x + 187, $y + 0, 64, 64)
+	GUICtrlSetState(-1,$GUI_HIDE)
+$THLevels007 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV07.ico",-1, $x + 187, $y + 0, 64, 64)
+	GUICtrlSetState(-1,$GUI_HIDE)
+$THLevels008 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV08.ico",-1, $x + 187, $y + 0, 64, 64)
+	GUICtrlSetState(-1,$GUI_HIDE)
+$THLevels009 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV09.ico",-1, $x + 187, $y + 0, 64, 64)
+	GUICtrlSetState(-1,$GUI_HIDE)
+$THLevels010 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV10.ico",-1, $x + 187, $y + 0, 64, 64)
+	GUICtrlSetState(-1,$GUI_HIDE)
+$THLevels011 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV11.ico",-1, $x + 187, $y + 0, 64, 64)
+	GUICtrlSetState(-1,$GUI_HIDE)
+
+$lblVersion = GUICtrlCreateLabel($sBotVersion, 200, $y + 70, 60, 17, $SS_CENTER)
 	GUICtrlSetColor(-1, $COLOR_MEDGRAY)
 
 $arrowleft = GUICtrlCreateIcon($pIconLib, $eIcnArrowLeft, $x + 249, $y + 30, 16, 16)

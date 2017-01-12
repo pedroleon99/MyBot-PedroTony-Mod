@@ -136,7 +136,7 @@ Func MatchProfileAcc($Num)
 		MsgBox($MB_OK, GetTranslated(655,88, "SwitchAcc Mode"), GetTranslated(655,91, "Account [") & _GUICtrlComboBox_GetCurSel($cmbAccountNo[$Num]) & GetTranslated(655,92, "] exceeds Total Account declared") ,30, $hGUI_BOT)
 		_GUICtrlComboBox_SetCurSel($cmbAccountNo[$Num], -1)
 		_GUICtrlComboBox_SetCurSel($cmbProfileType[$Num], -1)
-		saveConfig()
+		btnUpdateProfile()
 	EndIf
 
 	If _GUICtrlComboBox_GetCurSel($cmbAccountNo[$Num]) >= 0 Then
@@ -145,14 +145,15 @@ Func MatchProfileAcc($Num)
 				& _ArraySearch($aMatchProfileAcc,_GUICtrlComboBox_GetCurSel($cmbAccountNo[$Num])+1) + 1 & "]" ,30, $hGUI_BOT)
 			_GUICtrlComboBox_SetCurSel($cmbAccountNo[$Num], -1)
 			_GUICtrlComboBox_SetCurSel($cmbProfileType[$Num], -1)
-			saveConfig()
+			btnUpdateProfile()
 		ElseIf UBound(_ArrayFindAll($aMatchProfileAcc,_GUICtrlComboBox_GetCurSel($cmbAccountNo[$Num])+1)) > 1 Then
 			MsgBox($MB_OK, GetTranslated(655,88, "SwitchAcc Mode"), GetTranslated(655,91, "Account [") & _GUICtrlComboBox_GetCurSel($cmbAccountNo[$Num]) & GetTranslated(655,94, "] has been assigned to another profile") ,30, $hGUI_BOT)
 			_GUICtrlComboBox_SetCurSel($cmbAccountNo[$Num], -1)
 			_GUICtrlComboBox_SetCurSel($cmbProfileType[$Num], -1)
-			saveConfig()
+			btnUpdateProfile()
 		Else
 			_GUICtrlComboBox_SetCurSel($cmbProfileType[$Num], 0)
+			btnUpdateProfile()
 		EndIf
 
 	EndIf
@@ -318,47 +319,59 @@ Func AttackNowDB()
 	Setlog("End Dead Base Attack TEST")
 EndFunc   ;==>AttackNowLB
 
-; Change Android Shield Color
-Func btnColorShield()
-	$sSelectedColor = _ChooseColor(2,0xFFFFFF,2,$frmBot)
-	If $sSelectedColor <> -1 Then
-	$sSelectedColor = StringTrimLeft($sSelectedColor,2)
-	$AndroidShieldColor = Dec($sSelectedColor)
-	SetLog("Shield color successfully chosen! Will be used now", $COLOR_INFO)
+; GUI Control for SimpleQuickTrain
+Func chkSimpleQuickTrain()
+	If GUICtrlRead($chkSimpleQuickTrain) = $GUI_CHECKED Then
+		_GUI_Value_STATE("ENABLE", $chkFillArcher & "#" & $txtFillArcher & "#" & $chkFillEQ & "#" & $chkTrainDonated)
+
 	Else
-	SetLog("Shield color selection stopped, keeping the old one!",$COLOR_INFO)
+		_GUI_Value_STATE("DISABLE", $chkFillArcher & "#" & $txtFillArcher & "#" & $chkFillEQ & "#" & $chkTrainDonated)
+		_GUI_Value_STATE("UNCHECKED", $chkFillArcher & "#" & $chkFillEQ & "#" & $chkTrainDonated)
+
 	EndIf
+EndFunc   ;==>chkSimpleQuickTrain
+; ======================== SimpleQuickTrain ========================
 
-EndFunc
-
-Func sldrTransparancyShield()
-	$ReadTransparancyShield = GUICtrlRead($sldrTransparancyShield)
-	$AndroidShieldTransparency = Int($ReadTransparancyShield)
-
-EndFunc
-
-Func btnColorIdleShield()
-	$sSelectedColor = _ChooseColor(2,0xFFFFFF,2,$frmBot)
-	If $sSelectedColor <> -1 Then
-	$sSelectedColor = StringTrimLeft($sSelectedColor,2)
-	$AndroidInactiveColor = Dec($sSelectedColor)
-	SetLog("Idle Shield color successfully chosen! Will be used now", $COLOR_INFO)
-	Else
-	SetLog("Idle Shield color selection stopped, keeping the old one!",$COLOR_INFO)
-	EndIf
-
-EndFunc
-
-Func sldrTransparancyIdleShield()
-	$ReadTransparancyIdle = GUICtrlRead($sldrTransparancyIdleShield)
-	$AndroidInactiveTransparency = Int($ReadTransparancyIdle)
-
-EndFunc
-
-Func chkDontRemoveTroops()
-	If GUICtrlRead($chkDontRemoveTroops) = $GUI_CHECKED Then
-		$ichkDontRemoveTroops = 1
-	Else
-		$ichkDontRemoveTroops = 0
-	EndIf
-EndFunc
+; Switch Profile
+; IceCube (Misc v1.0)
+Func btnRecycle()
+	FileDelete($config)
+	SaveConfig()
+	SetLog(GetTranslated(637, 20, "Profile ") & $sCurrProfile & GetTranslated(637, 21, " was recycled with success"), $COLOR_GREEN)
+	SetLog(GetTranslated(637, 22, "All unused settings were removed"), $COLOR_GREEN)
+EndFunc   ;==>btnRecycle
+; IceCube (Misc v1.0)
+Func setupProfileComboBoxswitch()
+		; Clear the combo box current data in case profiles were deleted
+		GUICtrlSetData($cmbGoldMaxProfile, "", "")
+		; Set the new data of available profiles
+		GUICtrlSetData($cmbGoldMaxProfile, $profileString, "<No Profiles>")
+		; Clear the combo box current data in case profiles were deleted
+		GUICtrlSetData($cmbGoldMinProfile, "", "")
+		; Set the new data of available profiles
+		GUICtrlSetData($cmbGoldMinProfile, $profileString, "<No Profiles>")
+		; Clear the combo box current data in case profiles were deleted
+		GUICtrlSetData($cmbElixirMaxProfile, "", "")
+		; Set the new data of available profiles
+		GUICtrlSetData($cmbElixirMaxProfile, $profileString, "<No Profiles>")
+		; Clear the combo box current data in case profiles were deleted
+		GUICtrlSetData($cmbElixirMinProfile, "", "")
+		; Set the new data of available profiles
+		GUICtrlSetData($cmbElixirMinProfile, $profileString, "<No Profiles>")
+		; Clear the combo box current data in case profiles were deleted
+		GUICtrlSetData($cmbDEMaxProfile, "", "")
+		; Set the new data of available profiles
+		GUICtrlSetData($cmbDEMaxProfile, $profileString, "<No Profiles>")
+		; Clear the combo box current data in case profiles were deleted
+		GUICtrlSetData($cmbDEMinProfile, "", "")
+		; Set the new data of available profiles
+		GUICtrlSetData($cmbDEMinProfile, $profileString, "<No Profiles>")
+		; Clear the combo box current data in case profiles were deleted
+		GUICtrlSetData($cmbTrophyMaxProfile, "", "")
+		; Set the new data of available profiles
+		GUICtrlSetData($cmbTrophyMaxProfile, $profileString, "<No Profiles>")
+		; Clear the combo box current data in case profiles were deleted
+		GUICtrlSetData($cmbTrophyMinProfile, "", "")
+		; Set the new data of available profiles
+		GUICtrlSetData($cmbTrophyMinProfile, $profileString, "<No Profiles>")
+EndFunc   ;==>setupProfileComboBox

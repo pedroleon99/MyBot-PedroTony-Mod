@@ -93,7 +93,7 @@ Global Const $groupIcnSkeleton =$lblSeSpellIcon&"#"&$txtLevSkSpell
 Global Const $groupListSpells=$groupLightning&"#"&$groupHeal&"#"&$groupRage&"#"&$groupJumpSpell&"#"&$groupFreeze&"#"&$groupClone&"#"&$groupPoison&"#"&$groupEarthquake&"#"&$groupHaste&"#"&$groupSkeleton
 
 ;TH Level
-Global Const $groupListTHLevels=$THLevels04&"#"&$THLevels05&"#"&$THLevels06&"#"&$THLevels07&"#"&$THLevels08&"#"&$THLevels09&"#"&$THLevels10&"#"&$THLevels11
+Global Const $groupListTHLevels=$THLevels04&"#"&$THLevels05&"#"&$THLevels06&"#"&$THLevels07&"#"&$THLevels08&"#"&$THLevels09&"#"&$THLevels10&"#"&$THLevels11&"#"&$THLevels004&"#"&$THLevels005&"#"&$THLevels006&"#"&$THLevels007&"#"&$THLevels008&"#"&$THLevels009&"#"&$THLevels010&"#"&$THLevels011
 
 ;League
 Global Const $groupLeague=$UnrankedLeague&"#"&$BronzeLeague&"#"&$SilverLeague&"#"&$GoldLeague &"#"&$CrystalLeague&"#"&$MasterLeague&"#"&$ChampionLeague&"#"&$TitanLeague&"#"&$LegendLeague

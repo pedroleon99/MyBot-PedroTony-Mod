@@ -15,7 +15,11 @@
 
 Func chkUseQTrain()
 	If GUICtrlRead($hChk_UseQTrain) = $GUI_CHECKED Then
-		_GUI_Value_STATE("ENABLE", $hRadio_Army1 & "#" & $hRadio_Army2 & "#" & $hRadio_Army3 & "#" & $hRadio_Army12 & "#" & $hRadio_Army123) ;	Adding Quicktrain combo - Demen
+		_GUI_Value_STATE("ENABLE", $hRadio_Army1 & "#" & $hRadio_Army2 & "#" & $hRadio_Army3 & "#" & $hRadio_Army12 & "#" & $hRadio_Army123) 	;	Adding QuicktrainCombo - Demen
+		_GUI_Value_STATE("SHOW", $hRadio_Army12 & "#" & $hRadio_Army123) 																		;	Adding QuicktrainCombo - Demen
+		_GUI_Value_STATE("HIDE", $LblRemovecamp & "#" &  $icnRemovecamp)
+		_GUI_Value_STATE("ENABLE", $chkSimpleQuickTrain & "#" & $chkFillArcher & "#" & $txtFillArcher & "#" & $chkFillEQ & "#" & $chkTrainDonated) 	;	 SimpleQuicktrain - Demen
+		chkSimpleQuickTrain()																													;	SimpleQuicktrain - Demen
 		_GUI_Value_STATE("DISABLE", $grpTrainTroops)
 		_GUI_Value_STATE("DISABLE", $grpCookSpell)
 		GUICtrlSetData($lblTotalCountCamp, " 0s")
@@ -25,7 +29,11 @@ Func chkUseQTrain()
 		GUICtrlSetData($lblElixirCostSpell, "0")
 		GUICtrlSetData($lblDarkCostSpell, "0")
 	Else
-		_GUI_Value_STATE("DISABLE", $hRadio_Army1 & "#" & $hRadio_Army2 & "#" & $hRadio_Army3 & "#" & $hRadio_Army12 & "#" & $hRadio_Army123) ;	Adding Quicktrain combo - Demen
+		_GUI_Value_STATE("DISABLE", $hRadio_Army1 & "#" & $hRadio_Army2 & "#" & $hRadio_Army3 & "#" & $hRadio_Army12 & "#" & $hRadio_Army123) 	;	Adding QuicktrainCombo - Demen
+		_GUI_Value_STATE("HIDE", $hRadio_Army12 & "#" & $hRadio_Army123) 																		;	Adding QuicktrainCombo - Demen
+		_GUI_Value_STATE("SHOW", $LblRemovecamp & "#" &  $icnRemovecamp)
+		_GUI_Value_STATE("UNCHECKED", $chkSimpleQuickTrain & "#" & $chkFillArcher & "#" & $txtFillArcher & "#" & $chkFillEQ & "#" & $chkTrainDonated) 	;	 SimpleQuicktrain - Demen
+		_GUI_Value_STATE("DISABLE", $chkSimpleQuickTrain & "#" & $chkFillArcher & "#" & $txtFillArcher & "#" & $chkFillEQ & "#" & $chkTrainDonated) 	;	 SimpleQuicktrain - Demen
 		_GUI_Value_STATE("ENABLE", $grpTrainTroops)
 		_GUI_Value_STATE("ENABLE", $grpCookSpell)
 		lblTotalCount()
@@ -649,7 +657,7 @@ Func ChangeTroopTrainOrder()
 	;$TroopGroup[10][3] = [["Arch", 1, 1], ["Giant", 2, 5], ["Wall", 4, 2], ["Barb", 0, 1], ["Gobl", 3, 1], ["Heal", 7, 14], ["Pekk", 9, 25], ["Ball", 5, 5], ["Wiza", 6, 4], ["Drag", 8, 20]]
 
 	Local $sComboText = ""
-	Local $NewTroopGroup[19][6]
+	Local $NewTroopGroup[20][6]
 	Local $iUpdateCount = 0
 
 	If UBound($aTroopOrderList) - 1 <> UBound($TroopGroup) Then ; safety check in case troops are added
@@ -841,14 +849,15 @@ Func chkSmartLightSpell()
 		GUICtrlSetState($chkSmartZapSaveHeroes, $GUI_ENABLE)
 		GUICtrlSetState($txtMinDark, $GUI_ENABLE)
 		GUICtrlSetState($chkNoobZap, $GUI_ENABLE)
+		GUICtrlSetState($chkEarthQuakeZap, $GUI_ENABLE)
 		GUICtrlSetState($lblLSpell, $GUI_SHOW)
-		If GUICtrlRead($chkNoobZap) = $GUI_UNCHECKED Then
-			GUICtrlSetState($chkEarthQuakeZap, $GUI_ENABLE)
-		Else
-			GUICtrlSetState($chkEarthQuakeZap, $GUI_UNCHECKED)
-			GUICtrlSetState($chkEarthQuakeZap, $GUI_DISABLE)
-			GUICtrlSetState($lblEQZap, $GUI_HIDE)
-		EndIf
+;		If GUICtrlRead($chkNoobZap) = $GUI_UNCHECKED Then
+;			GUICtrlSetState($chkEarthQuakeZap, $GUI_ENABLE)
+;		Else
+;			GUICtrlSetState($chkEarthQuakeZap, $GUI_UNCHECKED)
+;			GUICtrlSetState($chkEarthQuakeZap, $GUI_DISABLE)
+;			GUICtrlSetState($lblEQZap, $GUI_HIDE)
+;		EndIf
 		$ichkSmartZap = 1
 	Else
 		GUICtrlSetState($chkSmartZapDB, $GUI_DISABLE)
@@ -864,13 +873,13 @@ EndFunc   ;==>chkSmartLightSpell
 Func chkNoobZap()
 	If GUICtrlRead($chkNoobZap) = $GUI_CHECKED Then
 		GUICtrlSetState($txtExpectedDE, $GUI_ENABLE)
-		GUICtrlSetState($chkEarthQuakeZap, $GUI_UNCHECKED)
-		GUICtrlSetState($chkEarthQuakeZap, $GUI_DISABLE)
-		GUICtrlSetState($lblEQZap, $GUI_HIDE)
+;		GUICtrlSetState($chkEarthQuakeZap, $GUI_UNCHECKED)
+;		GUICtrlSetState($chkEarthQuakeZap, $GUI_DISABLE)
+;		GUICtrlSetState($lblEQZap, $GUI_HIDE)
 		$ichkNoobZap = 1
 	Else
 		GUICtrlSetState($txtExpectedDE, $GUI_DISABLE)
-		GUICtrlSetState($chkEarthQuakeZap, $GUI_ENABLE)
+;		GUICtrlSetState($chkEarthQuakeZap, $GUI_ENABLE)
 		$ichkNoobZap = 0
 	EndIf
 EndFunc   ;==>chkNoobZap
@@ -1270,6 +1279,19 @@ Func LevLava()
 	EndIf
 EndFunc   ;==>LevLava
 
+Func LevIceW()
+	If $iGUIEnabled = 1 Then
+		While _IsPressed(01)
+			LevUpDown("IceW")
+			lblTotalCount2()
+			Sleep($iDelayLvUP)
+		WEnd
+	Else
+		LevUpDown("IceW")
+		lblTotalCount2()
+	EndIf
+EndFunc   ;==>LevLava
+
 Func LevBowl()
 	If $iGUIEnabled = 1 Then
 		While _IsPressed(01)
@@ -1572,6 +1594,11 @@ EndFunc   ;==>lblTotalCountWitc
 
 Func lblTotalCountLava()
 	AssignNumberTroopSpell("Lava")
+	lblTotalCount()
+EndFunc   ;==>lblTotalCountLava
+
+Func lblTotalCountIceW()
+	AssignNumberTroopSpell("IceW")
 	lblTotalCount()
 EndFunc   ;==>lblTotalCountLava
 

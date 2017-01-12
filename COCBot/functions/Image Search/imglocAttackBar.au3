@@ -12,6 +12,7 @@
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
+
 Func TestImglocTroopBar()
 	$RunState = True
 	$debugSetlog = 1
@@ -31,6 +32,10 @@ Func AttackBarCheck()
 	Local $x = 0, $y = 659, $x1 = 853, $y1 = 698
 	Local $CheckSlot12 = False
 	Local $CheckSlotwHero = False
+
+	; Reset to level one the Spells level
+	$GlobalEQSpelllevel = 1
+	$GlobalLSpelllevel = 1
 
 	; Setup arrays, including default return values for $return
 	Local $aResult[1][5], $aCoordArray[1][2], $aCoords, $aCoordsSplit, $aValue
@@ -54,7 +59,7 @@ Func AttackBarCheck()
 			Local $aKeys = StringSplit($res[0], "|", $STR_NOCOUNT)
 
 			; Redimension the result array to allow for the new entries
-			ReDim $aResult[UBound($aKeys)][5]
+			ReDim $aResult[UBound($aKeys)][6]
 
 			; Loop through the array
 			For $i = 0 To UBound($aKeys) - 1
@@ -112,6 +117,7 @@ Func AttackBarCheck()
 				EndIf
 			Next
 
+			Local $SlotCompensation = -6
 			For $i = 0 To UBound($aResult) - 1
 				Local $Slottemp
 				If $aResult[$i][1] > 0 Then
@@ -122,6 +128,7 @@ Func AttackBarCheck()
 					If _Sleep(20) then return        ; Pause function
 					If Ubound($Slottemp) = 2 then
 						If $debugSetlog = 1 Then SetLog("OCR : " & $Slottemp[0] & "|SLOT: " & $Slottemp[1], $COLOR_DEBUG) ;Debug
+						If $aResult[$i][0] = "King" Or $aResult[$i][0] = "Queen" Or $aResult[$i][0] = "Warden" Then $SlotCompensation = 8
 						If $aResult[$i][0] = "Castle" Or $aResult[$i][0] = "King" Or $aResult[$i][0] = "Queen" Or $aResult[$i][0] = "Warden" Then
 							$aResult[$i][3] = 1
 							$aResult[$i][4] = $Slottemp[1]
@@ -132,6 +139,16 @@ Func AttackBarCheck()
 								$aResult[$i][3] = Number(getTroopCountSmall(Number($Slottemp[0]), 641)) ; For small Numbers
 								$aResult[$i][4] = $Slottemp[1]
 							EndIf
+							If StringInStr($aResult[$i][0], "ESpell") <> 0 and $ichkSmartZap = 1 then
+								$aResult[$i][5] = getTroopsSpellsLevel(Number($Slottemp[0]) + $SlotCompensation, 704)
+								If $aResult[$i][5] <> "" then $GlobalEQSpelllevel = $aResult[$i][5] ; If they aren't empty will store the correct level , or will be level 1 , just in case
+								If $DebugSmartZap = 1 Then Setlog("EarthQuake Detected with level " & $aResult[$i][5], $COLOR_DEBUG)
+							EndIF
+							If StringInStr($aResult[$i][0], "LSpell") <> 0 and $ichkSmartZap = 1 then
+								$aResult[$i][5] = getTroopsSpellsLevel(Number($Slottemp[0]) + $SlotCompensation, 704)
+								If $aResult[$i][5] <> "" then $GlobalLSpelllevel = $aResult[$i][5]  ; If they aren't empty will store the correct level , or will be level 1 , just in case
+								If $DebugSmartZap = 1 Then Setlog("Lightning Detected with level " & $aResult[$i][5], $COLOR_DEBUG)
+							EndIF
 						EndIf
 					Else
 						Setlog("Problem with Attack bar detection!", $COLOR_RED)

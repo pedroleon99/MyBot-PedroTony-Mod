@@ -87,9 +87,6 @@ $y += $yNext
 $btnTestRequestCC = GUICtrlCreateButton(GetTranslated(636, 110, "Test Request"), $x, $y, 140, 25)
 $y += $yNext
 
-$btnTestAttackBar = GUICtrlCreateButton(GetTranslated(636, 90, "Test Attack Bar"), $x, $y, 140, 25)
-$y += $yNext
-
 $btnTestClickDrag = GUICtrlCreateButton(GetTranslated(636, 102, "Test Click Drag (scrolling)"), $x, $y, 140, 25)
 $y += $yNext
 
@@ -109,6 +106,9 @@ $btnTestTrainsimgloc = GUICtrlCreateButton("New Train Test", $x, $y, 140, 25)
 $y += $yNext
 
 $btnTestQuickTrainsimgloc = GUICtrlCreateButton("Quick Train Test", $x, $y, 140, 25)
+$y += $yNext
+
+$btnTestimglocTroopBar = GUICtrlCreateButton("IMGLOC ATTACKBAR", $x, $y, 140, 25)
 
 ; now go up again
 $x -= 145
@@ -121,10 +121,10 @@ $btnTestDeadBaseFolder = GUICtrlCreateButton(GetTranslated(636, 116, "Test Dead 
 $btnTestCleanYard = GUICtrlCreateButton(GetTranslated(636, 119, "Test Clean Yard"), $x - 145, $y, 140, 25)
 $y -= $yNext
 
-$btnTestAttackCSV = GUICtrlCreateButton(GetTranslated(636, 117, "Test Attack CSV"), $x, $y, 140, 25)
+$btnTestAttackCSV = GUICtrlCreateButton(GetTranslated(636, 121, "Test Attack CSV"), $x, $y, 140, 25)
 $y -= $yNext
 
-$btnTestimglocTroopBar = GUICtrlCreateButton("IMGLOC ATTACKBAR", $x, $y, 140, 25)
+$btnTestSmartZap = GUICtrlCreateButton("Test SmartZap", $x, $y, 140, 25)
 $y -= $yNext
 
 $btnTestConfigSave = GUICtrlCreateButton("Config Save", $x + 20, $y, 120, 25)

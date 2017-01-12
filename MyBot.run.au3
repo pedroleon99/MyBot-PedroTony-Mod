@@ -29,19 +29,18 @@
 #include <Process.au3>
 
 ;~ Boost launch time by increasing process priority (will be restored again when finished launching)
-Local $iBotProcessPriority = _ProcessGetPriority(@AutoItPID)
+Global $iBotProcessPriority = _ProcessGetPriority(@AutoItPID)
 ProcessSetPriority(@AutoItPID, $PROCESS_ABOVENORMAL)
 
 Global $iBotLaunchTime = 0
-Local $hBotLaunchTime = TimerInit()
+Global $hBotLaunchTime = TimerInit()
 
-Global $sBotVersion = "v6.5.2" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it is also use on Checkversion()
-Global $sModversion = "v1.9" ;<== Just Change This to Version Number
+Global $sBotVersion = "v6.5.2" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it it also use on Checkversion()
+Global $sModversion = "v2.0" ;<== Just Change This to Version Number
 Global $sModSupportUrl = "https://drive.google.com/file/d/0BxtxwQwk8kUaRzhCRGRZWUhsaEk/view?usp=sharing" ;<== Our Website Link Or Link Download
-Global $sModDownloadUrl ="https://github.com/pedroleon99/MyBot-PedroTony-Mod/releases"
+Global $sModDownloadUrl = "https://github.com/pedroleon99/MyBot-PedroTony-Mod/releases"
 
-Global $sBotTitle = "My Bot " & $sBotVersion & " Pedro&Tony Mod " & $sModversion  ;~ Don't use any non file name supported characters like \ / : * ? " < > |
-
+Global $sBotTitle = "My Bot " & $sBotVersion & " Pedro&Tony Mod " & $sModversion ;~ Don't use any non file name supported characters like \ / : * ? " < > |
 #include "COCBot\functions\Config\DelayTimes.au3"
 #include "COCBot\MBR Global Variables.au3"
 _GDIPlus_Startup()
@@ -167,6 +166,8 @@ DirCopy(@ScriptDir & "\Temp", $sProfilePath & "\" & $sCurrProfile & "\Temp", $FC
 DirRemove(@ScriptDir & "\Logs", 1)
 DirRemove(@ScriptDir & "\Loots", 1)
 DirRemove(@ScriptDir & "\Temp", 1)
+Local $forecastDir = @ScriptDir & "\COCBot\Forecast"
+DirCreate($forecastDir)
 
 ;Setup profile if doesn't exist yet
 If FileExists($config) = 0 Then
@@ -192,12 +193,6 @@ SetLog(GetTranslated(500, 8, "Android Emulator Configuration: %s", $sAndroidInfo
 
 CheckDisplay() ; verify display size and DPI (Dots Per Inch) setting
 
-;LoadTHImage() ; Load TH images
-;LoadElixirImage() ; Load Elixir images
-;LoadElixirImage75Percent() ; Load Elixir images full at 75%
-;LoadElixirImage50Percent() ; Load Elixir images full at 50%
-LoadAmountOfResourcesImages()
-
 $iGUIEnabled = 1
 
 ;~ InitializeVariables();initialize variables used in extrawindows
@@ -205,10 +200,6 @@ CheckVersion() ; check latest version on mybot.run site
 
 ;~ Update profile to write config for SwitchAcc Mode - DEMEN
 btnUpdateProfile()
-
-;~ Remember time in Milliseconds bot launched
-$iBotLaunchTime = TimerDiff($hBotLaunchTime)
-SetDebugLog("MyBot.run launch time " & Round($iBotLaunchTime) & " ms.")
 
 $sMsg = GetTranslated(500, 9, "Android Shield not available for %s", @OSVersion)
 If $AndroidShieldEnabled = False Then
@@ -221,7 +212,11 @@ DisableProcessWindowsGhosting()
 ProcessSetPriority(@AutoItPID, $iBotProcessPriority)
 
 ; ensure watchdog is launched
-LaunchWatchdog()
+; LaunchWatchdog()
+
+;~ Remember time in Milliseconds bot launched
+$iBotLaunchTime = TimerDiff($hBotLaunchTime)
+Setlog("MyBot.run launch time " & Round($iBotLaunchTime) & " ms.", $COLOR_INFO)
 
 ;AutoStart Bot if request
 AutoStart()
@@ -283,6 +278,10 @@ Func runBot() ;Bot that runs everything in order
 			If $Restart = True Then ContinueLoop
 			If _Sleep($iDelayRunBot3) Then Return
 			VillageReport()
+			If _Sleep(500) Then Return
+			ProfileSwitch()                 ; Added for Profile Switch
+			If _Sleep(500) Then Return
+			clanHop()  			            ; Added for Clan Hop
 			If $OutOfGold = 1 And (Number($iGoldCurrent) >= Number($itxtRestartGold)) Then ; check if enough gold to begin searching again
 				$OutOfGold = 0 ; reset out of gold flag
 				Setlog("Switching back to normal after no gold to search ...", $COLOR_SUCCESS)
@@ -322,6 +321,14 @@ Func runBot() ;Bot that runs everything in order
 			AddIdleTime()
 			If $RunState = False Then Return
 			If $Restart = True Then ContinueLoop
+			If $iChkForecastBoost = 1 Then
+				$currentForecast = readCurrentForecast()
+					If $currentForecast >= Number($iTxtForecastBoost, 3) Then
+					SetLog("Boost Time !", $COLOR_GREEN)
+					Else
+					SetLog("Forecast index is below the required value, no boost !", $COLOR_RED)
+					EndIf
+			EndIf
 			If IsSearchAttackEnabled() Then ; if attack is disabled skip reporting, requesting, donating, training, and boosting
 				Local $aRndFuncList = ['ReplayShare', 'NotifyReport', 'DonateCC,Train', 'BoostBarracks', 'BoostSpellFactory', 'BoostKing', 'BoostQueen', 'BoostWarden', 'RequestCC']
 				While 1
@@ -344,6 +351,7 @@ Func runBot() ;Bot that runs everything in order
 					If Unbreakable() = True Then ContinueLoop
 				EndIf
 			EndIf
+			MainSuperXPHandler()
 			Local $aRndFuncList = ['Laboratory', 'UpgradeHeroes', 'UpgradeBuilding']
 			While 1
 				If $RunState = False Then Return
@@ -373,8 +381,8 @@ Func runBot() ;Bot that runs everything in order
 				;$fullArmy1 = $fullArmy
 				If _Sleep($iDelayRunBot3) Then Return
 				If $Restart = True Then ContinueLoop
-				SaveStatChkTownHall()
-				SaveStatChkDeadBase()
+				;SaveStatChkTownHall()
+				;SaveStatChkDeadBase()
 				If $CommandStop <> 0 And $CommandStop <> 3 Then
 					AttackMain()
 					$SkipFirstZoomout = False
@@ -425,6 +433,7 @@ EndFunc   ;==>runBot
 
 Func Idle() ;Sequence that runs until Full Army
 	Local $TimeIdle = 0 ;In Seconds
+	ForecastSwitch()
 	If $debugsetlog = 1 Then SetLog("Func Idle ", $COLOR_DEBUG)
 
 	While $IsFullArmywithHeroesAndSpells = False
@@ -452,7 +461,7 @@ Func Idle() ;Sequence that runs until Full Army
 				If $Restart = True Then ExitLoop
 				If checkAndroidReboot() Then ContinueLoop 2
 			WEnd
-		EndIF
+		EndIf
 		If _Sleep($iDelayIdle1) Then ExitLoop
 		checkObstacles() ; trap common error messages also check for reconnecting animation
 		checkMainScreen(False) ; required here due to many possible exits
@@ -496,6 +505,7 @@ Func Idle() ;Sequence that runs until Full Army
 				$troops_maked_after_fullarmy = False
 				;Train()
 				TrainRevamp()
+				MainSuperXPHandler()
 				If $Restart = True Then ExitLoop
 				If _Sleep($iDelayIdle1) Then ExitLoop
 				checkMainScreen(False)
@@ -527,6 +537,7 @@ Func Idle() ;Sequence that runs until Full Army
 					EndIf
 					CheckArmyCamp(True, True)
 				EndIf
+				MainSuperXPHandler()
 			EndIf
 			If $fullArmy Then
 				SetLog("Army Camp and Barracks are full, stop Training...", $COLOR_ACTION)
@@ -546,10 +557,6 @@ Func Idle() ;Sequence that runs until Full Army
 		$TimeIdle += Round(TimerDiff($hTimer) / 1000, 2) ;In Seconds
 
 		If $canRequestCC = True Then RequestCC()
-
-		;If $CurCamp >= $TotalCamp * $iEnableAfterArmyCamps[$DB] / 100 And $iEnableSearchCamps[$DB] = 1 And IsSearchModeActive($DB) Then ExitLoop
-		;If $CurCamp >= $TotalCamp * $iEnableAfterArmyCamps[$LB] / 100 And $iEnableSearchCamps[$LB] = 1 And IsSearchModeActive($LB) Then ExitLoop
-		;If $CurCamp >= $TotalCamp * $iEnableAfterArmyCamps[$TS] / 100 And $iEnableSearchCamps[$TS] = 1 And IsSearchModeActive($TS) Then ExitLoop
 
 		SetLog("Time Idle: " & StringFormat("%02i", Floor(Floor($TimeIdle / 60) / 60)) & ":" & StringFormat("%02i", Floor(Mod(Floor($TimeIdle / 60), 60))) & ":" & StringFormat("%02i", Floor(Mod($TimeIdle, 60))))
 
@@ -572,7 +579,11 @@ EndFunc   ;==>Idle
 
 Func AttackMain() ;Main control for attack functions
 	;LoadAmountOfResourcesImages() ; for debug
-	getArmyCapacity(True, True)
+	If $ichkEnableSuperXP = 1 And $irbSXTraining = 2 Then
+		MainSuperXPHandler()
+		Return
+	EndIf
+	;getArmyCapacity(True, True)
 	If IsSearchAttackEnabled() Then
 		If (IsSearchModeActive($DB) And checkCollectors(True, False)) Or IsSearchModeActive($LB) Or IsSearchModeActive($TS) Then
 			If $iChkUseCCBalanced = 1 Or $iChkUseCCBalancedCSV = 1 Then ;launch profilereport() only if option balance D/R it's activated
@@ -629,7 +640,7 @@ Func Attack() ;Selects which algorithm
 		Algorithm_AttackCSV()
 	ElseIf $iMatchMode = $DB And $iAtkAlgorithm[$DB] = 2 Then
 		If $debugsetlog = 1 Then Setlog("start milking attack", $COLOR_ERROR)
-		Alogrithm_MilkingAttack()
+		Algorithm_MilkingAttack()
 	Else
 		If $debugsetlog = 1 Then Setlog("start standard attack", $COLOR_ERROR)
 		algorithm_AllTroops()
@@ -701,12 +712,12 @@ Func _RunFunction($action)
 				;If $iSkipDonateNearFulLTroopsEnable = 1 and $FirstStart = False Then getArmyCapacity(True, True)
 				If SkipDonateNearFullTroops(True) = False Then DonateCC()
 				If _Sleep($iDelayRunBot1) = False Then checkMainScreen(False)
-			EndIF
+			EndIf
 		Case "DonateCC,Train"
-			If $iSkipDonateNearFulLTroopsEnable = 1 and $FirstStart = true Then getArmyCapacity(True, True)
+			If $iSkipDonateNearFulLTroopsEnable = 1 And $FirstStart = True Then getArmyCapacity(True, True)
 			If $bActiveDonate = True Then
 				If SkipDonateNearFullTroops(True) = False Then DonateCC()
-			EndIF
+			EndIf
 			If _Sleep($iDelayRunBot1) = False Then checkMainScreen(False)
 			If $troops_maked_after_fullarmy = False And $actual_train_skip < $max_train_skip Then
 				$troops_maked_after_fullarmy = False
@@ -745,6 +756,9 @@ Func _RunFunction($action)
 			_Sleep($iDelayRunBot3)
 		Case "UpgradeBuilding"
 			UpgradeBuilding()
+			_Sleep($iDelayRunBot3)
+		Case "SuperXP"
+			MainSuperXPHandler()
 			_Sleep($iDelayRunBot3)
 		Case ""
 			SetDebugLog("Function call doesn't support empty string, please review array size", $COLOR_ERROR)

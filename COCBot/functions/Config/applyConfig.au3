@@ -1251,27 +1251,6 @@ Func applyConfig($bRedrawAtExit = True) ;Applies the data from config to the con
 GUICtrlSetData($txtSkipDonateNearFulLTroopsPercentual, $sSkipDonateNearFulLTroopsPercentual)
 chkskipDonateNearFulLTroopsEnable()
 
-
-
-
-
-
-
-;~ 	Switch $iActivateKQConditionCSV
-;~ 		Case "Manual"
-;~ 			GUICtrlSetState($radManAbilitiesCSV, $GUI_CHECKED)
-;~ 		Case "Auto"
-;~ 			GUICtrlSetState($radAutoAbilitiesCSV, $GUI_CHECKED)
-;~ 	EndSwitch
-
-;~ 	If $iActivateWardenConditionCSV = 1 Then
-;~ 		GUICtrlSetState($chkUseWardenAbilityCSV, $GUI_CHECKED)
-;~ 	Else
-;~ 		GUICtrlSetState($chkUseWardenAbilityCSV, $GUI_UNCHECKED)
-;~ 	EndIf
-
-;~ 	GUICtrlSetData($txtManAbilitiesCSV, ($delayActivateKQCSV / 1000))
-
 	If $iShareAttack = 1 Then
 		GUICtrlSetState($chkShareAttack, $GUI_CHECKED)
 	Else
@@ -1703,7 +1682,7 @@ chkskipDonateNearFulLTroopsEnable()
 		GUICtrlSetState($chkDonateAllCustomB, $GUI_UNCHECKED)
 	EndIf
 
-	; Extra Alphabets, Cyrillic, Chinese
+	; Extra Alphabets, Cyrillic, Chinese, Persian
 	If $ichkExtraAlphabets = 0 Then
 		GUICtrlSetState($chkExtraAlphabets, $GUI_UNCHECKED)
 	ElseIf $ichkExtraAlphabets = 1 Then
@@ -1711,8 +1690,13 @@ chkskipDonateNearFulLTroopsEnable()
 	EndIf
 	If $ichkExtraChinese = 0 Then
 		GUICtrlSetState($chkExtraChinese, $GUI_UNCHECKED)
-	ElseIf $ichkExtraChinese = 1 Then
+	Else
 		GUICtrlSetState($chkExtraChinese, $GUI_CHECKED)
+	EndIf
+	If $ichkExtraPersian = 0 Then
+		GUICtrlSetState($chkExtraPersian, $GUI_UNCHECKED)
+	Else
+		GUICtrlSetState($chkExtraPersian, $GUI_CHECKED)
 	EndIf
 
 	_GUICtrlComboBox_SetCurSel($cmbFilterDonationsCC, $icmbFilterDonationsCC)
@@ -2585,6 +2569,38 @@ chkskipDonateNearFulLTroopsEnable()
 	Else
 		GUICtrlSetState($chkAttackNearDarkElixirDrillDB, $GUI_UNCHECKED)
 	EndIf
+
+	; SuperXP
+	If $ichkEnableSuperXP = 1 Then
+		GUICtrlSetState($chkEnableSuperXP, $GUI_CHECKED)
+	Else
+		GUICtrlSetState($chkEnableSuperXP, $GUI_UNCHECKED)
+	EndIf
+	chkEnableSuperXP()
+	If $irbSXTraining = 1 Then
+		GUICtrlSetState($rbSXTraining, $GUI_CHECKED)
+		GUICtrlSetState($rbSXIAttacking, $GUI_UNCHECKED)
+	Else
+		GUICtrlSetState($rbSXIAttacking, $GUI_CHECKED)
+		GUICtrlSetState($rbSXTraining, $GUI_UNCHECKED)
+	EndIf
+	GUICtrlSetData($txtMaxXPtoGain, $itxtMaxXPtoGain)
+	If $ichkSXBK = $HERO_KING Then
+		GUICtrlSetState($chkSXBK, $GUI_CHECKED)
+	Else
+		GUICtrlSetState($chkSXBK, $GUI_UNCHECKED)
+	EndIf
+	If $ichkSXAQ = $HERO_QUEEN Then
+		GUICtrlSetState($chkSXAQ, $GUI_CHECKED)
+	Else
+		GUICtrlSetState($chkSXAQ, $GUI_UNCHECKED)
+	EndIf
+	If $ichkSXGW = $HERO_WARDEN Then
+		GUICtrlSetState($chkSXGW, $GUI_CHECKED)
+	Else
+		GUICtrlSetState($chkSXGW, $GUI_UNCHECKED)
+	EndIf
+
 ;~ 	If $chkATH = 1 Then
 ;~ 		GUICtrlSetState($chkAttackTH, $GUI_CHECKED)
 ;~ 	Else

@@ -75,6 +75,7 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 		$logwrited = False
 		$bBtnAttackNowPressed = False
 		$hAttackCountDown = TimerInit()
+		$SearchTHLResult = - 1
 
 		Local $Date = @YEAR & "-" & @MON & "-" & @MDAY
 		Local $Time = @HOUR & "." & @MIN & "." & @SEC
@@ -137,6 +138,9 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 			$THString = FindTownhall(False, False);find TH, but only if TH condition is checked
 		ElseIf ($iChkMeetOne[$DB] = 1 Or $iChkMeetOne[$LB] = 1) Then;meet one then attack, do not need correct resources
 			$THString = FindTownhall(True, False)
+		ElseIf $OptBullyMode = 1 And ($SearchCount >= $ATBullyMode) then
+			; Check the TH for BullyMode
+			$THString = FindTownhall(True, False)
 		EndIf
 
 		For $i = 0 To $iModeCount - 2
@@ -145,13 +149,16 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 					If $iChkMeetTH[$i] <> 1 And $iChkMeetTHO[$i] <> 1 Then
 						;ignore, conditions not checked
 					Else
-						If CompareTH($i) Then $match[$i] = True;have a match if meet one enabled & a TH condition is met.
+						If CompareTH($i) Then $match[$i] = True;have a match if meet one enabled & a TH condition is met.  ; UPDATE THE VARIABLE $SearchTHLResult
 					EndIf
 				Else
-					If Not CompareTH($i) Then $match[$i] = False;if TH condition not met, skip. if it is, match is determined based on resources
+					If Not CompareTH($i) Then $match[$i] = False;if TH condition not met, skip. if it is, match is determined based on resources ; UPDATE THE VARIABLE $SearchTHLResult
 				EndIf
 			EndIf
 		Next
+
+		; Check the TH Level for BullyMode conditional
+		if $SearchTHLResult = -1 then CompareTH(0)  ; inside have a conditional to update $SearchTHLResult
 
 		; ----------------- WRITE LOG OF ENEMY RESOURCES -----------------------------------
 		$GetResourcesTXT = StringFormat("%3s", $SearchCount) & "> [G]:" & StringFormat("%7s", $searchGold) & " [E]:" & StringFormat("%7s", $searchElixir) & " [D]:" & StringFormat("%5s", $searchDark) & " [T]:" & StringFormat("%2s", $searchTrophy) & $THString
@@ -159,7 +166,7 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 		; ----------------- CHECK DEAD BASE -------------------------------------------------
 		If Not $RunState Then Return
 		; check deadbase if no milking attack or milking attack but low cpu settings  ($MilkAttackType=1)
-		Local $checkDeadBase = ($match[$DB] And $iAtkAlgorithm[$DB] <> 2) Or $match[$LB] Or ($match[$DB] And $iAtkAlgorithm[$DB] = 2 And $MilkAttackType = 1)
+		Local $checkDeadBase = ($match[$DB] And $iAtkAlgorithm[$DB] <> 2) Or ($match[$DB] And $iAtkAlgorithm[$DB] = 2 And $MilkAttackType = 1)
 		If $checkDeadBase Then
 			$dbBase = checkDeadBase()
 		EndIf
@@ -239,15 +246,13 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 			$logwrited = True
 			$iMatchMode = $LB
 			ExitLoop
-		ElseIf $match[$LB] Or $match[$DB] Then
-			If $OptBullyMode = 1 And ($SearchCount >= $ATBullyMode) Then
-				If $SearchTHLResult = 1 Then
-					SetLog($GetResourcesTXT, $COLOR_SUCCESS, "Lucida Console", 7.5)
-					SetLog("      " & "Not a match, but TH Bully Level Found! ", $COLOR_SUCCESS, "Lucida Console", 7.5)
-					$logwrited = True
-					$iMatchMode = $iTHBullyAttackMode
-					ExitLoop
-				EndIf
+		ElseIf $OptBullyMode = 1 And ($SearchCount >= $ATBullyMode) Then
+			If $SearchTHLResult = 1 Then
+				SetLog($GetResourcesTXT, $COLOR_SUCCESS, "Lucida Console", 7.5)
+				SetLog("      " & "Not a match, but TH Bully Level Found! ", $COLOR_SUCCESS, "Lucida Console", 7.5)
+				$logwrited = True
+				$iMatchMode = $iTHBullyAttackMode
+				ExitLoop
 			EndIf
 		EndIf
 

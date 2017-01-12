@@ -49,7 +49,7 @@ Func DropOnEdge($troop, $edge, $number, $slotsPerEdge = 0, $edge2 = -1, $x = -1,
 		Local $maxX = $edge[4][0]
 		Local $minY = $edge[0][1]
 		Local $maxY = $edge[4][1]
-		If $FourFingers = 5 Then
+		If $FourFingers = 5 Then ; if $nbSide = 5
 			Local $minXTL = $TopLeft[0][0]
 			Local $maxXTL = $TopLeft[4][0]
 			Local $minYTL = $TopLeft[0][1]
@@ -60,7 +60,7 @@ Func DropOnEdge($troop, $edge, $number, $slotsPerEdge = 0, $edge2 = -1, $x = -1,
 			Local $maxX2 = $edge2[4][0]
 			Local $minY2 = $edge2[0][1]
 			Local $maxY2 = $edge2[4][1]
-			If $FourFingers = 5 Then
+			If $FourFingers = 5 Then ; if $nbSide = 5
 				Local $minX2TR = $TopRight[0][0]
 				Local $maxX2TR = $TopRight[4][0]
 				Local $minY2TR = $TopRight[0][1]

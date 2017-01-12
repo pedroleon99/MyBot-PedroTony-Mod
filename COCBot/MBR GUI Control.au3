@@ -56,10 +56,12 @@ Global $aTabControlsTHSnipe = [$hGUI_THSNIPE_TAB, $hGUI_THSNIPE_TAB_ITEM1, $hGUI
 Global $aTabControlsAttackOptions = [$hGUI_AttackOption_TAB, $hGUI_AttackOption_TAB_ITEM1, $hGUI_AttackOption_TAB_ITEM2, $hGUI_AttackOption_TAB_ITEM3,  $hGUI_AttackOption_TAB_ITEM4]
 Global $aTabControlsStrategies = [$hGUI_STRATEGIES_TAB, $hGUI_STRATEGIES_TAB_ITEM1, $hGUI_STRATEGIES_TAB_ITEM2]
 
-Global $aTabControlsBot = [$hGUI_BOT_TAB, $hGUI_BOT_TAB_ITEM1, $hGUI_BOT_TAB_ITEM2, $hGUI_BOT_TAB_ITEM3, $hGUI_BOT_TAB_ITEM4, $hGUI_BOT_TAB_ITEM5]
+Global $aTabControlsBot = [$hGUI_BOT_TAB, $hGUI_BOT_TAB_ITEM1, $hGUI_BOT_TAB_ITEM2, $hGUI_BOT_TAB_ITEM3, $hGUI_BOT_TAB_ITEM4]
+Global $aTabControlsMOD = [$hGUI_MOD_TAB, $hGUI_MOD_TAB_ITEM1, $hGUI_MOD_TAB_ITEM2]
+Global $aTabControlsMODSwitch = [$hGUI_MODSwitch_TAB, $hGUI_MODSwitch_TAB_ITEM1, $hGUI_MODSwitch_TAB_ITEM2]
 Global $aTabControlsStats = [$hGUI_STATS_TAB, $hGUI_STATS_TAB_ITEM1, $hGUI_STATS_TAB_ITEM2, $hGUI_STATS_TAB_ITEM3, $hGUI_STATS_TAB_ITEM4, $hGUI_STATS_TAB_ITEM5]
 
-Global $aAlwaysEnabledControls = [$chkUpdatingWhenMinimized, $chkHideWhenMinimized, $chkDebugClick, $chkDebugSetlog, $chkDebugDisableZoomout, $chkDebugDisableVillageCentering, $chkDebugDeadbaseImage, $chkDebugOcr, $chkDebugImageSave, $chkdebugBuildingPos, $chkdebugTrain, $chkdebugOCRDonate,$btnTestTrain, $btnTestDonateCC, $btnTestRequestCC, $btnTestAttackBar, $btnTestClickDrag, $btnTestImage, $btnTestVillageSize, $btnTestDeadBase, $btnTestDeadBaseFolder, $btnTestTHimgloc, $btnTestimglocTroopBar,$btnTestQuickTrainsimgloc, $chkdebugAttackCSV, $chkmakeIMGCSV, $btnTestAttackCSV, $btnTestFindButton, $txtTestFindButton, $btnTestCleanYard, $lblLightningUsed, $lblSmartZap, $lblEarthQuakeUsed, $btnTestConfigSave, $btnTestConfigRead, $btnTestConfigApply]
+Global $aAlwaysEnabledControls = [$chkUpdatingWhenMinimized, $chkHideWhenMinimized, $chkDebugClick, $chkDebugSetlog, $chkDebugDisableZoomout, $chkDebugDisableVillageCentering, $chkDebugDeadbaseImage, $chkDebugOcr, $chkDebugImageSave, $chkdebugBuildingPos, $chkdebugTrain, $chkdebugOCRDonate,$btnTestTrain, $btnTestDonateCC, $btnTestRequestCC, $btnTestClickDrag, $btnTestImage, $btnTestVillageSize, $btnTestDeadBase, $btnTestDeadBaseFolder, $btnTestTHimgloc, $btnTestimglocTroopBar,$btnTestQuickTrainsimgloc, $chkdebugAttackCSV, $chkmakeIMGCSV, $btnTestAttackCSV, $btnTestFindButton, $txtTestFindButton, $btnTestCleanYard, $lblLightningUsed, $lblSmartZap, $lblEarthQuakeUsed, $btnTestConfigSave, $btnTestConfigRead, $btnTestConfigApply]
 
 Global $frmBot_WNDPROC = 0
 Global $frmBot_WNDPROC_ptr = 0
@@ -111,6 +113,8 @@ Func IsTab($controlID)
 			_ArraySearch($aTabControlsAttackOptions, $controlID) <> -1 Or _
 			_ArraySearch($aTabControlsStrategies, $controlID) <> -1 Or _
 			_ArraySearch($aTabControlsBot, $controlID) <> -1 Or _
+			_ArraySearch($aTabControlsMOD, $controlID) <> -1 Or _
+			_ArraySearch($aTabControlsMODSwitch, $controlID) <> -1 Or _
 			_ArraySearch($aTabControlsStats, $controlID) <> -1 Then
 		Return True
 	EndIf
@@ -155,6 +159,7 @@ AtkLogHead()
 #include "GUI\MBR GUI Control Preset.au3"
 #include "GUI\MBR GUI Control Child Misc.au3"
 #include "GUI\MBR GUI Control Android.au3"
+#include "GUI\MBR GUI Control Tab Meteo.au3"
 #include "functions\NguyenAnhHD Mod's\GUI - Mod\MBR GUI Control - Mod.au3"
 
 ; Accelerator Key, more responsive than buttons in run-mode
@@ -427,9 +432,6 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 			btnAttackNowLB()
 		Case $btnAttackNowTS
 			btnAttackNowTS()
-		Case $CheckVersionConfig
-			CheckVersionHTML()
-			CheckModVersion()
 		Case $ModSupportConfig
 			ShellExecute($sModSupportUrl)
 		;Case $idMENU_DONATE_SUPPORT
@@ -488,8 +490,6 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 			btnTestDonateCC()
 		Case $btnTestRequestCC
 			btnTestRequestCC()
-		Case $btnTestAttackBar
-			btnTestAttackBar()
 		Case $btnTestClickDrag
 			btnTestClickDrag()
 		Case $btnTestImage
@@ -506,6 +506,8 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 			imglocTestQuickTrain(1)
 		Case $btnTestimglocTroopBar
 			TestImglocTroopBar()
+		Case $btnTestSmartZap
+			btnTestSmartZap()
 		Case $btnTestAttackCSV
 			btnTestAttackCSV()
 		Case $btnTestFindButton
@@ -635,6 +637,58 @@ Func GUIControl_WM_NOTIFY($hWind, $iMsg, $wParam, $lParam)
 			tabTHSnipe()
 		Case $hGUI_BOT_TAB
 			tabBot()
+		Case $hGUI_MOD_TAB
+				If GUICtrlRead($hGUI_MOD_TAB, 1) = $hGUI_MOD_TAB_ITEM2 Then
+						Local $tTag  = DllStructCreate("hwnd;int;int;int;int;int;int;ptr;int;int;int;int;int;int;int;int;int;int;int;int", $lParam)
+						Local $hFrom = DllStructGetData($tTag, 1)
+						Local $iID   = DllStructGetData($tTag, 2)
+						Local $iCode = DllStructGetData($tTag, 3)
+						Local $iPos  = DllStructGetData($tTag, 4)
+
+						If $iCode = -551 Then ;tab selected
+							GUICtrlSetState($hGUI_MOD_TAB_ITEM2, $GUI_SHOW)
+							sleep(100)
+							If TimerDiff($TimerForecast) > (1 * 10000) Then ; 1 Refresh Graphique toutes les 5 mn maxi, faut pas abuser
+							setForecast()
+							EndIf
+						EndIf
+					EndIf
+
+					tabMOD()
+
+					If GUICtrlRead($hGUI_MOD_TAB, 1) = $hGUI_MOD_TAB_ITEM2 Then
+						Local $tTag  = DllStructCreate("hwnd;int;int;int;int;int;int;ptr;int;int;int;int;int;int;int;int;int;int;int;int", $lParam)
+						Local $hFrom = DllStructGetData($tTag, 1)
+						Local $iID   = DllStructGetData($tTag, 2)
+						Local $iCode = DllStructGetData($tTag, 3)
+						Local $iPos  = DllStructGetData($tTag, 4)
+
+						If $iCode = -551 Then ;tab selected
+							GUICtrlSetState($hGUI_MOD_TAB_ITEM2, $GUI_SHOW)
+							sleep(100)
+							If TimerDiff($TimerForecast) > (1 * 10000) Then ; 1 Refresh Graphique toutes les 5 mn maxi, faut pas abuser
+						Switch GUICtrlRead($cmbSwLang) ;Added Multi Switch Language by rulesss and Kychera
+		                       Case "EN"
+		                                setForecast2()
+							   Case "RU"
+		                                setForecast3()
+							   Case "FR"
+			                            setForecast4()
+		                       Case "DE"
+		                                setForecast5()
+		                       Case "ES"
+		                                setForecast6()
+		                       Case "IT"
+		                                setForecast7()
+							   Case "PT"
+						                setForecast8()
+						       Case "IN"
+						                setForecast9()
+			            EndSwitch
+                            $TimerForecast = TimerInit()
+							EndIf
+						EndIf
+					EndIf
 		Case Else
 			$bCheckEmbeddedShield = False
 	EndSwitch
@@ -727,6 +781,13 @@ Func BotClose($SaveConfig = Default, $bExit = True)
    $TPaused = False
    ResumeAndroid()
    SetLog("Closing " & $sBotTitle & " now ...")
+   Sleep(500)
+   SetLog(" » All SharedFolder Deleted...", $COLOR_ORANGE)
+   Sleep(1000)
+   SetLog(" » Thanks For Using MyBot Pedro&Tony MOD", $COLOR_ORANGE)
+   Sleep(800)
+   SetLog(" »» Cheers!!", $COLOR_ORANGE)
+   Sleep(500)
    AndroidEmbed(False) ; detach Android Window
    AndroidShieldDestroy() ; destroy Shield Hooks
    AndroidBotStopEvent() ; signal android that bot is now stoppting
@@ -893,6 +954,7 @@ Func SetRedrawBotWindow($bEnableRedraw, $bCheckRedrawBotWindow = True, $bForceRe
 		; set dirty redraw flag
 		$bRedrawBotWindow[1] = True
 	EndIf
+	redrawForecast()
 	Return $bWasRedraw
 EndFunc   ;==>SetRedrawBotWindow
 
@@ -1007,12 +1069,14 @@ Func tabMain()
 				GUISetState(@SW_HIDE, $hGUI_VILLAGE)
 				GUISetState(@SW_HIDE, $hGUI_ATTACK)
 				GUISetState(@SW_HIDE, $hGUI_BOT)
+				GUISetState(@SW_HIDE, $hGUI_MOD)
 				GUISetState(@SW_SHOWNOACTIVATE, $hGUI_LOG)
 
 			Case $tabidx = 1 ; Village
 				GUISetState(@SW_HIDE, $hGUI_LOG)
 				GUISetState(@SW_HIDE, $hGUI_ATTACK)
 				GUISetState(@SW_HIDE, $hGUI_BOT)
+				GUISetState(@SW_HIDE, $hGUI_MOD)
 				GUISetState(@SW_SHOWNOACTIVATE, $hGUI_VILLAGE)
 				tabVillage()
 
@@ -1020,6 +1084,7 @@ Func tabMain()
 				GUISetState(@SW_HIDE, $hGUI_LOG)
 				GUISetState(@SW_HIDE, $hGUI_VILLAGE)
 				GUISetState(@SW_HIDE, $hGUI_BOT)
+				GUISetState(@SW_HIDE, $hGUI_MOD)
 				GUISetState(@SW_SHOWNOACTIVATE, $hGUI_ATTACK)
 				tabAttack()
 
@@ -1027,13 +1092,23 @@ Func tabMain()
 				GUISetState(@SW_HIDE, $hGUI_LOG)
 				GUISetState(@SW_HIDE, $hGUI_VILLAGE)
 				GUISetState(@SW_HIDE, $hGUI_ATTACK)
+				GUISetState(@SW_HIDE, $hGUI_MOD)
 				GUISetState(@SW_SHOWNOACTIVATE, $hGUI_BOT)
 				tabBot()
+
+			Case $tabidx = 4 ; MOD Option
+				GUISetState(@SW_HIDE, $hGUI_LOG)
+				GUISetState(@SW_HIDE, $hGUI_VILLAGE)
+				GUISetState(@SW_HIDE, $hGUI_ATTACK)
+				GUISetState(@SW_HIDE, $hGUI_BOT)
+				GUISetState(@SW_SHOWNOACTIVATE, $hGUI_MOD)
+				tabMOD()
 			Case ELSE
 				GUISetState(@SW_HIDE, $hGUI_LOG)
 				GUISetState(@SW_HIDE, $hGUI_VILLAGE)
 				GUISetState(@SW_HIDE, $hGUI_ATTACK)
 				GUISetState(@SW_HIDE, $hGUI_BOT)
+				GUISetState(@SW_HIDE, $hGUI_MOD)
 		EndSelect
 
 EndFunc   ;==>tabMain
@@ -1201,17 +1276,29 @@ Func tabBot()
 			Case $tabidx = 1 ; Debug tab
 				GUISetState(@SW_HIDE, $hGUI_STATS)
 				ControlHide("","",$cmbLanguage)
-			Case $tabidx = 2 ; Profiles tab
+;~			Case $tabidx = 2 ; Profiles tab
+;~				GUISetState(@SW_HIDE, $hGUI_STATS)
+;~				ControlHide("","",$cmbLanguage)
+			Case $tabidx = 2 ; Android tab
 				GUISetState(@SW_HIDE, $hGUI_STATS)
 				ControlHide("","",$cmbLanguage)
-			Case $tabidx = 3 ; Android tab
-				GUISetState(@SW_HIDE, $hGUI_STATS)
-				ControlHide("","",$cmbLanguage)
-			Case $tabidx = 4 ; Stats tab
+			Case $tabidx = 3 ; Stats tab
 				GUISetState(@SW_SHOWNOACTIVATE, $hGUI_STATS)
 				ControlHide("","",$cmbLanguage)
 		EndSelect
 EndFunc   ;==>tabBot
+
+Func tabMOD()
+	$tabidx = GUICtrlRead($hGUI_MOD_TAB)
+		Select
+			Case $tabidx = 0 ; Switch Profile $ Multi Option Tab
+				GUISetState(@SW_SHOWNOACTIVATE, $hGUI_MODSwitch)
+				GUISetState(@SW_HIDE, $hGUI_MODForecast)
+			Case $tabidx = 1 ; Forecast Tab
+				GUISetState(@SW_HIDE, $hGUI_MODSwitch)
+				GUISetState(@SW_SHOWNOACTIVATE, $hGUI_MODForecast)
+		EndSelect
+EndFunc   ;==>tabMOD
 
 Func tabDeadbase()
 	$tabidx = GUICtrlRead($hGUI_DEADBASE_TAB)
@@ -1446,7 +1533,7 @@ Func Bind_ImageList($nCtrl)
 	Switch $nCtrl
 		Case $tabMain
 			; the icons for main tab
-			Local $aIconIndex[5] = [$eIcnHourGlass, $eIcnTH11, $eIcnAttack, $eIcnGUI, $eIcnInfo]
+			Local $aIconIndex[6] = [$eIcnHourGlass, $eIcnTH11, $eIcnAttack, $eIcnGUI, $eIcnModNguyenAnh, $eIcnInfo]
 
 		Case $hGUI_VILLAGE_TAB
 			; the icons for village tab
@@ -1490,12 +1577,20 @@ Func Bind_ImageList($nCtrl)
 
 		Case $hGUI_AttackOption_TAB
 			; the icons for Attack Options tab
-			Local $aIconIndex[4] = [$eIcnMagnifier, $eIcnCamp, $eIcnSilverStar, $eIcnTrophy]
+			Local $aIconIndex[5] = [$eIcnMagnifier, $eIcnCamp, $eIcnSilverStar, $eIcnTrophy, $eIcnGoblinXP]
 
 		Case $hGUI_BOT_TAB
 			; the icons for Bot tab
-			Local $aIconIndex[5] = [$eIcnOptions, $eIcnAndroid, $eIcnProfile, $eIcnProfile, $eIcnGold]
+			Local $aIconIndex[4] = [$eIcnOptions, $eIcnAndroid, $eIcnProfile, $eIcnGold]
 			; The Android Robot is a Google Trademark and follows Creative Common Attribution 3.0
+
+		Case $hGUI_MOD_TAB
+			; the icons for Mod tab
+			Local $aIconIndex[2] = [$eIcnOptions, $eIcnForecast]
+
+		Case $hGUI_MODSwitch_TAB
+			; the icons for Mod tab
+			Local $aIconIndex[2] = [$eIcnReload2, $eIcnProfile2]
 
 		Case $hGUI_STRATEGIES_TAB
 			; the icons for strategies tab

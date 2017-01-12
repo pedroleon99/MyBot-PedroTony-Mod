@@ -5,7 +5,7 @@
 ; Parameters ....: None
 ; Return values .: None
 ; Author ........: LunaEclipse(February, 2016)
-; Modified ......: TheRevenor (November, 2016)
+; Modified ......: TheRevenor(November, 2016), TheRevenor(Desember, 2016)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2016
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -95,11 +95,11 @@ Local $x = 20, $y = 25
 		$lblSmartZap = GUICtrlCreateLabel("0", $x + 20, $y + 113, 391, 30, $SS_CENTER)
 			GUICtrlSetFont(-1, 16, $FW_BOLD, Default, "arial", $CLEARTYPE_QUALITY)
 			GUICtrlSetBkColor (-1, 0xBFDFFF)
-			$txtTip = GetTranslated(638, 22, "Number of dark elixir zapped during the attack with lightning")
+			$txtTip = GetTranslated(638, 22, "Number of dark elixir zapped during the attack with lightning and EarthQuake spell")
 			_GUICtrlSetTip(-1, $txtTip)
 	$x = 320
 	$y = 265
-		$chkDebugSmartZap = GUICtrlCreateCheckbox(GetTranslated(636, 120,"Debug SZ"), $x + 50 + 2, $y + 80, -1, -1)
-		$txtTip = GetTranslated(636, 121, "Use it to debug SmartZap")
+		$chkDebugSmartZap = GUICtrlCreateCheckbox(GetTranslated(638, 23,"Debug SZ"), $x + 50 + 2, $y + 80, -1, -1)
+		$txtTip = GetTranslated(638, 24, "Use this to debug SmartZap")
 		_GUICtrlSetTip(-1, $txtTip)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)

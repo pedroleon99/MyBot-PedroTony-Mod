@@ -20,8 +20,8 @@ $nTotalProfile = _GUICtrlComboBox_GetCount($cmbProfile)
 
 Local $x = 25, $y = 45	;	Keep upchanged as original GUI of Profile Tab
 
-	$x = 22
-	$y = 100
+	$x = 17
+	$y = 83
 
 	$grpSwitchAcc = GUICtrlCreateGroup(GetTranslated(655,50, "Switch Account Mode"), $x - 12, $y - 20, 200, 300)
 		$chkSwitchAcc = GUICtrlCreateCheckbox(GetTranslated(655,51, "Enable Switch Account"), $x - 5, $y, -1, -1)
@@ -82,7 +82,7 @@ Local $x = 25, $y = 45	;	Keep upchanged as original GUI of Profile Tab
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 
 	; Profiles & Account matching
-	Local $x = 235, $y = 100
+	Local $x = 229, $y = 83
 	$grpSwitchAccMapping = GUICtrlCreateGroup(GetTranslated(655,75, "Profiles"), $x - 20, $y - 20, 225, 300)
 		$btnUpdateProfiles = GUICtrlCreateButton(GetTranslated(655,76, "Update Profiles"), $x + 20, $y - 5 , -1, 25)
 			GUICtrlSetOnEvent(-1, "btnUpdateProfile")

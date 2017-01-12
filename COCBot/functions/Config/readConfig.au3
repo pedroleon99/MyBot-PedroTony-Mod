@@ -213,26 +213,8 @@ Func readConfig($inputfile = $config, $partial = False) ;Reads config and sets i
 
 		Local $tempTroop, $tempLevTroop
 		For $T = 0 To UBound($TroopName) - 1
-			Switch $TroopName[$T]
-				Case "Barb"
-					IniReadS($tempTroop, $config, "troop", $TroopName[$T], 58, "int")
-					IniReadS($tempLevTroop, $config, "LevelTroop", $TroopName[$T], 1, "int")
-				Case "Arch"
-					IniReadS($tempTroop, $config, "troop", $TroopName[$T], 115, "int")
-					IniReadS($tempLevTroop, $config, "LevelTroop", $TroopName[$T], 1, "int")
-				Case "Gobl"
-					IniReadS($tempTroop, $config, "troop", $TroopName[$T], 19, "int")
-					IniReadS($tempLevTroop, $config, "LevelTroop", $TroopName[$T], 1, "int")
-				Case "Giant"
-					IniReadS($tempTroop, $config, "troop", $TroopName[$T], 4, "int")
-					IniReadS($tempLevTroop, $config, "LevelTroop", $TroopName[$T], 1, "int")
-				Case "Wall"
-					IniReadS($tempTroop, $config, "troop", $TroopName[$T], 4, "int")
-					IniReadS($tempLevTroop, $config, "LevelTroop", $TroopName[$T], 1, "int")
-				Case Else
-					IniReadS($tempTroop, $config, "troop", $TroopName[$T], 0, "int")
-					IniReadS($tempLevTroop, $config, "LevelTroop", $TroopName[$T], 0, "int")
-			EndSwitch
+			IniReadS($tempTroop, $config, "troop", $TroopName[$T], 0, "int")
+			IniReadS($tempLevTroop, $config, "LevelTroop", $TroopName[$T], 0, "int")
 			Assign($TroopName[$T] & "Comp", $tempTroop)
 			Assign("itxtLev" & $TroopName[$T], $tempLevTroop)
 		Next
@@ -256,7 +238,7 @@ Func readConfig($inputfile = $config, $partial = False) ;Reads config and sets i
 
 		IniReadS($isldTrainITDelay, $config, "other", "TrainITDelay", 40, "int")
 
-		IniReadS($ichkCloseWaitEnable, $config, "other", "chkCloseWaitEnable", 0, "int")
+		IniReadS($ichkCloseWaitEnable, $config, "other", "chkCloseWaitEnable", 1, "int")
 		IniReadS($ichkCloseWaitTrain, $config, "other", "chkCloseWaitTrain", 1, "int")
 		IniReadS($ibtnCloseWaitStop, $config, "other", "btnCloseWaitStop", 0, "int")
 		IniReadS($ibtnCloseWaitStopRandom, $config, "other", "btnCloseWaitStopRandom", 0, "int")
@@ -361,6 +343,7 @@ Func readConfig($inputfile = $config, $partial = False) ;Reads config and sets i
 		IniReadS($iCmbWeakXBow[$DB], $config, "search", "DBWeakXBow", 4, "int")
 		IniReadS($iCmbWeakInferno[$DB], $config, "search", "DBWeakInferno", 1, "int")
 		IniReadS($iCmbWeakEagle[$DB], $config, "search", "DBWeakEagle", 2, "int")
+
 		IniReadS($iChkMaxMortar[$DB], $config, "search", "DBCheckMortar", 0, "int")
 		IniReadS($iChkMaxWizTower[$DB], $config, "search", "DBCheckWizTower", 0, "int")
 		IniReadS($iChkMaxAirDefense[$DB], $config, "search", "DBCheckAirDefense", 0, "int")
@@ -395,6 +378,7 @@ Func readConfig($inputfile = $config, $partial = False) ;Reads config and sets i
 		IniReadS($iCmbWeakXBow[$LB], $config, "search", "ABWeakXBow", 4, "int")
 		IniReadS($iCmbWeakInferno[$LB], $config, "search", "ABWeakInferno", 1, "int")
 		IniReadS($iCmbWeakEagle[$LB], $config, "search", "ABWeakEagle", 2, "int")
+
 		IniReadS($iChkMaxMortar[$LB], $config, "search", "ABCheckMortar", 0, "int")
 		IniReadS($iChkMaxWizTower[$LB], $config, "search", "ABCheckWizTower", 0, "int")
 		IniReadS($iChkMaxAirDefense[$LB], $config, "search", "ABCheckAirDefense", 0, "int")
@@ -1095,9 +1079,10 @@ Func readConfig($inputfile = $config, $partial = False) ;Reads config and sets i
 		$icmbFilterDonationsCC = Int(IniRead($config, "donate", "cmbFilterDonationsCC", 0))
 
 
-		; Extra Alphabets, Cyrillic, Chinese
+		; Extra Alphabets, Cyrillic, Chinese, Persian
 		$ichkExtraAlphabets = Int(IniRead($config, "donate", "chkExtraAlphabets", 0))
 		$ichkExtraChinese = Int(IniRead($config, "donate", "chkExtraChinese", 0))
+		$ichkExtraPersian = Int(IniRead($config, "donate", "chkExtraPersian", 0))
 
 		;IniReadS($chkLvl6Enabled, $config, "collectors", "lvl6Enabled", 0, "int")
 		$chkLvl6Enabled = 0
@@ -1182,6 +1167,14 @@ Func readConfig($inputfile = $config, $partial = False) ;Reads config and sets i
 ; ============================================================================
 
 		$_CheckIceWizardSlot = True ; recheck if Ice Wizard exists in Train Window
+
+		; SuperXP
+		IniReadS($ichkEnableSuperXP, $config, "attack", "EnableSuperXP", "0")
+		IniReadS($irbSXTraining, $config, "attack", "SXTraining", "1")
+		IniReadS($itxtMaxXPtoGain, $config, "attack", "MaxXptoGain", "500")
+		IniReadS($ichkSXBK, $config, "attack", "SXBK", $HERO_NOHERO)
+		IniReadS($ichkSXAQ, $config, "attack", "SXAQ", $HERO_NOHERO)
+		IniReadS($ichkSXGW, $config, "attack", "SXGW", $HERO_NOHERO)
 
 		; Adding Config Read - Added By NguyenAnhHD
 		#include "..\..\functions\NguyenAnhHD Mod's\Config - Mod\Config read - Mod.au3"

@@ -326,21 +326,21 @@ Func UpdateStats()
 ; ================================= SmartZap =================================
 ; ============================================================================
    ; SmartZap DE Gain
-	If $iOldSmartZapGain <> $smartZapGain Then
-		GUICtrlSetData($lblSmartZap, _NumberFormat($smartZapGain, True))
-		$iOldSmartZapGain = $smartZapGain
+	If $iOldSmartZapGain <> $iSmartZapGain Then
+		GUICtrlSetData($lblSmartZap, _NumberFormat($iSmartZapGain, True))
+		$iOldSmartZapGain = $iSmartZapGain
 	EndIf
 
 	; SmartZap Spells Used
-	If $iOldNumLTSpellsUsed <> $numLSpellsUsed Then
-		GUICtrlSetData($lblLightningUsed, _NumberFormat($numLSpellsUsed, True))
-		$iOldNumLTSpellsUsed = $numLSpellsUsed
+	If $iOldNumLSpellsUsed <> $iNumLSpellsUsed Then
+		GUICtrlSetData($lblLightningUsed, _NumberFormat($iNumLSpellsUsed, True))
+		$iOldNumLSpellsUsed = $iNumLSpellsUsed
  	EndIf
 
 	; EarthQuake Spells Used
-	If $iOldNumEQSpellsUsed <> $numEQSpellsUsed Then
-		GUICtrlSetData($lblEarthQuakeUsed, _NumberFormat($numEQSpellsUsed, True))
-		$iOldNumEQSpellsUsed = $numEQSpellsUsed
+	If $iOldNumEQSpellsUsed <> $iNumEQSpellsUsed Then
+		GUICtrlSetData($lblEarthQuakeUsed, _NumberFormat($iNumEQSpellsUsed, True))
+		$iOldNumEQSpellsUsed = $iNumEQSpellsUsed
  	EndIf
 ; ============================================================================
 ; ================================= SmartZap =================================
@@ -498,9 +498,9 @@ Func ResetStats()
 	$iElixirFromCollectors = 0
 	$iDElixirFromDrills = 0
 ; ======================= SmartZap =======================
-	$smartZapGain = 0
-	$numLSpellsUsed = 0
-	$numEQSpellsUsed = 0
+	$iSmartZapGain = 0
+	$iNumLSpellsUsed = 0
+	$iNumEQSpellsUsed = 0
 ; ======================= SmartZap =======================
 	For $i = 0 To $iModeCount
 		$iAttackedVillageCount[$i] = 0

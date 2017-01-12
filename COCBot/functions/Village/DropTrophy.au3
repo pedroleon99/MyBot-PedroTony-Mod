@@ -264,6 +264,11 @@ Func DropTrophy()
 				EndIf
 			Else
 				SetLog("Trophy Drop Complete", $COLOR_INFO)
+				If _Sleep(1000) Then Return                                           ; added lines
+				VillageReport()                                                       ; added lines
+				If _Sleep(1000) Then Return                                           ; added lines
+				ProfileSwitch()                                                       ; added lines
+				If _Sleep(5000) Then Return                                           ; added lines
 			EndIf
 		WEnd
 		If $DebugSetlog = 1 Then SetLog("Drop Trophy END", $COLOR_DEBUG)

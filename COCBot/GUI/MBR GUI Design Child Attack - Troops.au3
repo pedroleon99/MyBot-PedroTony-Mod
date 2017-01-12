@@ -51,15 +51,17 @@ Local $y = $yStart + 8
 	$hRadio_Army1 = GUICtrlCreateRadio(GetTranslated(621, 37, "Army 1"), $x + 120, $y + 20, 50, 15)
 	GUICtrlSetState(-1, $GUI_DISABLE)
 	GUICtrlSetState(-1, $GUI_CHECKED)
-	$hRadio_Army2 = GUICtrlCreateRadio(GetTranslated(621, 38, "Army 2"), $x + 174, $y + 20, 50, 15)
+	$hRadio_Army2 = GUICtrlCreateRadio(GetTranslated(621, 38, "Army 2"), $x + 180, $y + 20, 50, 15)
 	GUICtrlSetState(-1, $GUI_DISABLE)
-	$hRadio_Army3 = GUICtrlCreateRadio(GetTranslated(621, 39, "Army 3"), $x + 230, $y + 20, 50, 15)
+	$hRadio_Army3 = GUICtrlCreateRadio(GetTranslated(621, 39, "Army 3"), $x + 240, $y + 20, 50, 15)
 	GUICtrlSetState(-1, $GUI_DISABLE)
-	$hRadio_Army12 = GUICtrlCreateRadio("Army 12", $x + 285, $y + 20, 54, 15)
+	$hRadio_Army12 = GUICtrlCreateRadio(GetTranslated(621, 100, "Army 12"), $x + 300, $y + 20, 54, 15)
 	GUICtrlSetState(-1, $GUI_DISABLE)
-	$hRadio_Army123 = GUICtrlCreateRadio("Army 123", $x + 345, $y + 20, 60, 15)
+	GUICtrlSetState(-1, $GUI_HIDE)
+	$hRadio_Army123 = GUICtrlCreateRadio(GetTranslated(621, 101, "Army 123"), $x + 365, $y + 20, 60, 15)
 	GUICtrlSetState(-1, $GUI_DISABLE)
-	;$LblRemovecamp = GUICtrlCreateLabel(GetTranslated(621, 41, "Remove Army"), $x + 335, $y + 20, -1, 15, $SS_LEFT)
+	GUICtrlSetState(-1, $GUI_HIDE)
+	$LblRemovecamp = GUICtrlCreateLabel(GetTranslated(621, 41, "Remove Army"), $x + 335, $y + 20, -1, 15, $SS_LEFT)
 	$icnRemovecamp = GUICtrlCreateIcon($pIconLib, $eIcnResetButton, $x + 405, $y + 17, 24, 24)
 	GUICtrlSetOnEvent(-1, "Removecamp")
 
@@ -73,12 +75,12 @@ $y += 20
 	$icnBarb = GUICtrlCreateIcon($pIconLib, $eIcnBarbarian, $x, $y - 5, 32, 32)
 	_GUICtrlSetTip(-1, GetTranslated(621,40, "Mouse Left Click to Up level" & @CRLF & "Shift + Mouse Left Click to Down level"))
 	GUICtrlSetOnEvent(-1, "LevBarb")
-	$txtLevBarb = GUICtrlCreateLabel("1", $x + 2, $y + 14, 6, 11)
+	$txtLevBarb = GUICtrlCreateLabel("0", $x + 2, $y + 14, 6, 11)
 	GUICtrlSetBkColor(-1, $COLOR_WHITE)
 	GUICtrlSetFont(-1, 7, 400)
-	$txtNumBarb = GUICtrlCreateInput("58", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+	$txtNumBarb = GUICtrlCreateInput("0", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 	_GUICtrlSetTip(-1, $sTxtSetPerc3 & " " & $sTxtBarbarians & " " & $sTxtSetPerc2)
-	GUICtrlSetState(-1, $GUI_SHOW)
+	GUICtrlSetState(-1, $GUI_HIDE)
 	GUICtrlSetLimit(-1, 3)
 	GUICtrlSetOnEvent(-1, "lblTotalCountBarb")
 
@@ -87,12 +89,12 @@ $x += 38
 	$icnGiant = GUICtrlCreateIcon($pIconLib, $eIcnGiant, $x, $y - 5, 32, 32)
 	_GUICtrlSetTip(-1, GetTranslated(621,40, -1))
 	GUICtrlSetOnEvent(-1, "LevGiant")
-	$txtLevGiant = GUICtrlCreateLabel("1", $x + 2, $y + 14, 6, 11)
+	$txtLevGiant = GUICtrlCreateLabel("0", $x + 2, $y + 14, 6, 11)
 	GUICtrlSetBkColor(-1, $COLOR_WHITE)
 	GUICtrlSetFont(-1, 7, 400)
-	$txtNumGiant = GUICtrlCreateInput("4", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+	$txtNumGiant = GUICtrlCreateInput("0", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 	_GUICtrlSetTip(-1, $sTxtSetPerc3 & " " & $sTxtGiants & " " & $sTxtSetPerc2)
-	GUICtrlSetState(-1, $GUI_SHOW)
+	GUICtrlSetState(-1, $GUI_HIDE)
 	GUICtrlSetLimit(-1, 2)
 	GUICtrlSetOnEvent(-1, "lblTotalCountGiant")
 
@@ -101,12 +103,12 @@ $x += 38
 	$icnWall = GUICtrlCreateIcon($pIconLib, $eIcnWallBreaker, $x, $y - 5, 32, 32)
 	_GUICtrlSetTip(-1, GetTranslated(621,40, -1))
 	GUICtrlSetOnEvent(-1, "LevWall")
-	$txtLevWall = GUICtrlCreateLabel("1", $x + 2, $y + 14, 6, 11)
+	$txtLevWall = GUICtrlCreateLabel("0", $x + 2, $y + 14, 6, 11)
 	GUICtrlSetBkColor(-1, $COLOR_WHITE)
 	GUICtrlSetFont(-1, 7, 400)
-	$txtNumWall = GUICtrlCreateInput("4", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+	$txtNumWall = GUICtrlCreateInput("0", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 	_GUICtrlSetTip(-1, $sTxtSetPerc3 & " " & $sTxtWallBreakers & " " & $sTxtSetPerc2)
-	GUICtrlSetState(-1, $GUI_SHOW)
+	GUICtrlSetState(-1, $GUI_HIDE)
 	GUICtrlSetLimit(-1, 3)
 	GUICtrlSetOnEvent(-1, "lblTotalCountWall")
 
@@ -216,12 +218,12 @@ $y += 60
 	$icnArch = GUICtrlCreateIcon($pIconLib, $eIcnArcher, $x, $y - 5, 32, 32)
 	_GUICtrlSetTip(-1, GetTranslated(621,40, -1))
 	GUICtrlSetOnEvent(-1, "LevArch")
-	$txtLevArch = GUICtrlCreateLabel("1", $x + 2, $y + 14, 6, 11)
+	$txtLevArch = GUICtrlCreateLabel("0", $x + 2, $y + 14, 6, 11)
 	GUICtrlSetBkColor(-1, $COLOR_WHITE)
 	GUICtrlSetFont(-1, 7, 400)
-	$txtNumArch = GUICtrlCreateInput("115", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+	$txtNumArch = GUICtrlCreateInput("0", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 	_GUICtrlSetTip(-1, $sTxtSetPerc3 & " " & $sTxtArchers & " " & $sTxtSetPerc2)
-	GUICtrlSetState(-1, $GUI_SHOW)
+	GUICtrlSetState(-1, $GUI_HIDE)
 	GUICtrlSetLimit(-1, 3)
 	GUICtrlSetOnEvent(-1, "lblTotalCountArch")
 
@@ -230,12 +232,12 @@ $x += 38
 	$icnGobl = GUICtrlCreateIcon($pIconLib, $eIcnGoblin, $x, $y - 5, 32, 32)
 	_GUICtrlSetTip(-1, GetTranslated(621,40, -1))
 	GUICtrlSetOnEvent(-1, "LevGobl")
-	$txtLevGobl = GUICtrlCreateLabel("1", $x + 2, $y + 14, 6, 11)
+	$txtLevGobl = GUICtrlCreateLabel("0", $x + 2, $y + 14, 6, 11)
 	GUICtrlSetBkColor(-1, $COLOR_WHITE)
 	GUICtrlSetFont(-1, 7, 400)
-	$txtNumGobl = GUICtrlCreateInput("19", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+	$txtNumGobl = GUICtrlCreateInput("0", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 	_GUICtrlSetTip(-1, $sTxtSetPerc & " " & $sTxtGoblins & " " & $sTxtSetPerc2)
-	GUICtrlSetState(-1, $GUI_SHOW)
+	GUICtrlSetState(-1, $GUI_HIDE)
 	GUICtrlSetLimit(-1, 3)
 	GUICtrlSetOnEvent(-1, "lblTotalCountGobl")
 
@@ -296,6 +298,20 @@ $x += 38
 	GUICtrlSetOnEvent(-1, "lblTotalCountMine")
 
 $x += 45
+;~	; Ice Wizard
+;~	$icnIceW = GUICtrlCreateIcon($pIconLib, $eIcnIcew, $x, $y - 5, 32, 32)
+;~	_GUICtrlSetTip(-1, GetTranslated(621,40, -1))
+;~	GUICtrlSetOnEvent(-1, "LevIceW")
+;~	$txtLevIceW = GUICtrlCreateLabel("0", $x + 2, $y + 14, 6, 11)
+;~	GUICtrlSetBkColor(-1, $COLOR_WHITE)
+;~	GUICtrlSetFont(-1, 7, 400)
+;~	$txtNumIceW = GUICtrlCreateInput("0", $x + 1, $y + 29, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+;~	_GUICtrlSetTip(-1, $sTxtSetPerc3 & " " & $sTxtIcewizard & " " & $sTxtSetPerc2)
+;~	GUICtrlSetState(-1, $GUI_HIDE)
+;~	GUICtrlSetLimit(-1, 2)
+;~	GUICtrlSetOnEvent(-1, "lblTotalCountIceW")
+
+;~ $x += 38
 	; Hogs
 	$icnHogs = GUICtrlCreateIcon($pIconLib, $eIcnHogRider, $x, $y - 5, 32, 32)
 	_GUICtrlSetTip(-1, GetTranslated(621,40, -1))
@@ -337,16 +353,22 @@ $x += 38
 	GUICtrlSetLimit(-1, 2)
 	GUICtrlSetOnEvent(-1, "lblTotalCountLava")
 
+
 Local $x = 30
 $y += 66
-	GUICtrlCreateIcon($pIconLib, $eIcnCamp, $x - 10, $y - 15, 24, 24)
+	;GUICtrlCreateIcon($pIconLib, $eIcnCamp, $x - 10, $y - 15, 24, 24)
 	$lblFullTroop = GUICtrlCreateLabel(GetTranslated(621, 20, "'Full' Camps"), $x + 16, $y - 7, 55, 17)
+	GUICtrlSetState(-1, $GUI_HIDE)
 	$lblFullTroop2 = GUICtrlCreateLabel(ChrW(8805), $x + 75, $y - 7, -1, 17)
+	GUICtrlSetState(-1, $GUI_HIDE)
 	$txtFullTroop = GUICtrlCreateInput("100", $x + 83, $y - 10, 30, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+	GUICtrlSetState(-1, $GUI_HIDE)
 	GUICtrlSetOnEvent(-1, "SetComboTroopComp")
 	_GUICtrlSetTip(-1, GetTranslated(621, 21, "Army camps are 'Full' when reaching this %, then start attack."))
+	GUICtrlSetState(-1, $GUI_HIDE)
 	GUICtrlSetLimit(-1, 3)
 	$lblFullTroop3 = GUICtrlCreateLabel("%", $x + 114, $y - 7, -1, 17)
+	GUICtrlSetState(-1, $GUI_HIDE)
 
 $x += 180
 $Y -= 23
@@ -367,12 +389,24 @@ $Y -= 23
 	$icnDarkCamp = GUICtrlCreateIcon($pIconLib, $eIcnDark, $x + 146, $y + 14, 16, 16)
 
 $x -= 195
-$Y += 35
-	$chkTotalCampForced = GUICtrlCreateCheckbox(GetTranslated(636, 46, "Force Total Army Camp") & ":", $x + 3, $y, -1, -1)
+$y += 35
+
+	$chkFillArcher = GUICtrlCreateCheckbox(GetTranslated(702, 1, "Fill Barracks with Arch:"), $x + 3, $y - 22, -1, -1)
+		GUICtrlSetState(-1, $GUI_DISABLE)
+
+	$txtFillArcher = GUICtrlCreateInput("5", $x + 130, $y - 20, 20, 18, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+		GUICtrlSetState(-1, $GUI_DISABLE)
+		GUICtrlSetLimit(-1, 2)
+
+	$chkSimpleQuickTrain = GUICtrlCreateCheckbox(GetTranslated(702, 2, "Don't Remove Queued Troops"), $x + 3, $y, -1, -1)
+		GUICtrlSetState(-1, $GUI_DISABLE)
+		GUICtrlSetOnEvent(-1, "chkSimpleQuickTrain")
+
+	$chkTotalCampForced = GUICtrlCreateCheckbox(GetTranslated(636, 46, "Force Total Army Camp") & ":", $x + 172, $y, -1, -1)
 	GUICtrlSetState(-1, $GUI_CHECKED)
 	GUICtrlSetOnEvent(-1, "chkTotalCampForced")
 	_GUICtrlSetTip(-1, GetTranslated(636, 47, "If not detected set army camp values (instead ask)"))
-	$txtTotalCampForced = GUICtrlCreateInput("220", $x + 137, $y + 3, 30, 17, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+	$txtTotalCampForced = GUICtrlCreateInput("220", $x + 306, $y + 3, 30, 17, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 	GUICtrlSetOnEvent(-1, "SetComboTroopComp")
 	GUICtrlSetLimit(-1, 3)
 
@@ -380,12 +414,8 @@ $Y += 35
 	$lbltotalprogress = GUICtrlCreateLabel("", $x, $y + 22, 407, 10)
 	GUICtrlSetBkColor(-1, $COLOR_RED)
 	GUICtrlSetState(-1, BitOR($GUI_DISABLE, $GUI_HIDE))
-$x += 50
-	$chkDontRemoveTroops = GUICtrlCreateCheckbox(GetTranslated(636, 204, "Don't Remove Troops"), $x + 127, $y, -1, -1)
-	$txtTip = GetTranslated(636, 205, "Enable it to Don't Remove Troops.") & @CRLF & GetTranslated(636, 206, "This function only works if you do not donate.") & @CRLF & GetTranslated(636, 207, "If you donate, it's useless!")
-	GUICtrlSetTip(-1, $txtTip)
-	GUICtrlSetOnEvent(-1, "chkDontRemoveTroops")
-$x -= 10
+
+$x += 38
 	$lblTotalTroops = GUICtrlCreateLabel(GetTranslated(621, 15, "Total"), $x + 295, $y + 7, -1, -1, $SS_RIGHT)
 	$lblCountTotal = GUICtrlCreateLabel(0, $x + 330, $y + 5, 30, 15, $SS_CENTER)
 	_GUICtrlSetTip(-1, GetTranslated(621, 16, "The total Units of Troops should equal Total Army Camps."))
@@ -405,6 +435,10 @@ Local $y = 240
 	GUICtrlSetBkColor(-1, $COLOR_MONEYGREEN) ;lime, moneygreen
 	GUICtrlSetData(-1, "0|2|4|6|7|8|9|10|11", "0")
 	GUICtrlSetOnEvent(-1, "lblTotalCountSpell")
+	$chkFillEQ = GUICtrlCreateCheckbox(GetTranslated(702, 3, "Fill Spells with 1 EQ"), $x + 130, $y - 5, -1, -1)
+		GUICtrlSetState(-1, $GUI_DISABLE)
+	$chkTrainDonated = GUICtrlCreateCheckbox(GetTranslated(702, 4, "Train Donated Troops"), $x + 250, $y - 5, -1, -1)
+		GUICtrlSetState(-1, $GUI_DISABLE)
 
 $y += 13
 	$lblLSpellIcon = GUICtrlCreateIcon($pIconLib, $eIcnLightSpell, $x, $y + 10, 32, 32)
@@ -788,7 +822,7 @@ $y = $yStart + 45
 Local $sComboData = ""
 ; Do Not Use translated names here or ChangeTroopTrainOrder() code breaks
 ;Local $aTroopOrderList[] = ["", $sTxtBarbarians, $sTxtArchers, $sTxtGiants, $sTxtGoblins, $sTxtWallBreakers, $sTxtBalloons, $sTxtWizards, $sTxtHealers, $sTxtDragons, $sTxtPekkas, $sTxtBabyDragons, $sTxtMiners, $sTxtMinions, $sTxtHogRiders, $sTxtValkyries, $sTxtGolems, $sTxtWitches, $sTxtLavaHounds, $sTxtBowlers]
-Local $aTroopOrderList[] = ["", "Barbarians", "Archers", "Giants", "Goblins", "Wall Breakers", "Balloons", "Wizards", "Healers", "Dragons", "Pekkas", "Baby Dragons", "Miners", "Minions", "Hog Riders", "Valkyries", "Golems", "Witches", "Lava Hounds", "Bowlers"]
+Local $aTroopOrderList[] = ["", "Barbarians", "Archers", "Giants", "Goblins", "Wall Breakers", "Balloons", "Ice Wizards", "Wizards", "Healers", "Dragons", "Pekkas", "Baby Dragons", "Miners", "Minions", "Hog Riders", "Valkyries", "Golems", "Witches", "Lava Hounds", "Bowlers"]
 
 ; Create translated list of Troops for combo box
 For $j = 0 To UBound($aTroopOrderList) - 1
@@ -892,7 +926,7 @@ $y = $yStart + 45
 	$txtTip = GetTranslated(641, 4, "Option will exit CoC game for time required to complete TROOP training when SHIELD IS ACTIVE") & @CRLF & _
 			GetTranslated(641, 5, "Close for Spell creation will be enabled when 'Wait for Spells' is selected on Search tabs") & @CRLF & _
 			GetTranslated(641, 6, "Close for Hero healing will be enabled when 'Wait for Heroes' is enabled on Search tabs")
-	GUICtrlSetState(-1, $GUI_UNCHECKED)
+	GUICtrlSetState(-1, $GUI_CHECKED)
 	_GUICtrlSetTip(-1, $txtTip)
 	GUICtrlSetOnEvent(-1, "chkCloseWaitEnable")
 

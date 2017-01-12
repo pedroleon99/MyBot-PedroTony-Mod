@@ -146,7 +146,7 @@ Global Const $iDelaycheckMainScreen2 = 20000
 Global Const $iDelaycheckObstacles1 = 1000
 Global Const $iDelaycheckObstacles2 = 2000
 Global Const $iDelaycheckObstacles3 = 5000
-Global Const $iDelaycheckObstacles4 = 120000 ; 2 minutes
+Global Const $iDelaycheckObstacles4 = 3000 ; 30 sec
 Global Const $iDelaycheckObstacles5 = 500 ; click
 Global Const $iDelaycheckObstacles6 = 300000 ; 5 minutes
 Global Const $iDelaycheckObstacles7 = 600000 ; 10 minutes
@@ -278,6 +278,12 @@ Global Const $iDelayDropTrophy1 = 1000
 Global Const $iDelayDropTrophy2 = 2000
 Global Const $iDelayDropTrophy3 = 1500
 Global Const $iDelayDropTrophy4 = 250
+
+;SuperXP / GoblinXP
+Global Const $iDelayDropSuperXP1 = 500
+Global Const $iDelayDropSuperXP2 = 1000
+Global Const $iDelayDropSuperXP3 = 250
+Global Const $iDelayPrepareSearchSuperXP = 500
 
 ;GetTownHallLevel
 Global Const $iDelayGetTownHallLevel1 = 1000

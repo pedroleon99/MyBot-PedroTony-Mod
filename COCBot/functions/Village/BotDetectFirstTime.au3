@@ -108,27 +108,35 @@ Func BotDetectFirstTime()
 	Switch Number($iTownHallLevel)
 		Case 4
 			GUICtrlSetState($THLevels04, $GUI_SHOW)
+			GUICtrlSetState($THLevels004, $GUI_SHOW)
 			GUICtrlSetData($lblTHLevels, "4")
 		Case 5
 			GUICtrlSetState($THLevels05, $GUI_SHOW)
+			GUICtrlSetState($THLevels005, $GUI_SHOW)
 			GUICtrlSetData($lblTHLevels, "5")
 		Case 6
 			GUICtrlSetState($THLevels06, $GUI_SHOW)
+			GUICtrlSetState($THLevels006, $GUI_SHOW)
 			GUICtrlSetData($lblTHLevels, "6")
 		Case 7
 			GUICtrlSetState($THLevels07, $GUI_SHOW)
+			GUICtrlSetState($THLevels007, $GUI_SHOW)
 			GUICtrlSetData($lblTHLevels, "7")
 		Case 8
 			GUICtrlSetState($THLevels08, $GUI_SHOW)
+			GUICtrlSetState($THLevels008, $GUI_SHOW)
 			GUICtrlSetData($lblTHLevels, "8")
 		Case 9
 			GUICtrlSetState($THLevels09, $GUI_SHOW)
+			GUICtrlSetState($THLevels009, $GUI_SHOW)
 			GUICtrlSetData($lblTHLevels, "9")
 		Case 10
 			GUICtrlSetState($THLevels10, $GUI_SHOW)
+			GUICtrlSetState($THLevels010, $GUI_SHOW)
 			GUICtrlSetData($lblTHLevels, "10")
 		Case 11
 			GUICtrlSetState($THLevels11, $GUI_SHOW)
+			GUICtrlSetState($THLevels011, $GUI_SHOW)
 			GUICtrlSetData($lblTHLevels, "11")
 	EndSwitch
 	GUICtrlSetState(Eval("$THLevels" + Number($iTownHallLevel)), $GUI_SHOW)

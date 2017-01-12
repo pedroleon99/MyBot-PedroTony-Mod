@@ -757,3 +757,60 @@ Func FixClanCastle($inputString)
 	Return $OutputFinal
 
 EndFunc   ;==>FixClanCastle
+
+Func btnTestSmartZap($directory = $dirTemp)
+	Local $hBMP = 0, $hHBMP = 0
+	Local $sImageFile = FileOpenDialog("Select CoC screenshot to test, cancel to use live screenshot", $directory, "Image (*.png)", $FD_FILEMUSTEXIST, "", $frmBot)
+	If @error <> 0 Then
+		SetLog("Testing image cancelled, taking screenshot from " & $Android, $COLOR_INFO)
+		_CaptureRegion()
+		$hHBMP = $hHBitmap
+		TestCapture($hHBMP)
+	Else
+		SetLog("Testing image " & $sImageFile, $COLOR_INFO)
+		; load test image
+		$hBMP = _GDIPlus_BitmapCreateFromFile($sImageFile)
+		$hHBMP = _GDIPlus_BitmapCreateDIBFromBitmap($hBMP)
+		_GDIPlus_BitmapDispose($hBMP)
+		TestCapture($hHBMP)
+		SetLog("Testing image hHBitmap = " & $hHBMP)
+	EndIf
+
+	Local $currentRunState = $RunState
+	Local $currentDebugSmartZap = $DebugSmartZap
+	Local $currentatkTroops = $atkTroops
+	Local $currentdebugBuildingPos = $debugBuildingPos
+	Local $currentdebugGetLocation = $debugGetLocation
+	
+	$RunState = True
+	$DebugSmartZap = 1
+	$atkTroops[0][0] = $eLSpell
+	$atkTroops[0][1] = 5
+	$atkTroops[1][0] = $eESpell
+	$atkTroops[1][1] = 1
+	$atkTroops[2][0] = $eLSpell
+	$atkTroops[2][1] = 1
+	$GlobalEQSpelllevel  = 4
+	$GlobalLSpelllevel  = 7
+	;$debugBuildingPos = 1
+	;$debugGetLocation = 1
+	
+	SetLog("Testing smartZap()", $COLOR_INFO)
+
+	SearchZoomOut($aCenterEnemyVillageClickDrag, True, "btnTestSmartZap")
+	ResetTHsearch()
+	smartZap()
+
+	SetLog("Testing smartZap() DONE", $COLOR_INFO)
+
+	If $hHBMP <> 0 Then
+		_WinAPI_DeleteObject($hHBMP)
+		TestCapture(0)
+	EndIf
+
+	$DebugSmartZap = $currentDebugSmartZap
+	$atkTroops = $currentatkTroops
+	$debugBuildingPos = $currentdebugBuildingPos
+	$debugGetLocation = $currentdebugGetLocation
+	$RunState = $currentRunState
+EndFunc		;==>btnTestSmartZap

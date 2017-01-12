@@ -200,24 +200,4 @@ $chkFixClanCastle = GUICtrlCreateCheckbox(GetTranslated(636,104, "Force Clan Cas
 	_GUICtrlSetTip(-1, GetTranslated(636,105, "If clan Castle it is undetected and it is NOT placed in the last slot, force bot to consider the undetected slot as Clan Castle"))
 	GUICtrlSetState(-1, $GUI_UNCHECKED)
 
-$y += 45
-$grpShieldOpt = GUICtrlCreateGroup("Android Shield", $x-20, $y-18, 225, 70)
-$btnColorShield = GUICtrlCreateButton("Shield", $x, $y, 70, 17)
-	GUICtrlSetOnEvent(-1, "btnColorShield")
-	_GUICtrlSetTip(-1, "Set the Android Shield's Color")
-$btnColorIdleShield = GUICtrlCreateButton("Idle Shield", $x, $y + 25, 70, 17, -1)
-	GUICtrlSetOnEvent(-1, "btnColorIdleShield")
-	_GUICtrlSetTip(-1, "Set the Inactive Android Shield's Color")
-$x += 80
-$sldrTransparancyShield = GUICtrlCreateSlider($x, $y, 70, 17, BitOR($TBS_TOOLTIPS, $TBS_NOTICKS))
-	GUICtrlSetLimit(-1, 255, 1)
-	GUICtrlSetBkColor(-1, 0xFFFFFF)
-	GUICtrlSetOnEvent(-1, "sldrTransparancyShield")
-	_GUICtrlSetTip(-1, "Set the Android Shield's Transparancy")
-$sldrTransparancyIdleShield = GUICtrlCreateSlider($x, $y + 25, 70, 17, BitOR($TBS_TOOLTIPS, $TBS_NOTICKS))
-	GUICtrlSetLimit(-1, 255, 1)
-	GUICtrlSetBkColor(-1, 0xFFFFFF)
-	GUICtrlSetOnEvent(-1, "sldrTransparancyIdleShield")
-	_GUICtrlSetTip(-1, "Set the Inactive Android Shield's Transparancy")
-
 GUICtrlCreateGroup("", -99, -99, 1, 1)
