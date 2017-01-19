@@ -35,8 +35,8 @@ ProcessSetPriority(@AutoItPID, $PROCESS_ABOVENORMAL)
 Global $iBotLaunchTime = 0
 Global $hBotLaunchTime = TimerInit()
 
-Global $sBotVersion = "v6.5.2" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it it also use on Checkversion()
-Global $sModversion = "v2.0" ;<== Just Change This to Version Number
+Global $sBotVersion = "v6.5.3" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it is also use on Checkversion()
+Global $sModversion = "v2.1" ;<== Just Change This to Version Number
 Global $sModSupportUrl = "https://drive.google.com/file/d/0BxtxwQwk8kUaRzhCRGRZWUhsaEk/view?usp=sharing" ;<== Our Website Link Or Link Download
 Global $sModDownloadUrl = "https://github.com/pedroleon99/MyBot-PedroTony-Mod/releases"
 
@@ -447,6 +447,8 @@ Func Idle() ;Sequence that runs until Full Army
 		Local $iReHere = 0
 		;PrepareDonateCC()
 
+		BotHumanization()
+
 		;If $iSkipDonateNearFulLTroopsEnable = 1 Then getArmyCapacity(true,true)
 		If $bActiveDonate = True Then
 			Local $aHeroResult = CheckArmyCamp(True, True, True)
@@ -640,7 +642,7 @@ Func Attack() ;Selects which algorithm
 		Algorithm_AttackCSV()
 	ElseIf $iMatchMode = $DB And $iAtkAlgorithm[$DB] = 2 Then
 		If $debugsetlog = 1 Then Setlog("start milking attack", $COLOR_ERROR)
-		Algorithm_MilkingAttack()
+		Alogrithm_MilkingAttack()
 	Else
 		If $debugsetlog = 1 Then Setlog("start standard attack", $COLOR_ERROR)
 		algorithm_AllTroops()

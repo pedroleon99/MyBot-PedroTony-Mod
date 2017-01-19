@@ -17,7 +17,7 @@ Global $chkAutostart, $txtAutostartDelay, $chkAutohide, $txtAutohideDelay, $chkL
 Global $chkDebugClick, $chkDebugSetlog, $chkDebugDisableZoomout, $chkDebugDisableVillageCentering, $chkDebugOcr, $chkDebugImageSave, $chkdebugBuildingPos, $chkdebugTrain, $chkdebugOCRDonate, $chkdebugAttackCSV, $chkMakeIMGCSV
 Global $txtDeleteLogsDays, $txtDeleteTempDays, $txtDeleteLootsDays, $cmbLanguage, $chkScreenshotType, $chkScreenshotHideName, $chkUseRandomClick
 Global $sldVSDelay, $sldMaxVSDelay, $lblVSDelay, $lblMaxVSDelay, $lbltxtVSDelay, $lbltxtMaxVSDelay
-Global $sldTrainITDelay ,  $lbltxtTrainITDelay, $chkAlertSearch
+Global $sldTrainITDelay, $lbltxtTrainITDelay, $chkAlertSearch
 Global $chkSinglePBTForced, $txtSinglePBTimeForced, $txtPBTimeForcedExit
 
 $hGUI_BOT = GUICreate("", $_GUI_MAIN_WIDTH - 20, $_GUI_MAIN_HEIGHT - 255, $_GUI_CHILD_LEFT, $_GUI_CHILD_TOP, BitOR($WS_CHILD, $WS_TABSTOP), -1, $frmBotEx)
@@ -30,14 +30,12 @@ $hGUI_BOT_TAB = GUICtrlCreateTab(0, 0, $_GUI_MAIN_WIDTH - 20, $_GUI_MAIN_HEIGHT 
 $hGUI_BOT_TAB_ITEM1 = GUICtrlCreateTabItem(GetTranslated(600,35,"Options"))
 #include "MBR GUI Design Child Bot - Options.au3"
 GUICtrlCreateTabItem("")
+$hGUI_BOT_TAB_ITEM5 = GUICtrlCreateTabItem("Humanization")
+#include "MBR GUI Design Child Bot - Humanization.au3"
+GUICtrlCreateTabItem("")
 $hGUI_BOT_TAB_ITEM2 = GUICtrlCreateTabItem(GetTranslated(600,53,"Android"))
 #include "MBR GUI Design Child Bot - Android.au3"
 GUICtrlCreateTabItem("")
-
-;$hGUI_BOT_TAB_ITEM3 = GUICtrlCreateTabItem("Bot Humanization")
-;#include "MBR GUI Design Child Bot - Humanization.au3"
-;GUICtrlCreateTabItem("")
-
 $hGUI_BOT_TAB_ITEM3 = GUICtrlCreateTabItem(GetTranslated(600,51,"Debug"))
 #include "MBR GUI Design Child Bot - Debug.au3"
 GUICtrlCreateTabItem("")

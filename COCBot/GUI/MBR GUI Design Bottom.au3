@@ -97,24 +97,7 @@ If $AndroidAdbScreencap = True Then chkBackground() ; update background mode GUI
 
 $pic2arrow = GUICtrlCreateIcon($pIconLib, $eIcn2Arrow, $x + 190, $y + 10, 48, 48)
 
-$THLevels004 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV04.ico",-1, $x + 187, $y + 0, 64, 64)
-	GUICtrlSetState(-1,$GUI_HIDE)
-$THLevels005 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV05.ico",-1, $x + 187, $y + 0, 64, 64)
-	GUICtrlSetState(-1,$GUI_HIDE)
-$THLevels006 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV06.ico",-1, $x + 187, $y + 0, 64, 64)
-	GUICtrlSetState(-1,$GUI_HIDE)
-$THLevels007 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV07.ico",-1, $x + 187, $y + 0, 64, 64)
-	GUICtrlSetState(-1,$GUI_HIDE)
-$THLevels008 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV08.ico",-1, $x + 187, $y + 0, 64, 64)
-	GUICtrlSetState(-1,$GUI_HIDE)
-$THLevels009 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV09.ico",-1, $x + 187, $y + 0, 64, 64)
-	GUICtrlSetState(-1,$GUI_HIDE)
-$THLevels010 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV10.ico",-1, $x + 187, $y + 0, 64, 64)
-	GUICtrlSetState(-1,$GUI_HIDE)
-$THLevels011 = GUICtrlCreateIcon(@ScriptDir & "\images\TH\Levels\HdV11.ico",-1, $x + 187, $y + 0, 64, 64)
-	GUICtrlSetState(-1,$GUI_HIDE)
-
-$lblVersion = GUICtrlCreateLabel($sBotVersion, 200, $y + 70, 60, 17, $SS_CENTER)
+$lblVersion = GUICtrlCreateLabel($sBotVersion, 200, $y + 60, 60, 17, $SS_CENTER)
 	GUICtrlSetColor(-1, $COLOR_MEDGRAY)
 
 $arrowleft = GUICtrlCreateIcon($pIconLib, $eIcnArrowLeft, $x + 249, $y + 30, 16, 16)

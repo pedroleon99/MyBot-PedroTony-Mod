@@ -22,7 +22,7 @@
 Global Const $TCM_SETITEM = 0x1306
 
 Global Const $_GUI_MAIN_WIDTH = 470
-Global Const $_GUI_MAIN_HEIGHT = 650
+Global Const $_GUI_MAIN_HEIGHT = 690 ; 650
 Global Const $_GUI_MAIN_TOP = 5
 Global Const $_GUI_BOTTOM_HEIGHT = 135
 Global Const $_GUI_CHILD_LEFT = 10
@@ -201,7 +201,6 @@ Bind_ImageList($hGUI_AttackOption_TAB)
 Bind_ImageList($hGUI_THSNIPE_TAB)
 Bind_ImageList($hGUI_BOT_TAB)
 Bind_ImageList($hGUI_MOD_TAB)
-Bind_ImageList($hGUI_MODSwitch_TAB)
 Bind_ImageList($hGUI_STRATEGIES_TAB)
 Bind_ImageList($hGUI_STATS_TAB)
 #EndRegion ; Bind Icon images to all Tabs in all GUI windows (main and children)

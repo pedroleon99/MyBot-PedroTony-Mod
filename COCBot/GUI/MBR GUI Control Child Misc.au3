@@ -94,7 +94,7 @@ Func btnAddConfirm()
 			;====== SwitchAcc - DEMEN ==============
 
 		Case Else
-			SetLog(GetTranslated(637, 15, "If you are seeing this log message there is something wrong."), $COLOR_ERROR)
+			SetLog("If you are seeing this log message there is something wrong.", $COLOR_ERROR)
 	EndSwitch
 EndFunc   ;==>btnAddConfirm
 
@@ -154,7 +154,7 @@ Func btnDeleteCancel()
 			GUICtrlSetState($btnRecycle, $GUI_SHOW)
 			; IceCube (Misc v1.0)
 		Case Else
-			SetLog(GetTranslated(637, 14, "If you are seeing this log message there is something wrong."), $COLOR_ERROR)
+			SetLog("If you are seeing this log message there is something wrong.", $COLOR_ERROR)
 	EndSwitch
 
 	If GUICtrlRead($cmbProfile) = "<No Profiles>" Then
@@ -207,7 +207,7 @@ Func btnRenameConfirm()
 			GUICtrlSetState($btnRecycle, $GUI_SHOW)
 			; IceCube (Misc v1.0)
 		Case Else
-			SetLog(GetTranslated(637, 14, "If you are seeing this log message there is something wrong."), $COLOR_ERROR)
+			SetLog("If you are seeing this log message there is something wrong.", $COLOR_ERROR)
 	EndSwitch
 EndFunc   ;==>btnRenameConfirm
 

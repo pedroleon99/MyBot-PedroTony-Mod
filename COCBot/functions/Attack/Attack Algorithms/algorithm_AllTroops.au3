@@ -19,7 +19,9 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 
 	If _Sleep($iDelayalgorithm_AllTroops1) Then Return
 
-	If $iChkDeploySettings[$iMatchMode] <> 4 Then SmartAttackStrategy($iMatchMode) ; detect redarea first to drop any troops
+	If $iChkDeploySettings[$iMatchMode] <> 4 Then ; ! FourFinger
+		SmartAttackStrategy($iMatchMode) ; detect redarea first to drop any troops
+	EndIf
 
 	; If one of condtions passed then start TH snipe attack
 	; - detect matchmode TS
@@ -61,13 +63,13 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 	;########################################################################################################################
 	Local $nbSides = 0
 	Switch $iChkDeploySettings[$iMatchMode]
-		Case 0 ;Single sides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		Case 0 ;Single sides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			SetLog("Attacking on a single side", $COLOR_INFO)
 			$nbSides = 1
 		Case 1 ;Two sides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			SetLog("Attacking on two sides", $COLOR_INFO)
 			$nbSides = 2
-		Case 2 ;Three sides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		Case 2 ;Three sides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			SetLog("Attacking on three sides", $COLOR_INFO)
 			$nbSides = 3
 		Case 3 ;All sides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,11 +81,11 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 		Case 5 ;Multi Finger Attack ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			SetLog("Attacking Multi Finger Attack style", $COLOR_INFO)
 			$nbSides = 6
-		Case 6 ;DE Side - Live Base only ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		Case 6 ;DE Side - Live Base only ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			SetLog("Attacking on Dark Elixir Side.", $COLOR_INFO)
 			$nbSides = 1
 			If Not ($iChkRedArea[$iMatchMode]) Then GetBuildingEdge($eSideBuildingDES) ; Get DE Storage side when Redline is not used.
-		Case 7 ;TH Side - Live Base only ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		Case 7 ;TH Side - Live Base only ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			SetLog("Attacking on Town Hall Side.", $COLOR_INFO)
 			$nbSides = 1
 			If Not ($iChkRedArea[$iMatchMode]) Then GetBuildingEdge($eSideBuildingTH) ; Get Townhall side when Redline is not used.
@@ -95,7 +97,7 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 	If $iMatchMode = $LB And $iChkDeploySettings[$LB] = 5 Then ; Customise DE side wave deployment here
 		Switch $icmbStandardAlgorithm[$iMatchMode]
 			Case 0
-				Local $listInfoDeploy[22][5] = [[$eGole, $nbSides, 1, 1, 2] _
+				Local $listInfoDeploy[21][5] = [[$eGole, $nbSides, 1, 1, 2] _
 						, [$eLava, $nbSides, 1, 1, 2] _
 						, [$eGiant, $nbSides, 1, 1, 2] _
 						, [$eDrag, $nbSides, 1, 1, 0] _
@@ -104,7 +106,6 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 						, [$eBabyD, $nbSides, 1, 1, 1] _
 						, [$eHogs, $nbSides, 1, 1, 1] _
 						, [$eValk, $nbSides, 1, 1, 0] _
-						, [$eIceW, $nbSides, 1, 1, 0] _
 						, [$eBowl, $nbSides, 1, 1, 0] _
 						, [$eMine, $nbSides, 1, 1, 0] _
 						, [$eWall, $nbSides, 1, 1, 1] _
@@ -142,9 +143,10 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 						, [$eGobl, $nbSides, 1, 1, 1] _
 						]
 		EndSwitch
+
 	; Four Fingers Classic
 	ElseIf $nbSides = 5 Then
-		Local $listInfoDeploy[22][5] = [[$eGiant, $nbSides, 1, 1, 2], _
+		Local $listInfoDeploy[21][5] = [[$eGiant, $nbSides, 1, 1, 2], _
 						[$eGole, $nbSides, 1, 1, 2], _
 						[$eLava, $nbSides, 1, 1, 2], _
 						[$eBarb, $nbSides, 1, 1, 0], _
@@ -158,18 +160,41 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 						[$eMine, $nbSides, 1, 1, 0], _
 						[$ePekk, $nbSides, 1, 1, 2], _
 						[$eDrag, $nbSides, 1, 1, 2], _
-						[$eIceW, $nbSides, 1, 1, 0], _
 						[$eBall, $nbSides, 1, 1, 2], _
 						[$eBabyD, $nbSides, 1, 1, 1], _
 						[$eWiza, $nbSides, 1, 1, 2], _
 						[$eWitc, $nbSides, 1, 1, 2], _
 						[$eMini, $nbSides, 1, 1, 0], _
 						["HEROES", 1, 2, 1, 1]]
+
+	; Multi Finger Attack
+	ElseIf $nbSides = 6 Then
+		Local $listInfoDeploy[21][6] = [[$eGiant, $nbSides, 1, 1, 2], _
+						[$eGole,  $nbSides, 1, 1, 2], _
+						[$eLava,  $nbSides, 1, 1, 2], _
+						[$eBarb,  $nbSides, 1, 1, 0], _
+						["CC",           1, 1, 1, 1], _
+						[$eWall,  $nbSides, 1, 1, 2], _
+						[$eHogs,  $nbSides, 1, 1, 2], _
+						[$eValk,  $nbSides, 1, 1, 2], _
+						[$eBowl,  $nbSides, 1, 1, 0], _
+						[$eArch,  $nbSides, 1, 1, 0], _
+						[$eGobl,  $nbSides, 1, 1, 0], _
+						[$eMine,  $nbSides, 1, 1, 0], _
+						[$ePekk,  $nbSides, 1, 1, 2], _
+						[$eDrag,  $nbSides, 1, 1, 2], _
+						[$eBall,  $nbSides, 1, 1, 2], _
+						[$eBabyD, $nbSides, 1, 1, 1], _
+						[$eWiza,  $nbSides, 1, 1, 2], _
+						[$eWitc,  $nbSides, 1, 1, 2], _
+						[$eMini,  $nbSides, 1, 1, 0], _
+						["HEROES",       1, 2, 1, 1]]
+
 	Else
 		If $debugSetlog = 1 Then SetLog("listdeploy standard for attack", $COLOR_DEBUG)
 		Switch $icmbStandardAlgorithm[$iMatchMode]
 			Case 0
-				Local $listInfoDeploy[22][5] = [[$eGole, $nbSides, 1, 1, 2] _
+				Local $listInfoDeploy[21][5] = [[$eGole, $nbSides, 1, 1, 2] _
 						, [$eLava, $nbSides, 1, 1, 2] _
 						, [$eGiant, $nbSides, 1, 1, 2] _
 						, ["CC", 1, 1, 1, 1] _
@@ -178,7 +203,6 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 						, [$eBabyD, $nbSides, 1, 1, 0] _
 						, [$eHogs, $nbSides, 1, 1, 1] _
 						, [$eValk, $nbSides, 1, 1, 0] _
-						, [$eIceW, $nbSides, 1, 1, 0] _
 						, [$eBowl, $nbSides, 1, 1, 0] _
 						, [$eMine, $nbSides, 1, 1, 0] _
 						, [$eWall, $nbSides, 1, 1, 1] _
@@ -242,7 +266,7 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 	$DeployHeroesPosition[0] = -1
 	$DeployHeroesPosition[1] = -1
 
-	If $iChkDeploySettings[$iMatchMode] = 5 And  $iMatchMode = $DB Then
+	If $iChkDeploySettings[$iMatchMode] = 4 And  $iMatchMode = $DB Then
 		SetLog(_PadStringCenter("Multi Finger Attack", 50, "="), $COLOR_BLUE)
 		launchMultiFinger($listInfoDeploy, $CC, $King, $Queen, $Warden)
 	Else
