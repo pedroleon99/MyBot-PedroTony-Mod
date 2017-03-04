@@ -6,26 +6,25 @@
 ; Return values .: None
 ; Author ........:
 ; Modified ......:
-; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2016
+; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
 
+#include "functions\Other\SetLog.au3"
 #include "functions\Other\Synchronization.au3"
 #include "functions\Other\OnAutoItErrorRegisterBot.au3"
-#include "functions\Other\UpdateStatsWall.au3"
 
 #include "functions\Config\profileFunctions.au3"
 #include "functions\Config\applyConfig.au3"
-#include "functions\Config\strategies.au3"
 #include "functions\Config\readConfig.au3"
 #include "functions\Config\saveConfig.au3"
 
 #include "functions\Attack\AttackReport.au3"
 #include "functions\Attack\BuildingSide.au3"
-#include "functions\Attack\GoldElixirChange.au3"
+#include "functions\Attack\GoldElixirChangeThSnipes.au3"
 #include "functions\Attack\GoldElixirChangeEBO.au3"
 #include "functions\Attack\PrepareAttack.au3"
 #include "functions\Attack\ReturnHome.au3"
@@ -42,7 +41,6 @@
 #include "functions\Attack\AttackCSV\CheckCSVValues.au3"
 #include "functions\Attack\AttackCSV\DebugAttackCSV.au3"
 #include "functions\Attack\AttackCSV\DropTroopFromINI.au3"
-#include "functions\Attack\AttackCSV\DropSpellFromINIOnDefense.au3"
 #include "functions\Attack\AttackCSV\GetListPixel3.au3"
 #include "functions\Attack\AttackCSV\IsInsideDiamondRedArea.au3"
 #include "functions\Attack\AttackCSV\Line2Points.au3"
@@ -53,9 +51,6 @@
 #include "functions\Attack\AttackCSV\Slice8.au3"
 #include "functions\Attack\AttackCSV\CleanRedArea.au3"
 #include "functions\Attack\AttackCSV\ChkAttackCSVConfig.au3"
-#include "functions\Attack\AttackCSV\SideP.au3"
-#include "functions\Attack\AttackCSV\ZapCmd.au3"
-#include "functions\Attack\AttackCSV\UpdateTroopQuantity.au3"
 
 #include "functions\Attack\MilkingAttack\Algorithm_MilkingAttack.au3"
 #include "functions\Attack\MilkingAttack\AmountOfResourcesInStructure.au3"
@@ -133,6 +128,7 @@
 #include "functions\Image Search\imglocTHSearch.au3"
 #include "functions\Image Search\imglocAttackBar.au3"
 
+
 #include "functions\Main Screen\checkMainScreen.au3"
 #include "functions\Main Screen\checkObstacles.au3"
 #include "functions\Main Screen\GetDPI_Ratio.au3"
@@ -163,7 +159,6 @@
 #include "functions\Android\AndroidEmbed.au3"
 
 #include "functions\Other\WerFaultClose.au3"
-#include "functions\Other\_ArraySortEx.au3"
 #include "functions\Other\_NumberFormat.au3"
 #include "functions\Other\_PadStringCenter.au3"
 #include "functions\Other\_ReduceMemory.au3"
@@ -181,7 +176,6 @@
 #include "functions\Other\ExtendedErrorInfo.au3"
 #include "functions\Other\FindPos.au3"
 #include "functions\Other\StringSize.au3"
-#include "functions\Other\SetLog.au3"
 #include "functions\Other\Tab.au3"
 #include "functions\Other\Time.au3"
 #include "functions\Other\BlockInputEx.au3"
@@ -197,8 +191,10 @@
 #include "functions\Other\UpdateStats.au3"
 #include "functions\Other\CheckVersion.au3"
 #include "functions\Other\CloseRunningBot.au3"
+#include "functions\Other\RestartBot.au3"
 #include "functions\Other\WindowSystemMenu.au3"
 #include "functions\Other\image_get_info.au3"
+
 #include "functions\Other\ComError.au3"
 #include "functions\Other\IsPage.au3"
 #include "functions\Other\MoveMouseOutBS.au3"
@@ -206,7 +202,6 @@
 #include "functions\Other\LaunchConsole.au3"
 #include "functions\Other\ADB.au3"
 #include "functions\Other\FindAButton.au3"
-#include "functions\Other\ArrayFunctions.au3"
 
 #include "functions\Pixels\_CaptureRegion.au3"
 #include "functions\Pixels\_ColorCheck.au3"
@@ -275,38 +270,33 @@
 #include "functions\Village\GainCost.au3"
 #include "functions\Village\ConvertOCRTime.au3"
 #include "functions\Other\ClickZoneR.au3"
+#include "functions\Village\CheckNeedOpenTrain.au3"
 
 #include "functions\Other\Api.au3"
 #include "functions\Other\ApiClient.au3"
 
-;==============================================================
-; Added by DocOC team
-;==============================================================
-
-#include "functions\BotHumanization\BotHumanization.au3"
-#include "functions\BotHumanization\AttackNDefenseActions.au3"
-#include "functions\BotHumanization\BestClansNPlayersActions.au3"
-#include "functions\BotHumanization\ChatActions.au3"
-#include "functions\BotHumanization\ClanActions.au3"
-#include "functions\BotHumanization\ClanWarActions.au3"
+; Team Mod's (NguyenAnhHD, Demen)
+#include "functions\Mod's\AutoHide.au3"
+#include "functions\Mod's\AreCollectorsOutside.au3"
+#include "functions\Mod's\ProfileSwitch.au3"
+#include "functions\Mod's\SwitchAcc.au3"
+#include "functions\Mod's\UpdateProfileStats.au3"
+#include "functions\Mod's\SimpleTrain.au3"
 
 
-;OLD CODE
+; OLD CODE
 
-;#include "functions\Image Search\THSearch.au3"
-;#include "functions\Other\MBRFunc.au3"
-;#include "functions\CreateArmy\Train.au3"
-;#include "functions\CreateArmy\Spell.au3"
+;#include "functions\Image Search\checkWall.au3"
 ;#include "functions\CreateArmy\getArmyTroopCount.au3" we don't use this anymore
+;#include "functions\Other\MBRFunc.au3"
+;#include "functions\CreateArmy\Spell.au3"
 ;#include "functions\CreateArmy\_TrainMoveBtn.au3"
-;#include "functions\CreateArmy\isBarrack.au3"
+;#include "functions\CreateArmy\isBarrack.au3"ateArmy\TrainIt.au3"
+;#include "functions\CreateArmy\Train.au3"
+;#include "functions\Image Search\THSearch.au3"
 ;#include "functions\CreateArmy\BarracksStatus.au3"
-;#include "functions\Village\LocateBarrack.au3"
-;#include "functions\Village\LocateSpell.au3"
 ;#include "functions\Image Search\checkTownhall.au3"
+;#include "functions\Village\LocateBarrack.au3"
 ;#include "functions\Village\ClanLevel.au3"
-
-#include "functions\Village\SuperXP.au3"
-
-; MBR Functions Mod's - Added By NguyenAnhHD
-#include "functions\NguyenAnhHD Mod's\GUI - Mod\MBR Functions - Mod.au3"
+;#include "functions\Village\LocateSpell.au3"
+;#include "functions\Other\UpdateStatsWall.au3"
