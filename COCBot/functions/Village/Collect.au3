@@ -33,6 +33,8 @@ Func Collect()
 	Local $Filename = ""
 	Local $CollectXY
 
+	IsWaitingForConnection()
+
 	Local $aResult = returnMultipleMatchesOwnVillage($directory)
 	If UBound($aResult) > 1 Then
 

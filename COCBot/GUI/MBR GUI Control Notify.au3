@@ -63,6 +63,8 @@ Func chkPBTGenabled()
 		GUICtrlSetState($g_hChkNotifyAlertMaintenance, $GUI_ENABLE)
 		GUICtrlSetState($g_hChkNotifyAlertBAN, $GUI_ENABLE)
 		GUICtrlSetState($g_hChkNotifyBOTUpdate, $GUI_ENABLE)
+		; Notify Bot Speep (Kychera) - Added By NguyenAnhHD
+		GUICtrlSetState($g_hChkNotifyBOTSleep, $GUI_ENABLE)
 	Else
 		GUICtrlSetState($g_hChkNotifyRemote, $GUI_DISABLE)
 		GUICtrlSetState($g_hTxtNotifyOrigin, $GUI_DISABLE)
@@ -80,6 +82,8 @@ Func chkPBTGenabled()
 		GUICtrlSetState($g_hChkNotifyAlertMaintenance, $GUI_DISABLE)
 		GUICtrlSetState($g_hChkNotifyAlertBAN, $GUI_DISABLE)
 		GUICtrlSetState($g_hChkNotifyBOTUpdate, $GUI_DISABLE)
+		; Notify Bot Speep (Kychera) - Added By NguyenAnhHD
+		GUICtrlSetState($g_hChkNotifyBOTSleep, $GUI_DISABLE)
 		GUICtrlSetState($g_hCmbNotifyPushHours, $GUI_DISABLE)
 		GUICtrlSetState($g_hChkNotifyDeleteAllPBPushes, $GUI_DISABLE)
 		GUICtrlSetState($g_hChkNotifyDeleteOldPBPushes, $GUI_DISABLE)

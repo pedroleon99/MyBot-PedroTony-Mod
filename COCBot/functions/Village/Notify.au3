@@ -1094,6 +1094,16 @@ Func NotifyPushMessageToBoth($Message, $Source = "")
 				If $g_bNotifyPBEnable = True Then SetLog("Notify PushBullet: Your Army Camps are now Full", $COLOR_GREEN)
 				If $g_bNotifyTGEnable = True Then SetLog("Notify Telegram: Your Army Camps are now Full", $COLOR_GREEN)
 			EndIf
+		; Notify Bot Speep (Kychera) - Added By NguyenAnhHD
+		Case "SleepBot"
+		    If ($g_bNotifyPBEnable = True Or $g_bNotifyTGEnable = True) And $g_bNotifyAlertBOTSleep = True Then
+				NotifyPushToBoth($g_sNotifyOrigin & " | " & GetTranslated(620, 736, "Bot Sleep") & "..." & "\n" & $sWaitTime)
+		    EndIf
+		Case "WakeUpBot"
+		    If ($g_bNotifyPBEnable = True Or $g_bNotifyTGEnable = True) And $g_bNotifyAlertBOTSleep = True Then
+		      NotifyPushToBoth($g_sNotifyOrigin & " | " & GetTranslated(620, 737, "Wake Up Bot"))
+		    EndIf
+		; ======> Notify Bot Speep (Kychera) - Added By NguyenAnhHD
 		Case "Misc"
 			NotifyPushToBoth($Message)
 	EndSwitch

@@ -18,7 +18,7 @@ Global $g_hChkDBDisableCollectorsFilter = 0
 Global $g_ahChkDBCollectorLevel[13] = [-1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0] ; elements 0 thru 5 are never referenced
 Global $g_ahCmbDBCollectorLevel[13] = [-1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0] ; elements 0 thru 5 are never referenced
 Global $g_hCmbMinCollectorMatches = 0, $g_hSldCollectorTolerance = 0, $g_hLblCollectorWarning = 0
-Global $g_hChkDBMeetCollOutside = 0, $g_hTxtDBMinCollOutsidePercent
+Global $g_hChkDBMeetCollOutside = 0, $g_hTxtDBMinCollOutsidePercent ; Check Collector Outside - Added By NguyenAnhHD
 
 Func CreateAttackSearchDeadBaseCollectors()
    Local $x = 10, $y = 45
@@ -32,6 +32,7 @@ Func CreateAttackSearchDeadBaseCollectors()
 			GUICtrlSetState(-1, $GUI_UNCHECKED)
 			_GUICtrlSetTip(-1, GetTranslated(626,33, "Excluding Collector Filter the bot consider DeadBase as ActiveBase"))
 
+		; Check Collector Outside - Added By NguyenAnhHD
 		$g_hChkDBMeetCollOutside = GUICtrlCreateCheckbox(GetTranslated(626,40, "Check Collectors Outside"), $x+250, $y+90, -1, -1)
 			$sTxtTip = GetTranslated(626,41, "Search for bases that has their collectors outside.")
 			GUICtrlSetOnEvent(-1, "chkDBMeetCollOutside")

@@ -105,14 +105,10 @@ Func applyConfig($bRedrawAtExit = True, $TypeReadSave = "Read") ;Applies the dat
 	; <><><> Attack Plan / Train Army / Options <><><>
 	ApplyConfig_641_1($TypeReadSave)
 
-	; <><><> Team Mod's (NguyenAnhHD, Demen) <><><>
-	ApplyConfig_MOD($TypeReadSave)
-    ; <><><><> Switch Account - Demen <><><><>
-	ApplyConfig_SwitchAcc($TypeReadSave)
-
     ; <><><><> Attack Plan / Strategies <><><><>
-; <<< nothing here >>>
+    ; <<< nothing here >>>
 
+    ; <><><><> Bot / Profiles <><><><>
 	PopulatePresetComboBox()
 	MakeSavePresetMessage()
 	GUICtrlSetState($g_hLblLoadPresetMessage, $GUI_SHOW)
@@ -124,6 +120,14 @@ Func applyConfig($bRedrawAtExit = True, $TypeReadSave = "Read") ;Applies the dat
 
     ; <><><><> Bot / Stats <><><><>
     ; <<< nothing here >>>
+
+    ; <><><> DocOc <><><>
+    ApplyConfig_DocOc($TypeReadSave)
+
+	; <><><> DocOc++ Team MOD (NguyenAnhHD, Demen) <><><>
+    ApplyConfig_MOD($TypeReadSave)
+	; SwitchAcc_Demen_Style
+	ApplyConfig_SwitchAcc($TypeReadSave, True)
 
     ; <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 
@@ -342,10 +346,12 @@ Func ApplyConfig_600_12($TypeReadSave)
 			Next
 			cmbDonateCustomB()
 
-			GUICtrlSetData($g_hTxtGeneralBlacklist, $g_sTxtGeneralBlacklist)
 			GUICtrlSetState($g_hChkExtraAlphabets, $g_bChkExtraAlphabets ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_hChkExtraChinese, $g_bChkExtraChinese ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_hChkExtraKorean, $g_bChkExtraKorean ? $GUI_CHECKED : $GUI_UNCHECKED)
+
+			GUICtrlSetData($g_hTxtGeneralBlacklist, $g_sTxtGeneralBlacklist)
+
 		Case "Save"
 			$g_bChkDonate = (GUICtrlRead($g_hChkDonate) = $GUI_CHECKED)
 			For $i = 0 To $eTroopCount-1 + $g_iCustomDonateConfigs
@@ -392,10 +398,6 @@ Func ApplyConfig_600_13($TypeReadSave)
 			GUICtrlSetState($g_hChkSkipDonateNearFullTroopsEnable, $g_bDonateSkipNearFullEnable ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetData($g_hTxtSkipDonateNearFullTroopsPercentage, $g_iDonateSkipNearFullPercent)
 			chkskipDonateNearFulLTroopsEnable()
-			GUICtrlSetState($g_hChkUseCCBalanced, $iChkUseCCBalanced = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			_GUICtrlComboBox_SetCurSel($g_hCmbCCDonated, $iCmbCCDonated - 1)
-			_GUICtrlComboBox_SetCurSel($g_hCmbCCReceived, $iCmbCCReceived - 1)
-			chkBalanceDR()
 		Case "Save"
 			$g_bDonateHoursEnable = (GUICtrlRead($g_hChkDonateHoursEnable) = $GUI_CHECKED)
 			For $i = 0 To 23
@@ -404,9 +406,6 @@ Func ApplyConfig_600_13($TypeReadSave)
 			$g_iCmbDonateFilter = _GUICtrlComboBox_GetCurSel($g_hCmbFilterDonationsCC)
 			$g_bDonateSkipNearFullEnable = (GUICtrlRead($g_hChkSkipDonateNearFullTroopsEnable) = $GUI_CHECKED)
 			$g_iDonateSkipNearFullPercent = Number(GUICtrlRead($g_hTxtSkipDonateNearFullTroopsPercentage))
-			$iChkUseCCBalanced =  GUICtrlRead($g_hChkUseCCBalanced) = $GUI_CHECKED ? 1 : 0
-			$iCmbCCDonated = _GUICtrlComboBox_GetCurSel($g_hCmbCCDonated) + 1
-			$iCmbCCReceived = _GUICtrlComboBox_GetCurSel($g_hCmbCCReceived) + 1
 	EndSwitch
 EndFunc
 
@@ -994,6 +993,7 @@ Func ApplyConfig_600_29($TypeReadSave)
 			GUICtrlSetData($g_hTxtManAbilities, ($delayActivateKQ / 1000))
 			GUICtrlSetState($g_hChkUseWardenAbility, $iActivateWardenCondition = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetData($g_hTxtWardenAbility, ($delayActivateW / 1000))
+			CheckWardenTimer()
 			GUICtrlSetState($g_hChkAttackPlannerEnable, $ichkAttackPlannerEnable = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_hChkAttackPlannerCloseCoC, $ichkAttackPlannerCloseCoC = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_hChkAttackPlannerCloseAll, $ichkAttackPlannerCloseAll = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
@@ -1012,6 +1012,10 @@ Func ApplyConfig_600_29($TypeReadSave)
 			Next
 			GUICtrlSetState($g_hChkDropCCHoursEnable, $iPlannedDropCCHoursEnable = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
 			chkDropCCHoursEnable()
+			GUICtrlSetState($g_hChkUseCCBalanced, $iChkUseCCBalanced = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
+			_GUICtrlComboBox_SetCurSel($g_hCmbCCDonated, $iCmbCCDonated - 1)
+			_GUICtrlComboBox_SetCurSel($g_hCmbCCReceived, $iCmbCCReceived - 1)
+			chkBalanceDR()
 			For $i = 0 To 23
 				GUICtrlSetState($g_ahChkDropCCHours[$i], $iPlannedDropCCHours[$i] = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
 			Next
@@ -1019,7 +1023,7 @@ Func ApplyConfig_600_29($TypeReadSave)
 			$iActivateKQCondition = GUICtrlRead($g_hRadManAbilities) = $GUI_CHECKED ? "Manual" : "Auto"
 			$delayActivateKQ = GUICtrlRead($g_hTxtManAbilities) * 1000
 			$iActivateWardenCondition = GUICtrlRead($g_hChkUseWardenAbility) = $GUI_CHECKED ? 1 : 0
-			$g_hTxtWardenAbility = GUICtrlRead($g_hTxtWardenAbility) * 1000
+			$delayActivateW = GUICtrlRead($g_hTxtWardenAbility) * 1000
 			$ichkAttackPlannerEnable = GUICtrlRead($g_hChkAttackPlannerEnable) = $GUI_CHECKED ? 1 : 0
 			$ichkAttackPlannerCloseCoC = GUICtrlRead($g_hChkAttackPlannerCloseCoC) = $GUI_CHECKED ? 1 : 0
 			$ichkAttackPlannerCloseAll = GUICtrlRead($g_hChkAttackPlannerCloseAll) = $GUI_CHECKED ? 1 : 0
@@ -1037,6 +1041,9 @@ Func ApplyConfig_600_29($TypeReadSave)
 				$iPlannedattackHours[$i] = GUICtrlRead($g_ahChkAttackHours[$i]) = $GUI_CHECKED ? 1 : 0
 			Next
 			$iPlannedDropCCHoursEnable = GUICtrlRead($g_hChkDropCCHoursEnable) = $GUI_CHECKED ? 1 : 0
+			$iChkUseCCBalanced =  GUICtrlRead($g_hChkUseCCBalanced) = $GUI_CHECKED ? 1 : 0
+			$iCmbCCDonated = _GUICtrlComboBox_GetCurSel($g_hCmbCCDonated) + 1
+			$iCmbCCReceived = _GUICtrlComboBox_GetCurSel($g_hCmbCCReceived) + 1
 			Local $string = ""
 			For $i = 0 To 23
 				$iPlannedDropCCHours[$i] = GUICtrlRead($g_ahChkDropCCHours[$i]) = $GUI_CHECKED ? 1 : 0
@@ -1133,6 +1140,7 @@ Func ApplyConfig_600_29_DB_Standard($TypeReadSave)
 			$g_abAttackStdSmartNearCollectors[$DB][1] = (GUICtrlRead($g_hChkAttackNearElixirCollectorDB) = $GUI_CHECKED)
 			$g_abAttackStdSmartNearCollectors[$DB][2] = (GUICtrlRead($g_hChkAttackNearDarkElixirDrillDB) = $GUI_CHECKED)
 	EndSwitch
+	cmbDeployDB()
 EndFunc
 
 Func ApplyConfig_600_29_DB_Scripted($TypeReadSave)
@@ -1378,6 +1386,8 @@ Func ApplyConfig_600_29_LB_Standard($TypeReadSave)
 			$g_abAttackStdSmartNearCollectors[$LB][1] = (GUICtrlRead($g_hChkAttackNearElixirCollectorAB) = $GUI_CHECKED)
 			$g_abAttackStdSmartNearCollectors[$LB][2] = (GUICtrlRead($g_hChkAttackNearDarkElixirDrillAB) = $GUI_CHECKED)
 	EndSwitch
+
+	cmbDeployAB()
 EndFunc
 
 Func ApplyConfig_600_29_LB_Scripted($TypeReadSave)
@@ -1703,8 +1713,8 @@ Func ApplyConfig_600_52_1($TypeReadSave)
 		Case "Read"
 			GUICtrlSetState($g_hChkUseQuickTrain, $g_bQuickTrainEnable ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_ahChkArmy[0], $g_bQuickTrainArmy[0] ? $GUI_CHECKED : $GUI_UNCHECKED)			; 	QuickTrainCombo (Checkbox)- Demen
-			GUICtrlSetState($g_ahChkArmy[1], $g_bQuickTrainArmy[1] ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_ahChkArmy[2], $g_bQuickTrainArmy[2] ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_ahChkArmy[1], $g_bQuickTrainArmy[1] ? $GUI_CHECKED : $GUI_UNCHECKED)			; 	QuickTrainCombo (Checkbox)- Demen
+			GUICtrlSetState($g_ahChkArmy[2], $g_bQuickTrainArmy[2] ? $GUI_CHECKED : $GUI_UNCHECKED)			; 	QuickTrainCombo (Checkbox)- Demen
 		Case "Save"
 			$g_bQuickTrainEnable = (GUICtrlRead($g_hChkUseQuickTrain) = $GUI_CHECKED)
 			$g_bQuickTrainArmy[0] = (GUICtrlRead($g_ahChkArmy[0]) = $GUI_CHECKED)							; 	QuickTrainCombo (Checkbox)- Demen
@@ -1887,144 +1897,5 @@ Func ApplyConfig_641_1($TypeReadSave)
 			$g_bTrainAddRandomDelayEnable = (GUICtrlRead($g_hChkTrainAddRandomDelayEnable) = $GUI_CHECKED)
 			$g_iTrainAddRandomDelayMin = GUICtrlRead($g_hTxtAddRandomDelayMin)
 			$g_iTrainAddRandomDelayMax = GUICtrlRead($g_hTxtAddRandomDelayMax)
-	EndSwitch
-EndFunc
-
-Func ApplyConfig_MOD($TypeReadSave)
-	; <><><> Team Mod's (NguyenAnhHD, Demen) <><><>
-	Switch $TypeReadSave
-		Case "Read"
-			; Auto Hide (NguyenAnhHD) - Added by NguyenAnhHD
-			GUICtrlSetState($g_hChkAutohide, $ichkAutoHide = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetData($g_hTxtAutohideDelay, $ichkAutoHideDelay)
-			chkAutoHide()
-
-			; Classic Four Finger (Demen) - Added by NguyenAnhHD
-			cmbStandardDropSidesDB()
-			cmbStandardDropSidesAB()
-
-			; Check Collector Outside (McSlither) - Added by NguyenAnhHD
-			GUICtrlSetState($g_hChkDBMeetCollOutside, $ichkDBMeetCollOutside = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetData($g_hTxtDBMinCollOutsidePercent, $iDBMinCollOutsidePercent)
-			chkDBMeetCollOutside()
-
-			; CSV Deploy Speed (Roro-Titi) - Added by NguyenAnhHD
-			_GUICtrlComboBox_SetCurSel($g_hCmbCSVSpeed[$DB], $g_iCmbCSVSpeed[$DB])
-			_GUICtrlComboBox_SetCurSel($g_hCmbCSVSpeed[$LB], $g_iCmbCSVSpeed[$LB])
-
-			; Switch Profile (IceCube) - Added by NguyenAnhHD
-			GUICtrlSetState($g_hChkGoldSwitchMax, $ichkGoldSwitchMax = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			_GUICtrlComboBox_SetCurSel($g_hCmbGoldMaxProfile, $icmbGoldMaxProfile)
-			GUICtrlSetData($g_hTxtMaxGoldAmount, $itxtMaxGoldAmount)
-			GUICtrlSetState($g_hChkGoldSwitchMin, $ichkGoldSwitchMin = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			_GUICtrlComboBox_SetCurSel($g_hCmbGoldMinProfile, $icmbGoldMinProfile)
-			GUICtrlSetData($g_hTxtMinGoldAmount, $itxtMinGoldAmount)
-
-			GUICtrlSetState($g_hChkElixirSwitchMax, $ichkElixirSwitchMax = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			_GUICtrlComboBox_SetCurSel($g_hCmbElixirMaxProfile, $icmbElixirMaxProfile)
-			GUICtrlSetData($g_hTxtMaxElixirAmount, $itxtMaxElixirAmount)
-			GUICtrlSetState($g_hChkElixirSwitchMin, $ichkElixirSwitchMin = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			_GUICtrlComboBox_SetCurSel($g_hCmbElixirMinProfile, $icmbElixirMinProfile)
-			GUICtrlSetData($g_hTxtMinElixirAmount, $itxtMinElixirAmount)
-
-			GUICtrlSetState($g_hChkDESwitchMax, $ichkDESwitchMax = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			_GUICtrlComboBox_SetCurSel($g_hCmbDEMaxProfile, $icmbDEMaxProfile)
-			GUICtrlSetData($g_hTxtMaxDEAmount, $itxtMaxDEAmount)
-			GUICtrlSetState($g_hChkDESwitchMin, $ichkDESwitchMin = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			_GUICtrlComboBox_SetCurSel($g_hCmbDEMinProfile, $icmbDEMinProfile)
-			GUICtrlSetData($g_hTxtMinDEAmount, $itxtMinDEAmount)
-
-			GUICtrlSetState($g_hChkTrophySwitchMax, $ichkTrophySwitchMax = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			_GUICtrlComboBox_SetCurSel($g_hCmbTrophyMaxProfile, $icmbTrophyMaxProfile)
-			GUICtrlSetData($g_hTxtMaxTrophyAmount, $itxtMaxTrophyAmount)
-			GUICtrlSetState($g_hChkTrophySwitchMin, $ichkTrophySwitchMin = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			_GUICtrlComboBox_SetCurSel($g_hCmbTrophyMinProfile, $icmbTrophyMinProfile)
-			GUICtrlSetData($g_hTxtMinTrophyAmount, $itxtMinTrophyAmount)
-
-			; SimpleTrain (Demen) - Added by Demen
-			GUICtrlSetState($chkSimpleTrain, $ichkSimpleTrain = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($chkFillArcher, $ichkFillArcher = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetData($txtFillArcher, $iFillArcher)
-			GUICtrlSetState($chkFillEQ, $ichkFillEQ = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			chkSimpleTrain()
-
-		Case "Save"
-			; Auto Hide (NguyenAnhHD) - Added by NguyenAnhHD
-			$ichkAutoHide = GUICtrlRead($g_hChkAutohide) = $GUI_CHECKED ? 1 : 0
-			$ichkAutoHideDelay = GUICtrlRead($g_hTxtAutohideDelay)
-
-			; Check Collector Outside (McSlither) - Added by NguyenAnhHD
-			$ichkDBMeetCollOutside = GUICtrlRead($g_hChkDBMeetCollOutside) = $GUI_CHECKED ? 1 : 0
-			$iDBMinCollOutsidePercent = GUICtrlRead($g_hTxtDBMinCollOutsidePercent)
-
-			; CSV Deploy Speed (Roro-Titi) - Added by NguyenAnhHD
-			$g_iCmbCSVSpeed[$DB] = _GUICtrlComboBox_GetCurSel($g_hCmbCSVSpeed[$DB])
-			$g_iCmbCSVSpeed[$LB] = _GUICtrlComboBox_GetCurSel($g_hCmbCSVSpeed[$LB])
-
-			; Switch Profile (IceCube) - Added by NguyenAnhHD
-			$ichkGoldSwitchMax = GUICtrlRead($g_hChkGoldSwitchMax) = $GUI_CHECKED ? 1 : 0
-			$itxtMaxGoldAmount = GUICtrlRead($g_hTxtMaxGoldAmount)
-			$ichkGoldSwitchMin = GUICtrlRead($g_hChkGoldSwitchMin) = $GUI_CHECKED ? 1 : 0
-			$itxtMinGoldAmount = GUICtrlRead($g_hTxtMinGoldAmount)
-
-			$ichkElixirSwitchMax = GUICtrlRead($g_hChkElixirSwitchMax) = $GUI_CHECKED ? 1 : 0
-			$itxtMaxElixirAmount = GUICtrlRead($g_hTxtMaxElixirAmount)
-			$ichkElixirSwitchMin = GUICtrlRead($g_hChkElixirSwitchMin) = $GUI_CHECKED ? 1 : 0
-			$itxtMinElixirAmount = GUICtrlRead($g_hTxtMinElixirAmount)
-
-			$ichkDESwitchMax = GUICtrlRead($g_hChkDESwitchMax) = $GUI_CHECKED ? 1 : 0
-			$itxtMaxDEAmount = GUICtrlRead($g_hTxtMaxDEAmount)
-			$ichkDESwitchMin = GUICtrlRead($g_hChkDESwitchMin) = $GUI_CHECKED ? 1 : 0
-			$itxtMinDEAmount = GUICtrlRead($g_hTxtMinDEAmount)
-
-			$ichkTrophySwitchMax = GUICtrlRead($g_hChkTrophySwitchMax) = $GUI_CHECKED ? 1 : 0
-			$itxtMaxTrophyAmount = GUICtrlRead($g_hTxtMaxTrophyAmount)
-			$ichkTrophySwitchMin = GUICtrlRead($g_hChkTrophySwitchMin) = $GUI_CHECKED ? 1 : 0
-			$itxtMinTrophyAmount = GUICtrlRead($g_hTxtMinTrophyAmount)
-
-			;SimpleTrain (Demen) - Added by Demen
-			$ichkSimpleTrain = GUICtrlRead($chkSimpleTrain) = $GUI_CHECKED ? 1 : 0
-			$ichkFillArcher = GUICtrlRead($chkFillArcher) = $GUI_CHECKED ? 1 : 0
-			$iFillArcher = GUICtrlRead($txtFillArcher)
-			$ichkFillEQ = GUICtrlRead($chkFillEQ) = $GUI_CHECKED ? 1 : 0
-	EndSwitch
-EndFunc
-
-Func ApplyConfig_SwitchAcc($TypeReadSave)
-	; <><><><> Switch Account - Demen <><><><>
-	Switch $TypeReadSave
-		Case "Read"
-			GUICtrlSetState($chkSwitchAcc, $ichkSwitchAcc = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			If $ichkSmartSwitch = 1 Then
-			   GUICtrlSetState($radSmartSwitch, $GUI_CHECKED)
-			Else
-			   GUICtrlSetState($radNormalSwitch, $GUI_CHECKED)
-			EndIf
-			radNormalSwitch()
-			_GUICtrlCombobox_SetCurSel($cmbTotalAccount, $icmbTotalCoCAcc - 1)
-
-			If $ichkCloseTraining >= 1 Then
-				GUICtrlSetState($chkUseTrainingClose, $GUI_CHECKED)
-				If $ichkCloseTraining = 1 Then
-					GUICtrlSetState($radCloseCoC, $GUI_CHECKED)
-				Else
-					GUICtrlSetState($radCloseAndroid, $GUI_CHECKED)
-				EndIf
-			Else
-				GUICtrlSetState($chkUseTrainingClose, $GUI_UNCHECKED)
-			EndIf
-
-			For $i = 0 to 7
-				_GUICtrlCombobox_SetCurSel($cmbAccountNo[$i], $aMatchProfileAcc[$i]-1)
-				_GUICtrlCombobox_SetCurSel($cmbProfileType[$i], $aProfileType[$i]-1)
-			Next
-		Case "Save"
-			$ichkSwitchAcc = GUICtrlRead($chkSwitchAcc) = $GUI_CHECKED ? 1 : 0
-			$icmbTotalCoCAcc = _GUICtrlCombobox_GetCurSel($cmbTotalAccount)+1
-			$ichkSmartSwitch = GUICtrlRead($radSmartSwitch) = $GUI_CHECKED ? 1 : 0
-			$ichkCloseTraining = GUICtrlRead($chkUseTrainingClose) = $GUI_CHECKED ? 1 : 0
-			If $ichkCloseTraining = 1 Then
-				$ichkCloseTraining = GUICtrlRead($radCloseCoC) = $GUI_CHECKED ? 1 : 2
-			EndIf
 	EndSwitch
 EndFunc

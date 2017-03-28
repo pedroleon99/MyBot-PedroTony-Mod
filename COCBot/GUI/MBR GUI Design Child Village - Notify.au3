@@ -22,7 +22,7 @@ Global $g_hChkNotifyDeleteAllPBPushes = 0, $g_hBtnNotifyDeleteMessages = 0, $g_h
 	   $g_hChkNotifyAlertMatchFound = 0, $g_hChkNotifyAlertLastRaidIMG = 0, $g_hChkNotifyAlertLastRaidTXT = 0, $g_hChkNotifyAlertCampFull = 0, _
 	   $g_hChkNotifyAlertUpgradeWall = 0, $g_hChkNotifyAlertOutOfSync = 0, $g_hChkNotifyAlertTakeBreak = 0, $g_hChkNotifyAlertBuilderIdle = 0, _
 	   $g_hChkNotifyAlertVillageStats = 0, $g_hChkNotifyAlertLastAttack = 0, $g_hChkNotifyAlertAnotherDevice = 0, $g_hChkNotifyAlertMaintenance = 0, _
-	   $g_hChkNotifyAlertBAN = 0, $g_hChkNotifyBOTUpdate = 0
+	   $g_hChkNotifyAlertBAN = 0, $g_hChkNotifyBOTUpdate = 0, $g_hChkNotifyBOTSleep = 0
 
 Global $g_hChkNotifyOnlyHours = 0, $g_hChkNotifyOnlyWeekDays = 0, $g_hChkNotifyhours[24] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], _
 	   $g_hChkNotifyWeekdays[7] = [0,0,0,0,0,0,0]
@@ -158,6 +158,10 @@ Func CreatePushBulletTelegramSubTab()
 			GUICtrlSetState(-1, $GUI_DISABLE)
 		$g_hChkNotifyBOTUpdate = GUICtrlCreateCheckbox(GetTranslated(619,49, "BOT Update"), $x + 210, $y, -1, -1)
 			_GUICtrlSetTip(-1, GetTranslated(619,50, "Send an Alert when there is a new version of the bot."))
+			GUICtrlSetState(-1, $GUI_DISABLE)
+		; Notify Bot Speep (Kychera) - Added By NguyenAnhHD
+		$g_hChkNotifyBOTSleep = GUICtrlCreateCheckbox(GetTranslated(619,71, "BOT Sleep"), $x + 315, $y, -1, -1)
+			_GUICtrlSetTip(-1, GetTranslated(619,72, "Send an Alert when Sleep."))
 			GUICtrlSetState(-1, $GUI_DISABLE)
 		GUICtrlCreateLabel(GetTranslated(619,69,"Help ?"), $x + 200, $y + 60, 220, 24, $SS_RIGHT)
 			GUICtrlSetOnEvent(-1, "NotifyHelp")

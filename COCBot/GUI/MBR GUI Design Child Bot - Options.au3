@@ -25,7 +25,7 @@ Global $g_hChkAutostart = 0, $g_hTxtAutostartDelay = 0, $g_hChkCheckGameLanguage
 Global $g_hChkUpdatingWhenMinimized = 0, $g_hChkHideWhenMinimized = 0, $g_hChkUseRandomClick = 0, $g_hChkScreenshotType = 0, $g_hChkScreenshotHideName = 0, _
 	   $g_hTxtTimeAnotherDevice = 0
 Global $g_hChkSinglePBTForced = 0, $g_hTxtSinglePBTimeForced = 0, $g_hTxtPBTimeForcedExit = 0, $g_hChkFixClanCastle = 0, $g_hChkAutoResume = 0, $g_hTxtAutoResumeTime = 0
-Global $g_hChkAutohide = 0, $g_hTxtAutohideDelay = 0
+Global $g_hChkAutohide = 0, $g_hTxtAutohideDelay = 0 ; Auto Hide - Added By NguyenAnhHD
 
 Func CreateBotOptions()
 

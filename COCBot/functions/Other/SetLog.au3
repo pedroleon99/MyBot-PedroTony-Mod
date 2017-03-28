@@ -21,7 +21,7 @@
 ; ===============================================================================================================================
 #include-once
 
-Global $aTxtLogInitText[0][6] = [[]]
+;Global $aTxtLogInitText[0][6] = [[]]
 Global $aTxtAtkLogInitText[0][6] = [[]]
 
 
@@ -218,11 +218,7 @@ EndFunc   ;==>SetAtkLog
 Func AtkLogHead()
 	SetAtkLog(_PadStringCenter(" " & GetTranslated(601, 15, "ATTACK LOG") & " ", 71, "="), "", $COLOR_BLACK, "MS Shell Dlg", 8.5)
 	SetAtkLog(GetTranslated(601, 16, "                   --------  LOOT --------       ----- BONUS ------"), "")
-	If $ichkSwitchAcc = 1 Then
-		SetAtkLog("AC|" & GetTranslated(601, 17, " TIME|TROP.|SEARCH|   GOLD| ELIXIR|DARK EL|TR.|S|  GOLD|ELIXIR|  DE|L."), "", $COLOR_GREEN)					; SwitchAcc - Demen
-	Else
-		SetAtkLog(GetTranslated(601, 17, " TIME|TROP.|SEARCH|   GOLD| ELIXIR|DARK EL|TR.|S|  GOLD|ELIXIR|  DE|L."), "", $COLOR_GREEN)
-	EndIf
+	SetAtkLog(GetTranslated(601, 17, " TIME|TROP.|SEARCH|   GOLD| ELIXIR|DARK EL|TR.|S|  GOLD|ELIXIR|  DE|L."), "")
 EndFunc   ;==>AtkLogHead
 
 Func __FileWriteLog($handle, $text)
