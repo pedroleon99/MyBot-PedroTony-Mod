@@ -13,7 +13,7 @@
 ; Example .......: No
 ; ===============================================================================================================================
 
-Func BotStart()
+Func BotStart($bAutostartDelay = 0)
 	ResumeAndroid()
 	CalCostCamp()
 	CalCostSpell()
@@ -21,34 +21,36 @@ Func BotStart()
 	$g_bRunState = True
 	$g_bTogglePauseAllowed = True
 	$g_bSkipFirstZoomout = False
-	$Is_SearchLimit = False
-	$Is_ClientSyncError = False
+	$g_bIsSearchLimit = False
+	$g_bIsClientSyncError = False
 
 	EnableControls($g_hFrmBotBottom, False, $g_aFrmBotBottomCtrlState)
 	;$g_iFirstAttack = 0
 
-	$bTrainEnabled = True
-	$bDonationEnabled = True
+	$g_bTrainEnabled = True
+	$g_bDonationEnabled = True
 	$g_bMeetCondStop = False
-	$Is_ClientSyncError = False
-	$bDisableBreakCheck = False ; reset flag to check for early warning message when bot start/restart in case user stopped in middle
-	$bDisableDropTrophy = False ; Reset Disabled Drop Trophy because the user has no Tier 1 or 2 Troops
+	$g_bIsClientSyncError = False
+	$g_bDisableBreakCheck = False ; reset flag to check for early warning message when bot start/restart in case user stopped in middle
+	$g_bDisableDropTrophy = False ; Reset Disabled Drop Trophy because the user has no Tier 1 or 2 Troops
 
-	If Not $bSearchMode Then
-		CreateLogFile()
+	If Not $g_bSearchMode Then
+		If $g_hLogFile = 0 Then CreateLogFile() ; only create new log file when doesn't exist yet
 		CreateAttackLogFile()
 		If $g_iFirstRun = -1 Then $g_iFirstRun = 1
 	EndIf
-	_GUICtrlEdit_SetText($g_hTxtLog, _PadStringCenter(" BOT LOG ", 71, "="))
-	_GUICtrlRichEdit_SetFont($g_hTxtLog, 6, "Lucida Console")
-	_GUICtrlRichEdit_AppendTextColor($g_hTxtLog, "" & @CRLF, _ColorConvert($Color_Black))
+	SetLogCentered(" BOT LOG ", Default, Default, True)
 
 	SaveConfig()
 	readConfig()
 	applyConfig(False) ; bot window redraw stays disabled!
 
+	; Initial ObjEvents for the Autoit objects errors
+	__ObjEventIni()
+
 	;Reset Telegram message
 	NotifyGetLastMessageFromTelegram()
+	$g_iTGLastRemote = $g_sTGLast_UID
 
 	If BitAND($g_iAndroidSupportFeature, 1 + 2) = 0 And $g_bChkBackgroundMode = True Then
 		GUICtrlSetState($g_hChkBackgroundMode, $GUI_UNCHECKED)
@@ -68,12 +70,17 @@ Func BotStart()
 
 	SetRedrawBotWindow(True, Default, Default, Default, "BotStart")
 
+	If $bAutostartDelay Then
+		SetLog("Bot Auto Starting in " & Round($bAutostartDelay / 1000, 0) & " seconds", $COLOR_ERROR)
+		_SleepStatus($bAutostartDelay)
+	EndIf
+
 	Local $Result = False
 	If WinGetAndroidHandle() = 0 Then
 		$Result = OpenAndroid(False)
 	EndIf
 	SetDebugLog("Android Window Handle: " & WinGetAndroidHandle())
-	If $HWnD <> 0 Then ;Is Android open?
+	If $g_hAndroidWindow <> 0 Then ;Is Android open?
 		If Not $g_bRunState Then Return
 		If $g_bAndroidBackgroundLaunched = True Or AndroidControlAvailable() Then ; Really?
 			If Not $Result Then
@@ -85,19 +92,19 @@ Func BotStart()
 			$Result = RebootAndroid(False)
 		EndIf
 		If Not $g_bRunState Then Return
-		Local $hWndActive = $HWnD
+		Local $hWndActive = $g_hAndroidWindow
 		; check if window can be activated
 		If $g_bNoFocusTampering = False And $g_bAndroidBackgroundLaunched = False And $g_bAndroidEmbedded = False Then
-			Local $hTimer = TimerInit()
+			Local $hTimer = __TimerInit()
 			$hWndActive = -1
 			Local $activeHWnD = WinGetHandle("")
-			While TimerDiff($hTimer) < 1000 And $hWndActive <> $HWnD And Not _Sleep(100)
-				$hWndActive = WinActivate($HWnD) ; ensure bot has window focus
+			While __TimerDiff($hTimer) < 1000 And $hWndActive <> $g_hAndroidWindow And Not _Sleep(100)
+				$hWndActive = WinActivate($g_hAndroidWindow) ; ensure bot has window focus
 			WEnd
 			WinActivate($activeHWnD) ; restore current active window
 		EndIf
 		If Not $g_bRunState Then Return
-		If $hWndActive = $HWnD And ($g_bAndroidBackgroundLaunched = True Or AndroidControlAvailable())  Then ; Really?
+		If $hWndActive = $g_hAndroidWindow And ($g_bAndroidBackgroundLaunched = True Or AndroidControlAvailable())  Then ; Really?
 			AutoHide() ; Auto Hide - NguyenAnhHD
 			Initiate() ; Initiate and run bot
 		Else
@@ -135,9 +142,11 @@ Func BotStop()
 	GUICtrlSetState($g_hBtnStop, $GUI_HIDE)
 	GUICtrlSetState($g_hBtnPause, $GUI_HIDE)
 	GUICtrlSetState($g_hBtnResume, $GUI_HIDE)
-	If $iTownHallLevel > 2 Then GUICtrlSetState($g_hBtnSearchMode, $GUI_ENABLE)
+	If $g_iTownHallLevel > 2 Then GUICtrlSetState($g_hBtnSearchMode, $GUI_ENABLE)
 	GUICtrlSetState($g_hBtnSearchMode, $GUI_SHOW)
 	;GUICtrlSetState($g_hBtnMakeScreenshot, $GUI_ENABLE)
+	GUICtrlSetState($g_hBtnEnableGUI, $GUI_HIDE) ; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen
+	GUICtrlSetState($g_hBtnDisableGUI, $GUI_HIDE) ; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen
 
 	; hide attack buttons if show
 	GUICtrlSetState($g_hBtnAttackNowDB, $GUI_HIDE)
@@ -146,10 +155,9 @@ Func BotStop()
 	GUICtrlSetState($g_hPicTwoArrowShield, $GUI_SHOW)
 	GUICtrlSetState($g_hLblVersion, $GUI_SHOW)
 
-	;_BlockInputEx(0, "", "", $HWnD)
-	SetLog(_PadStringCenter(" Bot Stop ", 50, "="), $COLOR_ACTION)
-	If Not $bSearchMode Then
-		If Not $g_bBotPaused Then $g_iTimePassed += Int(TimerDiff($g_hTimerSinceStarted))
+	SetLogCentered(" Bot Stop ", Default, $COLOR_ACTION)
+	If Not $g_bSearchMode Then
+		If Not $g_bBotPaused Then $g_iTimePassed += Int(__TimerDiff($g_hTimerSinceStarted))
 		;AdlibUnRegister("SetTime")
 		$g_bRestart = True
 
@@ -163,19 +171,24 @@ Func BotStop()
 		  $g_hAttackLogFile = 0
 	   EndIf
 	Else
-		$bSearchMode = False
+		$g_bSearchMode = False
 	EndIf
+
+	; Ends ObjEvents for the Autoit objects errors
+	__ObjEventEnds()
+
+	ReduceBotMemory()
 EndFunc   ;==>BotStop
 
 Func BotSearchMode()
-	$bSearchMode = True
+	$g_bSearchMode = True
 	$g_bRestart = False
-	$Is_ClientSyncError = False
+	$g_bIsClientSyncError = False
 	If $g_iFirstRun = 1 Then $g_iFirstRun = -1
 	btnStart()
 	checkMainScreen(False)
 	If _Sleep(100) Then Return
-	$iTrophyCurrent = getTrophyMainScreen($aTrophies[0], $aTrophies[1]) ; get OCR to read current Village Trophies
+	$g_aiCurrentLoot[$eLootTrophy] = getTrophyMainScreen($aTrophies[0], $aTrophies[1]) ; get OCR to read current Village Trophies
 	If _Sleep(100) Then Return
 	CheckArmySpellCastel()
 	ClickP($aAway, 2, 0, "") ;Click Away

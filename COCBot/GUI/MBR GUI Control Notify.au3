@@ -32,9 +32,9 @@ Func chkPBTGenabled()
 		GUICtrlSetState($g_hChkNotifyTGEnable, $GUI_ENABLE)
 		GUICtrlSetState($g_hTxtNotifyPBToken, $GUI_DISABLE)
 		GUICtrlSetState($g_hBtnNotifyDeleteMessages, $GUI_DISABLE)
-		GUICtrlSetState($g_hChkNotifyDeleteAllPBPushes, $GUI_ENABLE)
-		GUICtrlSetState($g_hChkNotifyDeleteOldPBPushes, $GUI_ENABLE)
-		GUICtrlSetState($g_hBtnNotifyDeleteMessages, $GUI_ENABLE)
+		GUICtrlSetState($g_hChkNotifyDeleteAllPBPushes, $GUI_DISABLE)
+		GUICtrlSetState($g_hChkNotifyDeleteOldPBPushes, $GUI_DISABLE)
+		GUICtrlSetState($g_hBtnNotifyDeleteMessages, $GUI_DISABLE)
 		GUICtrlSetState($g_hCmbNotifyPushHours, $GUI_DISABLE)
 	EndIf
 
@@ -63,8 +63,6 @@ Func chkPBTGenabled()
 		GUICtrlSetState($g_hChkNotifyAlertMaintenance, $GUI_ENABLE)
 		GUICtrlSetState($g_hChkNotifyAlertBAN, $GUI_ENABLE)
 		GUICtrlSetState($g_hChkNotifyBOTUpdate, $GUI_ENABLE)
-		; Notify Bot Speep (Kychera) - Added By NguyenAnhHD
-		GUICtrlSetState($g_hChkNotifyBOTSleep, $GUI_ENABLE)
 	Else
 		GUICtrlSetState($g_hChkNotifyRemote, $GUI_DISABLE)
 		GUICtrlSetState($g_hTxtNotifyOrigin, $GUI_DISABLE)
@@ -82,8 +80,6 @@ Func chkPBTGenabled()
 		GUICtrlSetState($g_hChkNotifyAlertMaintenance, $GUI_DISABLE)
 		GUICtrlSetState($g_hChkNotifyAlertBAN, $GUI_DISABLE)
 		GUICtrlSetState($g_hChkNotifyBOTUpdate, $GUI_DISABLE)
-		; Notify Bot Speep (Kychera) - Added By NguyenAnhHD
-		GUICtrlSetState($g_hChkNotifyBOTSleep, $GUI_DISABLE)
 		GUICtrlSetState($g_hCmbNotifyPushHours, $GUI_DISABLE)
 		GUICtrlSetState($g_hChkNotifyDeleteAllPBPushes, $GUI_DISABLE)
 		GUICtrlSetState($g_hChkNotifyDeleteOldPBPushes, $GUI_DISABLE)
@@ -106,8 +102,8 @@ Func btnDeletePBMessages()
 EndFunc   ;==>btnDeletePBMessages
 
 Func NotifyHelp()
-	If FileExists(@ScriptDir & "\Help\NotifyHelp_" & $sLanguage & ".mht") Then
-		ShellExecute(@ScriptDir & "\Help\NotifyHelp_" & $sLanguage & ".mht")
+	If FileExists(@ScriptDir & "\Help\NotifyHelp_" & $g_sLanguage & ".mht") Then
+		ShellExecute(@ScriptDir & "\Help\NotifyHelp_" & $g_sLanguage & ".mht")
 	ElseIf FileExists(@ScriptDir & "\Help\NotifyHelp_English.mht") Then
 		ShellExecute(@ScriptDir & "\Help\NotifyHelp_English.mht")
 	EndIf

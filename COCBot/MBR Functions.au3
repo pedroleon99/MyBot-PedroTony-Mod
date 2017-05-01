@@ -12,25 +12,26 @@
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
-
-#include "functions\Other\Synchronization.au3"
+;#include-once
+#include "functions\Other\SetLog.au3"
+;#include "functions\Other\Synchronization.au3" ; now included in LaunchConsole.au3
 #include "functions\Other\OnAutoItErrorRegisterBot.au3"
 
-;#include "functions\Config\profileFunctions.au3" ; --- > DocOc Mod
+#include "functions\Config\profileFunctions.au3"
+#include "functions\Config\_Ini_Table.au3"
 #include "functions\Config\applyConfig.au3"
 #include "functions\Config\readConfig.au3"
 #include "functions\Config\saveConfig.au3"
 
-;#include "functions\Attack\AttackReport.au3" --- > DocOc Mod
+#include "functions\Attack\AttackReport.au3"
 #include "functions\Attack\BuildingSide.au3"
 #include "functions\Attack\GoldElixirChangeThSnipes.au3"
 #include "functions\Attack\GoldElixirChangeEBO.au3"
 #include "functions\Attack\PrepareAttack.au3"
-; #include "functions\Attack\ReturnHome.au3"  --- > DocOc Mod
-#include "functions\Attack\SnipeWhileTrain.au3"
+#include "functions\Attack\ReturnHome.au3"
 #include "functions\Attack\Unbreakable.au3"
 
-; #include "functions\Attack\Attack Algorithms\algorithm_AllTroops.au3" --- > DocOc Mod
+#include "functions\Attack\Attack Algorithms\algorithm_AllTroops.au3"
 #include "functions\Attack\Attack Algorithms\algorithm_Barch.au3"
 #include "functions\Attack\Attack Algorithms\algorithmTH.au3"
 #include "functions\Attack\Attack Algorithms\THAttackTypes.au3"
@@ -39,14 +40,14 @@
 #include "functions\Attack\AttackCSV\AttackCSVDebugImage.au3"
 #include "functions\Attack\AttackCSV\CheckCSVValues.au3"
 #include "functions\Attack\AttackCSV\DebugAttackCSV.au3"
-; #include "functions\Attack\AttackCSV\DropTroopFromINI.au3" --- > DocOc Mod
+;~ #include "functions\Attack\AttackCSV\DropTroopFromINI.au3" ; Move for CSV Command (Mr.Viper)
 #include "functions\Attack\AttackCSV\GetListPixel3.au3"
 #include "functions\Attack\AttackCSV\IsInsideDiamondRedArea.au3"
 #include "functions\Attack\AttackCSV\Line2Points.au3"
 #include "functions\Attack\AttackCSV\MakeDropLine.au3"
 #include "functions\Attack\AttackCSV\MakeDropPoints.au3"
-; #include "functions\Attack\AttackCSV\ParseAttackCSV.au3"  --- > DocOc Mod
-; #include "functions\Attack\AttackCSV\ParseAttackCSV_Read_SIDE_variables.au3" --- > DocOc Mod
+;~ #include "functions\Attack\AttackCSV\ParseAttackCSV.au3" ; Move for CSV Command (Mr.Viper)
+;~ #include "functions\Attack\AttackCSV\ParseAttackCSV_Read_SIDE_variables.au3" ; Move for CSV Command (Mr.Viper)
 #include "functions\Attack\AttackCSV\Slice8.au3"
 #include "functions\Attack\AttackCSV\CleanRedArea.au3"
 #include "functions\Attack\AttackCSV\ChkAttackCSVConfig.au3"
@@ -70,12 +71,12 @@
 
 #include "functions\Attack\RedArea\_FindPixelCloser.au3"
 #include "functions\Attack\RedArea\_GetOffsetTroopFurther.au3"
-; #include "functions\Attack\RedArea\_GetRedArea.au3" --- > DocOc Mod
+;~ #include "functions\Attack\RedArea\_GetRedArea.au3" ; Move for CSV Command (Mr.Viper)
 #include "functions\Attack\RedArea\_GetVectorOutZone.au3"
 #include "functions\Attack\RedArea\DebugRedArea.au3"
 #include "functions\Attack\RedArea\DropOnPixel.au3"
-; #include "functions\Attack\RedArea\DropTroop.au3" --- > DocOc Mod
-; #include "functions\Attack\RedArea\GetLocation.au3" --- > DocOc Mod
+#include "functions\Attack\RedArea\DropTroop.au3"
+#include "functions\Attack\RedArea\GetLocation.au3"
 #include "functions\Attack\RedArea\GetOffestPixelRedArea2.au3"
 #include "functions\Attack\RedArea\GetPixelDropTroop.au3"
 #include "functions\Attack\RedArea\GetPixelSide.au3"
@@ -83,22 +84,22 @@
 #include "functions\Attack\RedArea\GetVectorPixelOnEachSide.au3"
 #include "functions\Attack\RedArea\GetVectorPixelToDeploy.au3"
 
-; #include "functions\Attack\Troops\CheckHeroesHealth.au3" --- > DocOc Mod
+#include "functions\Attack\Troops\CheckHeroesHealth.au3"
 #include "functions\Attack\Troops\dropCC.au3"
 #include "functions\Attack\Troops\dropHeroes.au3"
-; #include "functions\Attack\Troops\DropOnEdge.au3"  --- > DocOc Mod
-; #include "functions\Attack\Troops\DropOnEdges.au3" --- > DocOc Mod
-; #include "functions\Attack\Troops\GetXPosOfArmySlot.au3"
+#include "functions\Attack\Troops\DropOnEdge.au3"
+#include "functions\Attack\Troops\DropOnEdges.au3"
+;~ #include "functions\Attack\Troops\GetXPosOfArmySlot.au3" ; Move for CSV Command (Mr.Viper)
 #include "functions\Attack\Troops\GetSlotIndexFromXPos.au3"
-; #include "functions\Attack\Troops\LauchTroop.au3" --- > DocOc Mod
+#include "functions\Attack\Troops\LauchTroop.au3"
 #include "functions\Attack\Troops\NameOfTroop.au3"
 #include "functions\Attack\Troops\OldDropTroop.au3"
-; #include "functions\Attack\Troops\ReadTroopQuantity.au3" --- > DocOc Mod
+;~ #include "functions\Attack\Troops\ReadTroopQuantity.au3" ; Move for CSV Command (Mr.Viper)
 #include "functions\Attack\Troops\SelectDropTroop.au3"
 #include "functions\Attack\Troops\SetSleep.au3"
 
 #include "functions\Attack\SmartZap\drillSearch.au3"
-; #include "functions\Attack\SmartZap\smartZap.au3" --- > DocOc Mod
+#include "functions\Attack\SmartZap\smartZap.au3"
 
 #include "functions\CreateArmy\CheckFullArmy.au3"
 #include "functions\CreateArmy\CheckArmyCamp.au3"
@@ -106,7 +107,7 @@
 #include "functions\CreateArmy\getArmyCCStatus.au3"
 #include "functions\CreateArmy\getArmyHeroCount.au3"
 #include "functions\CreateArmy\getArmyHeroTime.au3"
-;#include "functions\CreateArmy\getArmyHeroStatus.au3" ; --- > DocOc Mod
+#include "functions\CreateArmy\getArmyHeroStatus.au3"
 #include "functions\CreateArmy\getArmySpellCapacity.au3"
 #include "functions\CreateArmy\getArmySpellCount.au3"
 #include "functions\CreateArmy\getArmySpellTime.au3"
@@ -120,16 +121,16 @@
 #include "functions\Image Search\ImageSearch.au3"
 #include "functions\Image Search\checkDeadBase.au3"
 #include "functions\Image Search\CheckTombs.au3"
-; #include "functions\Image Search\imglocAuxiliary.au3" --- > DocOc Mod
+#include "functions\Image Search\imglocAuxiliary.au3"
 #include "functions\Image Search\imglocScreens.au3"
 #include "functions\Image Search\imglocTrainHelper.au3"
 #include "functions\Image Search\imglocCheckWall.au3"
-; #include "functions\Image Search\imglocTHSearch.au3" --- > DocOc Mod
+#include "functions\Image Search\imglocTHSearch.au3"
 #include "functions\Image Search\imglocAttackBar.au3"
 
 
 #include "functions\Main Screen\checkMainScreen.au3"
-;#include "functions\Main Screen\checkObstacles.au3" --- > DocOc Mod
+#include "functions\Main Screen\checkObstacles.au3"
 #include "functions\Main Screen\GetDPI_Ratio.au3"
 #include "functions\Main Screen\isGemOpen.au3"
 #include "functions\Main Screen\isNoUpgradeLoot.au3"
@@ -160,7 +161,6 @@
 #include "functions\Other\WerFaultClose.au3"
 #include "functions\Other\_NumberFormat.au3"
 #include "functions\Other\_PadStringCenter.au3"
-#include "functions\Other\_ReduceMemory.au3"
 #include "functions\Other\_ProcessSuspendResume2.au3"
 #include "functions\Other\_Sleep.au3"
 #include "functions\Other\_SleepStatus.au3"
@@ -175,26 +175,24 @@
 #include "functions\Other\ExtendedErrorInfo.au3"
 #include "functions\Other\FindPos.au3"
 #include "functions\Other\StringSize.au3"
-;#include "functions\Other\SetLog.au3" ; --- > DocOc Mod
 #include "functions\Other\Tab.au3"
 #include "functions\Other\Time.au3"
-#include "functions\Other\BlockInputEx.au3"
 #include "functions\Other\TogglePause.au3"
-;#include "functions\Other\CheckPrerequisites.au3" ; --- > DocOc Mod
-;#include "functions\Other\CheckDisplay.au3" ; --- > DocOc Mod
-#include "functions\Other\AutoStart.au3"
+#include "functions\Other\CheckPrerequisites.au3"
+#include "functions\Other\CheckDisplay.au3"
 #include "functions\Other\WindowsArrange.au3"
 #include "functions\Other\MakeScreenshot.au3"
 #include "functions\Other\ClickDrag.au3"
 #include "functions\Other\TestLanguage.au3"
 #include "functions\Other\DeleteFiles.au3"
-; #include "functions\Other\UpdateStats.au3"  --- > DocOc Mod
+#include "functions\Other\UpdateStats.au3"
+#include "functions\Other\CheckVersion.au3"
 #include "functions\Other\CloseRunningBot.au3"
 #include "functions\Other\RestartBot.au3"
 #include "functions\Other\WindowSystemMenu.au3"
 #include "functions\Other\image_get_info.au3"
+#include "functions\Other\SetWakeUpTime.au3"
 
-#include "functions\Other\ComError.au3"
 #include "functions\Other\IsPage.au3"
 #include "functions\Other\MoveMouseOutBS.au3"
 #include "functions\Other\KillProcess.au3"
@@ -209,7 +207,6 @@
 #include "functions\Pixels\_GetPixelColor.au3"
 #include "functions\Pixels\_PixelSearch.au3"
 #include "functions\Pixels\_MultiPixelSearch.au3"
-#include "functions\Pixels\boolPixelSearch.au3"
 #include "functions\Pixels\isInsideDiamond.au3"
 
 #include "functions\Read Text\getBuilderCount.au3"
@@ -222,8 +219,8 @@
 #include "functions\Search\WeakBase.au3"
 #include "functions\Search\CompareResources.au3"
 #include "functions\Search\GetResources.au3"
-;#include "functions\Search\PrepareSearch.au3" ;--- > DocOc Mod
-;#include "functions\Search\VillageSearch.au3" ;--- > DocOc Mod
+#include "functions\Search\PrepareSearch.au3"
+#include "functions\Search\VillageSearch.au3"
 #include "functions\Search\CheckZoomOut.au3"
 #include "functions\Search\SearchTownHallloc.au3"
 #include "functions\Search\FindTownHall.au3"
@@ -240,10 +237,12 @@
 #include "functions\Village\CheckBaseQuick.au3"
 #include "functions\Village\chkShieldStatus.au3"
 #include "functions\Village\Collect.au3"
-; #include "functions\Village\DonateCC.au3" --- > DocOc Mod
+#include "functions\Village\TreasuryCollect.au3"
+#include "functions\Village\DonateCC.au3"
 #include "functions\Village\DonateCCWBL.au3"
-;#include "functions\Village\DropTrophy.au3" --- > DocOc Mod
+#include "functions\Village\DropTrophy.au3"
 #include "functions\Village\GetTownHallLevel.au3"
+#include "functions\Village\isAtkDarkElixirFull.au3"
 #include "functions\Village\isDarkElixirFull.au3"
 #include "functions\Village\isGoldFull.au3"
 #include "functions\Village\isElixirFull.au3"
@@ -255,18 +254,18 @@
 #include "functions\Village\ProfileReport.au3"
 #include "functions\Village\ReArm.au3"
 #include "functions\Village\RequestCC.au3"
-;#include "functions\Village\VillageReport.au3" ; --- > DocOc Mod
-;#include "functions\Village\UpgradeBuilding.au3" ; --- > DocOc Mod
-;#include "functions\Village\UpgradeWall.au3" ; --- > DocOc Mod
-;#include "functions\Village\Notify.au3" ; --- > DocOc Mod
+#include "functions\Village\VillageReport.au3"
+#include "functions\Village\UpgradeBuilding.au3"
+#include "functions\Village\UpgradeWall.au3"
+#include "functions\Village\Notify.au3"
 #include "functions\Village\Laboratory.au3"
 #include "functions\Village\ReplayShare.au3"
 #include "functions\Village\BoostHeroes.au3"
-;#include "functions\Village\UpgradeHeroes.au3" ; --- > DocOc Mod
+#include "functions\Village\UpgradeHeroes.au3"
 #include "functions\Village\StarBonus.au3"
 #include "functions\Village\AddIdleTime.au3"
 #include "functions\Village\GetVillageSize.au3"
-;#include "functions\Village\GainCost.au3" ; --- > DocOc Mod
+#include "functions\Village\GainCost.au3"
 #include "functions\Village\ConvertOCRTime.au3"
 #include "functions\Other\ClickZoneR.au3"
 #include "functions\Village\CheckNeedOpenTrain.au3"
@@ -274,11 +273,8 @@
 #include "functions\Other\Api.au3"
 #include "functions\Other\ApiClient.au3"
 
-; MOD DocOC | Modified Originals Files
-#include "MOD_DocOc\Functions DocOC.au3"
-
-; DocOC++ Team MOD
-#include "MOD_DocOc++\Functions DocOC++.au3"
+; Team++ AIO MOD
+#include "MOD_Team++AIO\Functions_Team++AIO.au3"
 
 ; OLD CODE
 

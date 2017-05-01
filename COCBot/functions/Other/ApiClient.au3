@@ -11,36 +11,27 @@
 ; Example .......: No
 ; ===============================================================================================================================
 
-Global $aManagedMyBotHosts[0] ; Contains array of registered MyBot.run host Window Handle and TimerHandle of last communication
+Global $g_ahManagedMyBotHosts[0] ; Contains array of registered MyBot.run host Window Handle and TimerHandle of last communication
 GUIRegisterMsg($WM_MYBOTRUN_API_1_0, "WM_MYBOTRUN_API_1_0_CLIENT")
 
 Func WM_MYBOTRUN_API_1_0_CLIENT($hWind, $iMsg, $wParam, $lParam)
 
 	If $hWind <> $g_hFrmBot Then Return 0
 
-	;SetDebugLog("API: $hWind=" & $hWind & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam, Default, True)
+	;SetDebugLog("API: $hWind=" & $hWind & ",$iMsg=" & $iMsg & ",$wParam=" & $wParam & ",$lParam=" & $lParam)
 
 	$hWind = 0
 	Switch BitAND($wParam, 0xFFFF)
 
 		; Post Message to Manage Farm App and consume message
 
-		Case 0x0000 ; query bot run and pause state
-			$hWind = HWnd($lParam)
-			$lParam = $g_hFrmBot
-			$wParam += 1
-			Local $wParamHi = 0
-			If $g_bRunState = True Then $wParamHi += 1
-			If $g_bBotPaused = True Then $wParamHi += 2
-			$wParam += BitShift($wParamHi, -16)
-
-		Case 0x0010 ; query bot detailed state
+		Case 0x0100 ; query bot detailed state
 			$iMsg = $WM_MYBOTRUN_STATE_1_0
 			$hWind = HWnd($lParam)
 			$lParam = $g_hFrmBot
 			$wParam = DllStructGetPtr($tBotState)
 			DllStructSetData($tBotState, "frmBot", $g_hFrmBot)
-			DllStructSetData($tBotState, "HWnD", $HWnD)
+			DllStructSetData($tBotState, "HWnD", $g_hAndroidWindow)
 			DllStructSetData($tBotState, "RunState", $g_bRunState)
 			DllStructSetData($tBotState, "TPaused", $g_bBotPaused)
 
@@ -99,11 +90,24 @@ Func WM_MYBOTRUN_API_1_0_CLIENT($hWind, $iMsg, $wParam, $lParam)
 			BotCloseRequest()
 			$wParam += BitShift($wParamHi, -16)
 
+		Case Else ;Case 0x0000 ; query bot run and pause state
+			If $wParam < 0x100 Then
+				$hWind = HWnd($lParam)
+				$lParam = $g_hFrmBot
+				Local $iActiveBots = BitAND($wParam, 0xFF)
+				If $g_BotInstanceCount <> $iActiveBots Then SetDebugLog($iActiveBots & " running bot instances detected")
+				$g_BotInstanceCount = $iActiveBots
+				$wParam = 1
+				Local $wParamHi = 0
+				If $g_bRunState = True Then $wParamHi += 1
+				If $g_bBotPaused = True Then $wParamHi += 2
+				$wParam += BitShift($wParamHi, -16)
+			EndIf
 	EndSwitch
 
 	If $hWind <> 0 Then
 		Local $a = GetManagedMyBotHost($hWind)
-		$a[1] = TimerInit()
+		$a[1] = __TimerInit()
 		_WinAPI_PostMessage($hWind, $iMsg, $wParam, $lParam)
 	EndIf
 
@@ -114,20 +118,20 @@ EndFunc   ;==>WM_MYBOTRUN_API_1_0_CLIENT
 Func GetManagedMyBotHost($hFrmHost = Default)
 
 	If $hFrmHost = Default Then
-		Return $aManagedMyBotHosts
+		Return $g_ahManagedMyBotHosts
 	EndIf
 
 	If IsHWnd($hFrmHost) = 0 Then Return -1
 
-	For $i = 0 To UBound($aManagedMyBotHosts) - 1
-		Local $a = $aManagedMyBotHosts[$i]
+	For $i = 0 To UBound($g_ahManagedMyBotHosts) - 1
+		Local $a = $g_ahManagedMyBotHosts[$i]
 		If $a[0] = $hFrmHost Then Return $a
 	Next
 
-	ReDim $aManagedMyBotHosts[UBound($aManagedMyBotHosts) + 1]
+	ReDim $g_ahManagedMyBotHosts[UBound($g_ahManagedMyBotHosts) + 1]
 	Local $a[2]
 	$a[0] = $hFrmHost
-	$aManagedMyBotHosts[$i] = $a
+	$g_ahManagedMyBotHosts[$i] = $a
 	SetDebugLog("New Bot Host Window Handle registered: " & $hFrmHost)
 	Return $a
 EndFunc   ;==>GetManagedMyBotHost
@@ -156,11 +160,11 @@ Func LaunchWatchdog()
 EndFunc   ;==>LaunchWatchdog
 
 Func UnregisterManagedMyBotHost()
-	For $i = 0 To UBound($aManagedMyBotHosts) - 1
-		Local $a = $aManagedMyBotHosts[$i]
+	For $i = 0 To UBound($g_ahManagedMyBotHosts) - 1
+		Local $a = $g_ahManagedMyBotHosts[$i]
 		Local $hFrmHost = $a[0]
 		$a[0] = 0
-		$aManagedMyBotHosts[$i] = $a
+		$g_ahManagedMyBotHosts[$i] = $a
 		If IsHWnd($hFrmHost) Then
 			Local $hWind = $hFrmHost
 			Local $iMsg = $WM_MYBOTRUN_API_1_0

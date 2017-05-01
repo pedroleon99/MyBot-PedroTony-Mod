@@ -19,10 +19,14 @@ Global $g_hGUI_DONATE = 0, $g_hGUI_DONATE_TAB = 0, $g_hGUI_DONATE_TAB_ITEM1 = 0,
 ; Request
 Global $g_hChkRequestTroopsEnable = 0, $g_hTxtRequestCC = 0, $g_ahChkRequestCCHours[24] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 Global $g_hChkRequestCCHoursE1 = 0, $g_hChkRequestCCHoursE2 = 0
-Global $g_hGrpRequestCC = 0, $g_ahLblRequestCCHours0 = 0, $g_hLblRequestCCHoursAM = 0, $g_hLblRequestCCHoursPM = 0
+Global $g_hGrpRequestCC = 0, $g_hLblRequestCCHoursAM = 0, $g_hLblRequestCCHoursPM = 0
+Global $g_hLblRequestCChour = 0, $g_ahLblRequestCChoursE = 0
+GLobal $g_hLblRequestCChours[12] = [0,0,0,0,0,0,0,0,0,0,0,0]
+Global $g_hchkGTFO
+Global $cmbgtfo
 
 ; Donate
-Global $g_hChkExtraAlphabets = 0, $g_hChkExtraChinese = 0, $g_hChkExtraKorean = 0
+Global $g_hChkExtraAlphabets = 0, $g_hChkExtraChinese = 0, $g_hChkExtraKorean = 0, $g_hChkExtraPersian = 0
 Global $g_ahChkDonateTroop[$eTroopCount+$g_iCustomDonateConfigs] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 Global $g_ahChkDonateAllTroop[$eTroopCount+$g_iCustomDonateConfigs] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 Global $g_ahTxtDonateTroop[$eTroopCount+$g_iCustomDonateConfigs] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -47,6 +51,7 @@ Global $g_hLblDonateTroopTBD1 = 0, $g_hLblDonateTroopTBD2 = 0, $g_hLblDonateTroo
 	   $g_hLblDonateTroopCustomI = 0, $g_hLblDonateTroopCustomJ = 0, $g_hLblDonateSpellTBD1 = 0
 
 Global $g_hGrpDonateGeneralBlacklist = 0, $g_hTxtGeneralBlacklist = 0
+Global $g_hGrpDonateOptions = 0, $g_hChkClanHop = 0
 Global $lblBtnCustomE = 0
 
 ; Schedule
@@ -62,9 +67,11 @@ Global $g_hGrpDonate = 0, $g_hChkDonate = 1, $g_hLblDonateDisabled = 0, $g_hLblS
 
 ; Clan castle
 Global $g_hChkUseCCBalanced = 0, $g_hCmbCCDonated = 0, $g_hCmbCCReceived = 0
+GLobal $g_hLblDonateCChour = 0, $g_ahLblDonateCChoursE = 0
+GLobal $g_hLblDonateCChours[12] = [0,0,0,0,0,0,0,0,0,0,0,0]
 
 Func CreateVillageDonate()
-   $g_hGUI_DONATE = GUICreate("", $_GUI_MAIN_WIDTH - 28, $_GUI_MAIN_HEIGHT - 255 - 28, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_VILLAGE)
+   $g_hGUI_DONATE = _GUICreate("", $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_VILLAGE)
    ;GUISetBkColor($COLOR_WHITE, $g_hGUI_DONATE)
 	Local $x = 82
 	$g_hChkDonate = GUICtrlCreateCheckbox("", $x + 131, 6, 13, 13)
@@ -75,13 +82,13 @@ Func CreateVillageDonate()
 		CreateScheduleSubTab()
 	GUISwitch($g_hGUI_DONATE)
 
-	$g_hGUI_DONATE_TAB = GUICtrlCreateTab(0, 0, $_GUI_MAIN_WIDTH - 30, $_GUI_MAIN_HEIGHT - 255 - 30, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
+	$g_hGUI_DONATE_TAB = GUICtrlCreateTab(0, 0, $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, BitOR($TCS_MULTILINE, $TCS_RIGHTJUSTIFY))
 	$g_hGUI_DONATE_TAB_ITEM1 = GUICtrlCreateTabItem(GetTranslated(600,11,"Request Troops"))
 	$g_hGUI_DONATE_TAB_ITEM2 = GUICtrlCreateTabItem(GetTranslated(600,12,"Donate Troops") & "    ")
-	$g_hLblDonateDisabled = GUICtrlCreateLabel(GetTranslated(612, 1, "Note: Donate is disabled, tick the checkmark on the") & " " & GetTranslated(600, 12, -1) & " " & GetTranslated(600, 50, -1), 5, 30, 430, 374)
+	$g_hLblDonateDisabled = GUICtrlCreateLabel(GetTranslated(612, 1, "Note: Donate is disabled, tick the checkmark on the") & " " & GetTranslated(600, 12, -1) & " " & GetTranslated(600, 50, -1), 5, 30, $g_iSizeWGrpTab3, 374)
 		GUICtrlSetState(-1, $GUI_HIDE)
 	$g_hGUI_DONATE_TAB_ITEM3 = GUICtrlCreateTabItem(GetTranslated(600,13,"Schedule Donations"))
- 	$g_hLblScheduleDisabled = GUICtrlCreateLabel(GetTranslated(612, 1, -1) & " " & GetTranslated(600, 12, -1) & " " & GetTranslated(600, 50, -1), 5, 30, 430, 374)
+ 	$g_hLblScheduleDisabled = GUICtrlCreateLabel(GetTranslated(612, 1, -1) & " " & GetTranslated(600, 12, -1) & " " & GetTranslated(600, 50, -1), 5, 30, $g_iSizeWGrpTab3, 374)
 		GUICtrlSetState(-1, $GUI_HIDE)
 	GUICtrlCreateTabItem("")
 EndFunc
@@ -89,12 +96,12 @@ EndFunc
 #Region CreateRequestSubTab
 Func CreateRequestSubTab()
 	Local $xStart = 25, $yStart = 45
-	$g_hGUI_RequestCC = GUICreate("", $_GUI_MAIN_WIDTH - 30 - 10, $_GUI_MAIN_HEIGHT - 255 - 30 - 30, $xStart - 20, $yStart - 20, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_DONATE)
-	GUISetBkColor($COLOR_WHITE)
+	$g_hGUI_RequestCC = _GUICreate("", $g_iSizeWGrpTab3, $g_iSizeHGrpTab3, $xStart - 20, $yStart - 20, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_DONATE)
+	; GUISetBkColor($COLOR_WHITE)
 	Local $xStart = 20, $yStart = 20
 	Local $x = $xStart
 	Local $y = $yStart
-	$g_hGrpRequestCC = GUICtrlCreateGroup(GetTranslated(611,1, "Clan Castle Troops"), $x - 20, $y - 20, 430, 375)
+	$g_hGrpRequestCC = GUICtrlCreateGroup(GetTranslated(611,1, "Clan Castle Troops"), $x - 20, $y - 20, $g_iSizeWGrpTab3, $g_iSizeHGrpTab3)
 		$y += 10
 		$x += 10
 		GUICtrlCreateIcon($g_sLibIconPath, $eIcnCCRequest, $x - 5, $y, 64, 64, $BS_ICON)
@@ -110,31 +117,34 @@ Func CreateRequestSubTab()
 
 		$x += 30
 		$y += 25
-		$g_ahLblRequestCCHours0 = GUICtrlCreateLabel(" 0", $x + 30, $y, 13, 15)
+		$g_hLblRequestCChour = GUICtrlCreateLabel(GetTranslated(603, 15, -1) & ":", $x , $y, -1, 15)
+			Local $sTxtTip = GetTranslated(603, 30, -1)
+			_GUICtrlSetTip(-1, $sTxtTip)
+		$g_hLblRequestCChours[0] =  GUICtrlCreateLabel(" 0", $x + 30, $y, 13, 15)
 		GUICtrlSetState(-1, $GUI_DISABLE)
-		GUICtrlCreateLabel(" 1", $x + 45, $y, 13, 15)
+		$g_hLblRequestCChours[1] = GUICtrlCreateLabel(" 1", $x + 45, $y, 13, 15)
 		GUICtrlSetState(-1, $GUI_DISABLE)
-		GUICtrlCreateLabel(" 2", $x + 60, $y, 13, 15)
+		$g_hLblRequestCChours[2] = GUICtrlCreateLabel(" 2", $x + 60, $y, 13, 15)
 		GUICtrlSetState(-1, $GUI_DISABLE)
-		GUICtrlCreateLabel(" 3", $x + 75, $y, 13, 15)
+		$g_hLblRequestCChours[3] = GUICtrlCreateLabel(" 3", $x + 75, $y, 13, 15)
 		GUICtrlSetState(-1, $GUI_DISABLE)
-		GUICtrlCreateLabel(" 4", $x + 90, $y, 13, 15)
+		$g_hLblRequestCChours[4] = GUICtrlCreateLabel(" 4", $x + 90, $y, 13, 15)
 		GUICtrlSetState(-1, $GUI_DISABLE)
-		GUICtrlCreateLabel(" 5", $x + 105, $y, 13, 15)
+		$g_hLblRequestCChours[5] = GUICtrlCreateLabel(" 5", $x + 105, $y, 13, 15)
 		GUICtrlSetState(-1, $GUI_DISABLE)
-		GUICtrlCreateLabel(" 6", $x + 120, $y, 13, 15)
+		$g_hLblRequestCChours[6] = GUICtrlCreateLabel(" 6", $x + 120, $y, 13, 15)
 		GUICtrlSetState(-1, $GUI_DISABLE)
-		GUICtrlCreateLabel(" 7", $x + 135, $y, 13, 15)
+		$g_hLblRequestCChours[7] = GUICtrlCreateLabel(" 7", $x + 135, $y, 13, 15)
 		GUICtrlSetState(-1, $GUI_DISABLE)
-		GUICtrlCreateLabel(" 8", $x + 150, $y, 13, 15)
+		$g_hLblRequestCChours[8] = GUICtrlCreateLabel(" 8", $x + 150, $y, 13, 15)
 		GUICtrlSetState(-1, $GUI_DISABLE)
-		GUICtrlCreateLabel(" 9", $x + 165, $y, 13, 15)
+		$g_hLblRequestCChours[9] = GUICtrlCreateLabel(" 9", $x + 165, $y, 13, 15)
 		GUICtrlSetState(-1, $GUI_DISABLE)
-		GUICtrlCreateLabel("10", $x + 180, $y, 13, 15)
+		$g_hLblRequestCChours[10] = GUICtrlCreateLabel("10", $x + 180, $y, 13, 15)
 		GUICtrlSetState(-1, $GUI_DISABLE)
-		GUICtrlCreateLabel("11", $x + 195, $y, 13, 15)
+		$g_hLblRequestCChours[11] = GUICtrlCreateLabel("11", $x + 195, $y, 13, 15)
 		GUICtrlSetState(-1, $GUI_DISABLE)
-		GUICtrlCreateLabel("X", $x + 213, $y+2, 11, 11)
+		$g_ahLblRequestCChoursE = GUICtrlCreateLabel("X", $x + 213, $y+2, 11, 11)
 		GUICtrlSetState(-1, $GUI_DISABLE)
 
 		$y += 15
@@ -203,14 +213,32 @@ Func CreateRequestSubTab()
 		$g_hLblRequestCCHoursPM = GUICtrlCreateLabel(GetTranslated(603,4, "PM"), $x + 5, $y)
 		 GUICtrlSetState(-1, $GUI_DISABLE)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
+
+   ; === KICK MOD ===================================
+   $x = $xStart
+   $y += 191
+   GUICtrlCreateGroup(GetTranslated(634,50, "____G.T.F.O"), $x - 20, $y, $g_iSizeWGrpTab3, 40)
+	$g_hchkGTFO = GUICtrlCreateCheckbox(GetTranslated(634,51, "KICK Members:"), $x + 2, $y + 15, 85, 17)
+            GUICtrlSetState(-1, $GUI_UNCHECKED)
+            GUICtrlSetTip(-1, GetTranslated(634,52, "Kick New Donated Members Or Already Full"))
+            GUICtrlCreateIcon($g_sLibIconPath, $eIcnKick, $x - 13, $y - 9, 24, 24)
+    GUICtrlCreateLabel(GetTranslated(634,53, "Kicks In a Single Loop: "), $x + 112, $y + 17, -1, -1)
+    $cmbgtfo = GUICtrlCreateCombo("", $x + 260, $y + 12, 35, 21, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
+            GUICtrlSetTip(-1, GetTranslated(634,54, "Number of New Members You Want To Kick") & @CRLF & _
+			" " & @CRLF & _
+			GetTranslated(634,55, " »  Use [1 -  3] For Normal Kicking") & @CRLF & _
+			GetTranslated(634,56, " »  Use [4 -  6] For Massive Donating") & @CRLF & _
+			GetTranslated(634,57, " »  Use [7 - 10] For Forced Kicking"))
+            GUICtrlSetData(-1, "1|2|3|4|5|6|7|8|9|10", "5")
+   GUICtrlCreateGroup("", -99, -99, 1, 1)
 EndFunc
 #EndRegion
 
 #Region CreateDonateSubTab
 Func CreateDonateSubTab()
 	Local $xStart = 25, $yStart = 45
-	$g_hGUI_DONATECC = GUICreate("", $_GUI_MAIN_WIDTH - 30 - 10, $_GUI_MAIN_HEIGHT - 255 - 30 - 30, $xStart - 20, $yStart - 20, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_DONATE)
-	GUISetBkColor($COLOR_WHITE)
+	$g_hGUI_DONATECC = _GUICreate("", $g_iSizeWGrpTab3, $g_iSizeHGrpTab3, $xStart - 20, $yStart - 20, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_DONATE)
+	; GUISetBkColor($COLOR_WHITE)
 	Local $xStart = 20, $yStart = 20
   ;~ -------------------------------------------------------------
    ;~ Language Variables used a lot
@@ -265,7 +293,7 @@ Func CreateDonateSubTab()
 	Local $x = $xStart
 	Local $y = $yStart
    Local $Offx = 38
-   GUICtrlCreateGroup(GetTranslated(612,22, "Donate Troops Selection Menu"), $x - 20, $y - 20, 430, 185)
+   GUICtrlCreateGroup(GetTranslated(612,22, "Donate Troops Selection Menu"), $x - 20, $y - 20, $g_iSizeWGrpTab3, 185)
 		$x = $xStart - 18
 		  $g_ahLblDonateTroop[$eTroopBarbarian] = GUICtrlCreateLabel("", $x, $y - 2, $Offx + 2, $Offx + 2)
 			  GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
@@ -605,13 +633,12 @@ Func CreateDonateSubTab()
 			  GUICtrlSetState(-1, $GUI_DISABLE)
 
 		  GUICtrlCreateButton("", $x + 2, $y, $Offx - 2, $Offx - 2, $BS_ICON)
-			  GUICtrlSetState(-1, $GUI_DISABLE)
-	  ;		GUICtrlSetImage (-1, $g_sLibIconPath, $eIcnTroops, 0)
-	  ;		GUICtrlSetOnEvent(-1, "btnDonateCustomD")
-      $x += $Offx
-	   GUICtrlCreateButton("", $x + 2, $y, $Offx - 2, $Offx - 2, $BS_ICON)
-		   GUICtrlSetImage (-1, $g_sLibIconPath, $eIcnDonBlacklist, 1)
-		   GUICtrlSetOnEvent(-1, "btnDonateBlacklist")
+			  GUICtrlSetImage (-1, $g_sLibIconPath, $eIcnDonBlacklist, 1)
+			  GUICtrlSetOnEvent(-1, "btnDonateBlacklist")
+	  $x += $Offx
+		  GUICtrlCreateButton("", $x + 2, $y, $Offx - 2, $Offx - 2, $BS_ICON)
+			  GUICtrlSetImage (-1, $g_sLibIconPath, $eIcnClanHop, 1)
+			  GUICtrlSetOnEvent(-1, "btnDonateOptions")
 
 	   Local $Offy = $yStart + 185
 	   $x = $xStart
@@ -619,13 +646,15 @@ Func CreateDonateSubTab()
 	   GUICtrlCreateLabel(GetTranslated(612,115, "Extra Alphabet Recognitions:"), $x - 15, $y + 153, -1, -1)
 	   $g_hChkExtraAlphabets = GUICtrlCreateCheckbox(GetTranslated(612,25, "Cyrillic"), $x + 127 , $y + 149, -1, -1)
 	   _GUICtrlSetTip(-1, GetTranslated(612,26, "Check this to enable the Cyrillic Alphabet."))
-	   $g_hChkExtraChinese = GUICtrlCreateCheckbox(GetTranslated(612,103, "Chinese"), $x + 221, $y + 149, -1, -1)
+	   $g_hChkExtraChinese = GUICtrlCreateCheckbox(GetTranslated(612,103, "Chinese"), $x + 191, $y + 149, -1, -1)
 	   _GUICtrlSetTip(-1, GetTranslated(612,104, "Check this to enable the Chinese Alphabet."))
-	   $g_hChkExtraKorean = GUICtrlCreateCheckbox(GetTranslated(612,116, "Korean"), $x + 315, $y + 149, -1, -1)
+	   $g_hChkExtraKorean = GUICtrlCreateCheckbox(GetTranslated(612,116, "Korean"), $x + 265, $y + 149, -1, -1)
 	   _GUICtrlSetTip(-1, GetTranslated(612,117, "Check this to enable the Korean Alphabet."))
+	   $g_hChkExtraPersian = GUICtrlCreateCheckbox(GetTranslated(612,118, "Persian"), $x + 340, $y + 149, -1, -1)
+	   _GUICtrlSetTip(-1, GetTranslated(612,119, "Check this to enable the Persian Alphabet."))
     GUICtrlCreateGroup("", -99, -99, 1, 1)
 
-	$g_ahGrpDonateTroop[$eTroopBarbarian] = GUICtrlCreateGroup($sTxtBarbarians, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateTroop[$eTroopBarbarian] = GUICtrlCreateGroup($sTxtBarbarians, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 		$x -= 10
 		$y -= 4
 		GUICtrlCreateIcon($g_sLibIconPath, $eIcnDonBarbarian, $x + 215, $y, 64, 64, $BS_ICON)
@@ -649,7 +678,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateTroop[$eTroopArcher] = GUICtrlCreateGroup($sTxtArchers, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateTroop[$eTroopArcher] = GUICtrlCreateGroup($sTxtArchers, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -681,7 +710,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateTroop[$eTroopGiant] = GUICtrlCreateGroup($sTxtGiants, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateTroop[$eTroopGiant] = GUICtrlCreateGroup($sTxtGiants, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -713,7 +742,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateTroop[$eTroopGoblin] = GUICtrlCreateGroup($sTxtGoblins, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateTroop[$eTroopGoblin] = GUICtrlCreateGroup($sTxtGoblins, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -745,7 +774,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateTroop[$eTroopWallBreaker] = GUICtrlCreateGroup($sTxtWallBreakers, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateTroop[$eTroopWallBreaker] = GUICtrlCreateGroup($sTxtWallBreakers, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -777,7 +806,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateTroop[$eTroopBalloon] = GUICtrlCreateGroup($sTxtBalloons, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateTroop[$eTroopBalloon] = GUICtrlCreateGroup($sTxtBalloons, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -809,7 +838,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateTroop[$eTroopWizard] = GUICtrlCreateGroup($sTxtWizards, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateTroop[$eTroopWizard] = GUICtrlCreateGroup($sTxtWizards, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -841,7 +870,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateTroop[$eTroopHealer] = GUICtrlCreateGroup($sTxtHealers, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateTroop[$eTroopHealer] = GUICtrlCreateGroup($sTxtHealers, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -873,7 +902,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateTroop[$eTroopDragon] = GUICtrlCreateGroup($sTxtDragons, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateTroop[$eTroopDragon] = GUICtrlCreateGroup($sTxtDragons, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -905,7 +934,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateTroop[$eTroopPekka] = GUICtrlCreateGroup($sTxtPekkas, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateTroop[$eTroopPekka] = GUICtrlCreateGroup($sTxtPekkas, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -937,7 +966,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateTroop[$eTroopBabyDragon] = GUICtrlCreateGroup($sTxtBabyDragons, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateTroop[$eTroopBabyDragon] = GUICtrlCreateGroup($sTxtBabyDragons, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -969,7 +998,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateTroop[$eTroopMiner] = GUICtrlCreateGroup($sTxtMiners, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateTroop[$eTroopMiner] = GUICtrlCreateGroup($sTxtMiners, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -1001,7 +1030,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateSpell[$eSpellLightning] = GUICtrlCreateGroup($sTxtLightningSpells, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateSpell[$eSpellLightning] = GUICtrlCreateGroup($sTxtLightningSpells, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -1033,7 +1062,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateSpell[$eSpellHeal] = GUICtrlCreateGroup($sTxtHealSpells, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateSpell[$eSpellHeal] = GUICtrlCreateGroup($sTxtHealSpells, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -1065,7 +1094,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateSpell[$eSpellRage] = GUICtrlCreateGroup($sTxtRageSpells, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateSpell[$eSpellRage] = GUICtrlCreateGroup($sTxtRageSpells, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -1097,7 +1126,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateSpell[$eSpellJump] = GUICtrlCreateGroup($sTxtJumpSpells, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateSpell[$eSpellJump] = GUICtrlCreateGroup($sTxtJumpSpells, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -1129,7 +1158,7 @@ Func CreateDonateSubTab()
 
 	$x = $xStart
 	$y = $Offy
-	$g_ahGrpDonateSpell[$eSpellFreeze] = GUICtrlCreateGroup($sTxtFreezeSpells, $x - 20, $y - 20, 430, 169)
+	$g_ahGrpDonateSpell[$eSpellFreeze] = GUICtrlCreateGroup($sTxtFreezeSpells, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	$x -= 10
 	$y -= 4
 		GUICtrlSetState(-1, $GUI_HIDE)
@@ -1163,7 +1192,7 @@ Func CreateDonateSubTab()
 
 	   $x = $xStart
 	   $y = $Offy
-	   $g_ahGrpDonateTroop[$eTroopMinion] = GUICtrlCreateGroup($sTxtMinions, $x - 20, $y - 20, 430, 169)
+	   $g_ahGrpDonateTroop[$eTroopMinion] = GUICtrlCreateGroup($sTxtMinions, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	   $x -= 10
 	   $y -= 4
 		   GUICtrlSetState(-1, $GUI_HIDE)
@@ -1195,7 +1224,7 @@ Func CreateDonateSubTab()
 
 	   $x = $xStart
 	   $y = $Offy
-	   $g_ahGrpDonateTroop[$eTroopHogRider] = GUICtrlCreateGroup($sTxtHogRiders, $x - 20, $y - 20, 430, 169)
+	   $g_ahGrpDonateTroop[$eTroopHogRider] = GUICtrlCreateGroup($sTxtHogRiders, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	   $x -= 10
 	   $y -= 4
 		   GUICtrlSetState(-1, $GUI_HIDE)
@@ -1227,7 +1256,7 @@ Func CreateDonateSubTab()
 
 	   $x = $xStart
 	   $y = $Offy
-	   $g_ahGrpDonateTroop[$eTroopValkyrie] = GUICtrlCreateGroup($sTxtValkyries, $x - 20, $y - 20, 430, 169)
+	   $g_ahGrpDonateTroop[$eTroopValkyrie] = GUICtrlCreateGroup($sTxtValkyries, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	   $x -= 10
 	   $y -= 4
 		   GUICtrlSetState(-1, $GUI_HIDE)
@@ -1259,7 +1288,7 @@ Func CreateDonateSubTab()
 
 	   $x = $xStart
 	   $y = $Offy
-	   $g_ahGrpDonateTroop[$eTroopGolem] = GUICtrlCreateGroup($sTxtGolems, $x - 20, $y - 20, 430, 169)
+	   $g_ahGrpDonateTroop[$eTroopGolem] = GUICtrlCreateGroup($sTxtGolems, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	   $x -= 10
 	   $y -= 4
 		   GUICtrlSetState(-1, $GUI_HIDE)
@@ -1291,7 +1320,7 @@ Func CreateDonateSubTab()
 
 	   $x = $xStart
 	   $y = $Offy
-	   $g_ahGrpDonateTroop[$eTroopWitch] = GUICtrlCreateGroup($sTxtWitches, $x - 20, $y - 20, 430, 169)
+	   $g_ahGrpDonateTroop[$eTroopWitch] = GUICtrlCreateGroup($sTxtWitches, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	   $x -= 10
 	   $y -= 4
 		   GUICtrlSetState(-1, $GUI_HIDE)
@@ -1323,7 +1352,7 @@ Func CreateDonateSubTab()
 
 	   $x = $xStart
 	   $y = $Offy
-	   $g_ahGrpDonateTroop[$eTroopLavaHound] = GUICtrlCreateGroup($sTxtLavaHounds, $x - 20, $y - 20, 430, 169)
+	   $g_ahGrpDonateTroop[$eTroopLavaHound] = GUICtrlCreateGroup($sTxtLavaHounds, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	   $x -= 10
 	   $y -= 4
 		   GUICtrlSetState(-1, $GUI_HIDE)
@@ -1355,7 +1384,7 @@ Func CreateDonateSubTab()
 
 	   $x = $xStart
 	   $y = $Offy
-	   $g_ahGrpDonateTroop[$eTroopBowler] = GUICtrlCreateGroup($sTxtBowlers, $x - 20, $y - 20, 430, 169)
+	   $g_ahGrpDonateTroop[$eTroopBowler] = GUICtrlCreateGroup($sTxtBowlers, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	   $x -= 10
 	   $y -= 4
 		   GUICtrlSetState(-1, $GUI_HIDE)
@@ -1387,7 +1416,7 @@ Func CreateDonateSubTab()
 
 	   $x = $xStart
 	   $y = $Offy
-	   $g_ahGrpDonateSpell[$eSpellPoison] = GUICtrlCreateGroup($sTxtPoisonSpells, $x - 20, $y - 20, 430, 169)
+	   $g_ahGrpDonateSpell[$eSpellPoison] = GUICtrlCreateGroup($sTxtPoisonSpells, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	   $x -= 10
 	   $y -= 4
 		   GUICtrlSetState(-1, $GUI_HIDE)
@@ -1419,7 +1448,7 @@ Func CreateDonateSubTab()
 
 	   $x = $xStart
 	   $y = $Offy
-	   $g_ahGrpDonateSpell[$eSpellEarthquake] = GUICtrlCreateGroup($sTxtEarthQuakeSpells, $x - 20, $y - 20, 430, 169)
+	   $g_ahGrpDonateSpell[$eSpellEarthquake] = GUICtrlCreateGroup($sTxtEarthQuakeSpells, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	   $x -= 10
 	   $y -= 4
 		   GUICtrlSetState(-1, $GUI_HIDE)
@@ -1451,7 +1480,7 @@ Func CreateDonateSubTab()
 
 	   $x = $xStart
 	   $y = $Offy
-	   $g_ahGrpDonateSpell[$eSpellHaste] = GUICtrlCreateGroup($sTxtHasteSpells, $x - 20, $y - 20, 430, 169)
+	   $g_ahGrpDonateSpell[$eSpellHaste] = GUICtrlCreateGroup($sTxtHasteSpells, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	   $x -= 10
 	   $y -= 4
 		   GUICtrlSetState(-1, $GUI_HIDE)
@@ -1483,7 +1512,7 @@ Func CreateDonateSubTab()
 
 	   $x = $xStart
 	   $y = $Offy
-	   $g_ahGrpDonateSpell[$eSpellSkeleton] = GUICtrlCreateGroup($sTxtSkeletonSpells, $x - 20, $y - 20, 430, 169)
+	   $g_ahGrpDonateSpell[$eSpellSkeleton] = GUICtrlCreateGroup($sTxtSkeletonSpells, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	   $x -= 10
 	   $y -= 4
 		   GUICtrlSetState(-1, $GUI_HIDE)
@@ -1516,7 +1545,7 @@ Func CreateDonateSubTab()
 	   $x = $xStart
 	   $y = $Offy
 	  ;;; Custom Combination Donate by ChiefM3, edit by Hervidero
-	   $g_ahGrpDonateTroop[$eCustomA] = GUICtrlCreateGroup($sDonateTxtCustomA, $x - 20, $y - 20, 430, 169)
+	   $g_ahGrpDonateTroop[$eCustomA] = GUICtrlCreateGroup($sDonateTxtCustomA, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	   $x -= 10
 	   $y -= 2
 		   GUICtrlSetState(-1, $GUI_HIDE)
@@ -1586,7 +1615,7 @@ Func CreateDonateSubTab()
 	   $x = $xStart
 	   $y = $Offy
    ;;; Custom Combination Donate added by MonkeyHunter
-	   $g_ahGrpDonateTroop[$eCustomB] = GUICtrlCreateGroup($sDonateTxtCustomB, $x - 20, $y - 20, 430, 169)
+	   $g_ahGrpDonateTroop[$eCustomB] = GUICtrlCreateGroup($sDonateTxtCustomB, $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	   $x -= 10
 	   $y -= 2
 		   GUICtrlSetState(-1, $GUI_HIDE)
@@ -1655,7 +1684,7 @@ Func CreateDonateSubTab()
 
 	   $x = $xStart
 	   $y = $Offy
-	   $g_hGrpDonateGeneralBlacklist = GUICtrlCreateGroup(GetTranslated(612,78, "General Blacklist"), $x - 20, $y - 20, 430, 169)
+	   $g_hGrpDonateGeneralBlacklist = GUICtrlCreateGroup(GetTranslated(612,78, "General Blacklist"), $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
 	   $x -= 10
 	   $y -= 4
 		   GUICtrlSetState(-1, $GUI_HIDE)
@@ -1670,18 +1699,29 @@ Func CreateDonateSubTab()
 			   GUICtrlSetData(-1, StringFormat(GetTranslated(612,79, "clan war\r\nwar\r\ncw")))
 			   _GUICtrlSetTip(-1, GetTranslated(612,80, "General Blacklist for donation requests"))
 	   GUICtrlCreateGroup("", -99, -99, 1, 1)
+
+	   $x = $xStart
+	   $y = $Offy
+	   $g_hGrpDonateOptions = GUICtrlCreateGroup("Donate Options", $x - 20, $y - 20, $g_iSizeWGrpTab3, 169)
+	   $x -= 10
+	   $y -= 4
+		   GUICtrlSetState(-1, $GUI_HIDE)
+		   $g_hChkClanHop = GUICtrlCreateCheckbox("Clan Hop", $x, $y)
+			   GUICtrlSetState(-1,$GUI_HIDE)
+	   GUICtrlCreateGroup("", -99, -99, 1, 1)
+
 EndFunc
 #EndRegion
 
 #Region CreateScheduleSubTab
 Func CreateScheduleSubTab()
 	Local $xStart = 25, $yStart = 45
-	$g_hGUI_ScheduleCC = GUICreate("", $_GUI_MAIN_WIDTH - 30 - 10, $_GUI_MAIN_HEIGHT - 255 - 30 - 30, $xStart - 20, $yStart - 20, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_DONATE)
-	GUISetBkColor($COLOR_WHITE)
+	$g_hGUI_ScheduleCC = _GUICreate("", $g_iSizeWGrpTab3, $g_iSizeHGrpTab3, $xStart - 20, $yStart - 20, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_DONATE)
+	; GUISetBkColor($COLOR_WHITE)
 	Local $xStart = 20, $yStart = 20
 	Local $x = $xStart
 	Local $y = $yStart
-	$g_hGrpDonateCC = GUICtrlCreateGroup(GetTranslated(613,1,"Donate Schedule"), $x - 20, $y - 20, 430, 120)
+	$g_hGrpDonateCC = GUICtrlCreateGroup(GetTranslated(613,1,"Donate Schedule"), $x - 20, $y - 20, $g_iSizeWGrpTab3, 120)
 	   $y += 10
 	   $x += 10
 	   GUICtrlCreateIcon($g_sLibIconPath, $eIcnCCDonate, $x - 5, $y, 64, 60, $BS_ICON)
@@ -1691,31 +1731,34 @@ Func CreateScheduleSubTab()
 
 	   $y += 20
 	   $x += 90
-	   $g_hLblDonateHours1 = GUICtrlCreateLabel(" 0", $x + 30, $y, 13, 15)
+		$g_hLblDonateCChour = GUICtrlCreateLabel(GetTranslated(603, 15, -1) & ":", $x , $y, -1, 15)
+			Local $sTxtTip = GetTranslated(603, 30, -1)
+			_GUICtrlSetTip(-1, $sTxtTip)
+	   $g_hLblDonateCChours[0] = GUICtrlCreateLabel(" 0", $x + 30, $y, 13, 15)
 	   GUICtrlSetState(-1, $GUI_DISABLE)
-	   GUICtrlCreateLabel(" 1", $x + 45, $y, 13, 15)
+	   $g_hLblDonateCChours[1] = GUICtrlCreateLabel(" 1", $x + 45, $y, 13, 15)
 	   GUICtrlSetState(-1, $GUI_DISABLE)
-	   GUICtrlCreateLabel(" 2", $x + 60, $y, 13, 15)
+	   $g_hLblDonateCChours[2] = GUICtrlCreateLabel(" 2", $x + 60, $y, 13, 15)
 	   GUICtrlSetState(-1, $GUI_DISABLE)
-	   GUICtrlCreateLabel(" 3", $x + 75, $y, 13, 15)
+	   $g_hLblDonateCChours[3] = GUICtrlCreateLabel(" 3", $x + 75, $y, 13, 15)
 	   GUICtrlSetState(-1, $GUI_DISABLE)
-	   GUICtrlCreateLabel(" 4", $x + 90, $y, 13, 15)
+	   $g_hLblDonateCChours[4] = GUICtrlCreateLabel(" 4", $x + 90, $y, 13, 15)
 	   GUICtrlSetState(-1, $GUI_DISABLE)
-	   GUICtrlCreateLabel(" 5", $x + 105, $y, 13, 15)
+	   $g_hLblDonateCChours[5] = GUICtrlCreateLabel(" 5", $x + 105, $y, 13, 15)
 	   GUICtrlSetState(-1, $GUI_DISABLE)
-	   GUICtrlCreateLabel(" 6", $x + 120, $y, 13, 15)
+	   $g_hLblDonateCChours[6] = GUICtrlCreateLabel(" 6", $x + 120, $y, 13, 15)
 	   GUICtrlSetState(-1, $GUI_DISABLE)
-	   GUICtrlCreateLabel(" 7", $x + 135, $y, 13, 15)
+	   $g_hLblDonateCChours[7] = GUICtrlCreateLabel(" 7", $x + 135, $y, 13, 15)
 	   GUICtrlSetState(-1, $GUI_DISABLE)
-	   GUICtrlCreateLabel(" 8", $x + 150, $y, 13, 15)
+	   $g_hLblDonateCChours[8] = GUICtrlCreateLabel(" 8", $x + 150, $y, 13, 15)
 	   GUICtrlSetState(-1, $GUI_DISABLE)
-	   GUICtrlCreateLabel(" 9", $x + 165, $y, 13, 15)
+	   $g_hLblDonateCChours[9] = GUICtrlCreateLabel(" 9", $x + 165, $y, 13, 15)
 	   GUICtrlSetState(-1, $GUI_DISABLE)
-	   GUICtrlCreateLabel("10", $x + 180, $y, 13, 15)
+	   $g_hLblDonateCChours[10] = GUICtrlCreateLabel("10", $x + 180, $y, 13, 15)
 	   GUICtrlSetState(-1, $GUI_DISABLE)
-	   GUICtrlCreateLabel("11", $x + 195, $y, 13, 15)
+	   $g_hLblDonateCChours[11] = GUICtrlCreateLabel("11", $x + 195, $y, 13, 15)
 	   GUICtrlSetState(-1, $GUI_DISABLE)
-	   GUICtrlCreateLabel("X", $x + 213, $y+2, 11, 11)
+	   $g_ahLblDonateCChoursE = GUICtrlCreateLabel("X", $x + 213, $y+2, 11, 11)
 	   GUICtrlSetState(-1, $GUI_DISABLE)
 
 	   $y += 15
@@ -1788,7 +1831,7 @@ Func CreateScheduleSubTab()
 
 	$x = $xStart
 	$y = $yStart + 130
-	GUICtrlCreateGroup(GetTranslated(613,2,"Donation Clan Mates Filter"), $x - 20, $y - 20, 430, 155)
+	GUICtrlCreateGroup(GetTranslated(613,2,"Donation Clan Mates Filter"), $x - 20, $y - 20, $g_iSizeWGrpTab3, 155)
 		$y += 10
 		GUICtrlCreateLabel(GetTranslated(613, 8,"Using this option you can choose to donate to all members of your team (No Filter), donate only to certain friends (White List) or give everyone except a few members of your team (Black List)"), $x , $y - 10, 380, 40, $BS_MULTILINE)
 		$y += 35
@@ -1807,7 +1850,7 @@ Func CreateScheduleSubTab()
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 
    $y += 60
-   GUICtrlCreateGroup(GetTranslated(613,15,"Skip donation near full troops"), $x - 20, $y - 20, 430, 45)
+   GUICtrlCreateGroup(GetTranslated(613,15,"Skip donation near full troops"), $x - 20, $y - 20, $g_iSizeWGrpTab3, 45)
 
 	  $g_hChkSkipDonateNearFullTroopsEnable = GUICtrlCreateCheckbox(GetTranslated(613,13,"Skip donation near full troops"), $x, $y-4)
 			GUICtrlSetState(-1, $GUI_CHECKED )
@@ -1821,6 +1864,31 @@ Func CreateScheduleSubTab()
 	  $x += 95
 		 $g_hLblSkipDonateNearFullTroopsText1 =  GUICtrlCreateLabel("%", $x, $y)
 
+   GUICtrlCreateGroup("", -99, -99, 1, 1)
+
+   $x = $xStart
+   $y += 25
+   GUICtrlCreateGroup(GetTranslated(634,13,"Balance Donate/Receive"), $x - 20, $y, $g_iSizeWGrpTab3, 40)
+   	$y += 12
+		$g_hChkUseCCBalanced = GUICtrlCreateCheckbox(GetTranslated(634,13,"Balance Donate/Receive"), $x, $y+2, -1, -1)
+			GUICtrlSetState(-1, $GUI_UNCHECKED)
+			_GUICtrlSetTip(-1, GetTranslated(634,14, "Disable Clan Castle Usage or Donations if Ratio is not correct. Will Auto Continue when the Ratio is correct again"))
+			GUICtrlSetOnEvent(-1, "chkBalanceDR")
+
+	$x += 290
+		$g_hCmbCCDonated = GUICtrlCreateCombo("",  $x + 40 , $y, 30, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
+			_GUICtrlSetTip(-1, GetTranslated(634,15, "Donated ratio"))
+			GUICtrlSetData(-1, "1|2|3|4|5", "1")
+			GUICtrlSetState(-1, $GUI_DISABLE)
+			GUICtrlSetOnEvent(-1, "cmbBalanceDR")
+		GUICtrlCreateLabel("/", $x + 73, $y + 5, -1, -1)
+			_GUICtrlSetTip(-1, GetTranslated(634,16, "Wanted donated / received ratio") & @CRLF & _
+							   GetTranslated(634,17, "1/1 means donated = received, 1/2 means donated = half the received etc."))
+		$g_hCmbCCReceived = GUICtrlCreateCombo("", $x +80, $y, 30, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
+			_GUICtrlSetTip(-1, GetTranslated(634,18, "Received ratio"))
+			GUICtrlSetData(-1, "1|2|3|4|5", "1")
+			GUICtrlSetState(-1, $GUI_DISABLE)
+			GUICtrlSetOnEvent(-1, "cmbBalanceDR")
    GUICtrlCreateGroup("", -99, -99, 1, 1)
 EndFunc
 #EndRegion

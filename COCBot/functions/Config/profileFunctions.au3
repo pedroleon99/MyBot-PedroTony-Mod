@@ -1,7 +1,7 @@
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: profileFunctions.au3
 ; Description ...: Functions for the new profile system
-; Author ........: LunaEclipse(February, 2016)
+; Author ........: LunaEclipse(02-2016)
 ; Modified ......:
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
 ;                  MyBot is distributed under the terms of the GNU GPL
@@ -9,7 +9,7 @@
 
 Func setupProfileComboBox()
 	; Array to store Profile names to add to ComboBox
-	Local $profileString = ""
+	$profileString = ""
 	Local $aProfiles = _FileListToArray($g_sProfilePath, "*", $FLTA_FOLDERS)
 	If @error Then
 		; No folders for profiles so lets set the combo box to a generic entry
@@ -27,8 +27,12 @@ Func setupProfileComboBox()
 
 	; Clear the combo box current data in case profiles were deleted
 	GUICtrlSetData($g_hCmbProfile, "", "")
+	GUICtrlSetData($cmbForecastHopingSwitchMin, "", "")
+	GUICtrlSetData($cmbForecastHopingSwitchMax, "", "")
 	; Set the new data of available profiles
 	GUICtrlSetData($g_hCmbProfile, $profileString, "<No Profiles>")
+	GUICtrlSetData($cmbForecastHopingSwitchMax, $profileString, "<No Profiles>")
+	GUICtrlSetData($cmbForecastHopingSwitchMin, $profileString, "<No Profiles>")
 EndFunc   ;==>setupProfileComboBox
 
 Func renameProfile()
@@ -36,15 +40,15 @@ Func renameProfile()
 	Local $newPath = $g_sProfilePath & "\" & $g_sProfileCurrentName
 	If FileExists($originalPath) Then
 		; Close the logs to ensure all files can be deleted.
-	   If $g_hLogFile <> 0 Then
-		  FileClose($g_hLogFile)
-		  $g_hLogFile = 0
-	   EndIf
+		If $g_hLogFile <> 0 Then
+			FileClose($g_hLogFile)
+			$g_hLogFile = 0
+		EndIf
 
-	   If $g_hAttackLogFile <> 0 Then
-		  FileClose($g_hAttackLogFile)
-		  $g_hAttackLogFile = 0
-	   EndIf
+		If $g_hAttackLogFile <> 0 Then
+			FileClose($g_hAttackLogFile)
+			$g_hAttackLogFile = 0
+		EndIf
 
 		; Remove the directory and all files and sub folders.
 		DirMove($originalPath, $newPath, $FC_NOOVERWRITE)
@@ -57,15 +61,15 @@ Func deleteProfile()
 	If FileExists($deletePath) Then
 		If $sProfile = $g_sProfileCurrentName Then
 			; Close the logs to ensure all files can be deleted.
-			 If $g_hLogFile <> 0 Then
+			If $g_hLogFile <> 0 Then
 				FileClose($g_hLogFile)
 				$g_hLogFile = 0
-			 EndIf
+			EndIf
 
-			 If $g_hAttackLogFile <> 0 Then
+			If $g_hAttackLogFile <> 0 Then
 				FileClose($g_hAttackLogFile)
 				$g_hAttackLogFile = 0
-			 EndIf
+			EndIf
 		EndIf
 		; Remove the directory and all files and sub folders.
 		DirRemove($deletePath, $DIR_REMOVE)
@@ -77,10 +81,12 @@ Func createProfile($bCreateNew = False)
 	If $bCreateNew = True Then
 		; create new profile (recursive call from setupProfile() and selectProfile() !!!)
 		setupProfileComboBox()
+		setupProfileComboBoxswitch()
 		setupProfile()
 		saveConfig()
 		; applyConfig()
 		setupProfileComboBox()
+		setupProfileComboBoxswitch()
 		selectProfile()
 		Return
 	EndIf
