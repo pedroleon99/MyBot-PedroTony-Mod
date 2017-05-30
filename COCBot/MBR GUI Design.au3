@@ -99,7 +99,7 @@ Global $hImageList = 0
 Global $g_hFrmBotButtons, $g_hFrmBotLogoUrlSmall, $g_hFrmBotEx = 0, $g_hLblBotTitle, $g_hLblBotShrink = 0, $g_hLblBotExpand = 0, $g_hLblBotMinimize = 0, $g_hLblBotClose = 0, $g_hFrmBotBottom = 0
 Global $g_hFrmBotEmbeddedShield = 0, $g_hFrmBotEmbeddedShieldInput = 0, $g_hFrmBotEmbeddedGraphics = 0
 Global $g_hFrmBot_MAIN_PIC = 0, $g_hFrmBot_URL_PIC = 0, $g_hFrmBot_URL_PIC2 = 0
-Global $g_hTabMain = 0, $g_hTabLog = 0, $g_hTabVillage = 0, $g_hTabAttack = 0, $g_hTabBot = 0, $g_hTabMOD = 0, $g_hTabAbout = 0
+Global $g_hTabMain = 0, $g_hTabLog = 0, $g_hTabVillage = 0, $g_hTabAttack = 0, $g_hTabBot = 0, $g_hTabAbout = 0
 Global $g_hStatusBar = 0
 Global $g_hTiShow = 0, $g_hTiHide = 0, $g_hTiDonate = 0, $g_hTiAbout = 0, $g_hTiExit = 0
 Global $g_aFrmBotPosInit[8] = [0, 0, 0, 0, 0, 0, 0, 0]
@@ -113,8 +113,8 @@ Global $g_bFrmBotMinimized = False ; prevents bot flickering
 #include "GUI\MBR GUI Design Bot.au3"
 #include "GUI\MBR GUI Design About.au3"
 
-; Team++ AIO MOD
-#include "MOD_Team++AIO\GUI\MOD GUI Design.au3"
+;Demen Mod
+#include "MOD\GUI Design_Demen.au3"
 
 Func CreateMainGUI()
 
@@ -142,7 +142,7 @@ EndFunc   ;==>CreateMainGUI
 Func CreateMainGUIControls()
    Local $aBtnSize = $_GUI_MAIN_BUTTON_SIZE
    GUISwitch($g_hFrmBot)
-   SplashStep(GetTranslated(500, 23, "Loading Main GUI..."))
+   SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_01", "Loading Main GUI..."))
 
    If $g_bCustomTitleBarActive Then
 	   $g_hFrmBotButtons = GUICreate("My Bot Title Buttons", 3 * $aBtnSize[0], $aBtnSize[1], $_GUI_MAIN_WIDTH - $aBtnSize[0] * 3, 0, BitOR($WS_CHILD, $WS_TABSTOP), BitOR($WS_EX_TOOLWINDOW, $WS_EX_NOACTIVATE, ($g_bAndroidShieldPreWin8 ? 0 : $WS_EX_LAYERED)), $g_hFrmBot)
@@ -226,15 +226,15 @@ Func CreateMainGUIControls()
    ;~ Header Menu
    ;~ ------------------------------------------------------
    GUISwitch($g_hFrmBot)
-   ;$idMENU_DONATE = GUICtrlCreateMenu("&" & GetTranslated(601,18,"Paypal Donate?"))
+   ;$idMENU_DONATE = GUICtrlCreateMenu("&" & GetTranslatedFileIni("MBR GUI Design Bottom", "g_hLblDonate_Info_01", "Paypal Donate?"))
    ;_GUICtrlMenu_SetItemType(_GUICtrlMenu_GetMenu($g_hFrmBot), 0, $MFT_RIGHTJUSTIFY) ; move to right
-   ;$idMENU_DONATE_SUPPORT = GUICtrlCreateMenuItem(GetTranslated(601,19,"Support the development"), $idMENU_DONATE)
+   ;$idMENU_DONATE_SUPPORT = GUICtrlCreateMenuItem(GetTranslatedFileIni("MBR GUI Design Bottom", "g_hLblDonate", "Support the development"), $idMENU_DONATE)
    ;GUICtrlSetOnEvent(-1, "")
 
    ;~ ------------------------------------------------------
    ;~ GUI Bottom Panel
    ;~ ------------------------------------------------------
-   SplashStep(GetTranslated(500, 24, "Loading GUI Bottom..."))
+   SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_02", "Loading GUI Bottom..."))
    GUISwitch($g_hFrmBotBottom)
    CreateBottomPanel()
 
@@ -246,37 +246,33 @@ Func CreateMainGUIControls()
    ; This dummy is used in btnStart and btnStop to disable/enable all labels, text, buttons etc. on all tabs.
    $g_hFirstControlToHide = GUICtrlCreateDummy()
 
-   SplashStep(GetTranslated(500, 25, "Loading Log tab..."))
+   SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_03", "Loading Log tab..."))
    CreateLogTab()
 
-   SplashStep(GetTranslated(500, 26, "Loading Village tab..."))
+   SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_04", "Loading Village tab..."))
    CreateVillageTab()
 
-   SplashStep(GetTranslated(500, 27, "Loading Attack tab..."))
+   SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_05", "Loading Attack tab..."))
    CreateAttackTab()
 
-   SplashStep(GetTranslated(500, 28, "Loading Bot tab..."))
+   SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_06", "Loading Bot tab..."))
    CreateBotTab()
 
-   SplashStep(GetTranslated(500, 37, "Loading Mods tab..."))
-   CreateMODTab()
-
-   SplashStep(GetTranslated(500, 29, "Loading About Us tab..."))
+   SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_07", "Loading About Us tab..."))
    CreateAboutTab()
 
-   SplashStep(GetTranslated(500, 30, "Initializing GUI..."))
+   SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_08", "Initializing GUI..."))
 
    ;~ ------------------------------------------------------
    ;~ GUI Main Tab Control
    ;~ ------------------------------------------------------
    GUISwitch($g_hFrmBotEx)
    $g_hTabMain = GUICtrlCreateTab(5, 85 + $_GUI_MAIN_TOP, $_GUI_MAIN_WIDTH - 9, $_GUI_MAIN_HEIGHT - 225); , $TCS_MULTILINE)
-   $g_hTabLog = GUICtrlCreateTabItem(GetTranslated(600,1, "Log"))
-   $g_hTabVillage = GUICtrlCreateTabItem(GetTranslated(600,2, "Village"))
-   $g_hTabAttack = GUICtrlCreateTabItem(GetTranslated(600,3,"Attack Plan"))
-   $g_hTabBot = GUICtrlCreateTabItem(GetTranslated(600,4,"Bot"))
-   $g_hTabMOD = GUICtrlCreateTabItem(GetTranslated(600,57,"Mods"))
-   $g_hTabAbout = GUICtrlCreateTabItem(GetTranslated(600, 5, "About Us"))
+   $g_hTabLog = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_01", "Log"))
+   $g_hTabVillage = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_02", "Village"))
+   $g_hTabAttack = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_03", "Attack Plan"))
+   $g_hTabBot = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_04", "Bot"))
+   $g_hTabAbout = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_05", "About Us"))
    GUICtrlCreateTabItem("")
    GUICtrlSetResizing(-1, $GUI_DOCKBORDERS)
 
@@ -302,9 +298,6 @@ Func CreateMainGUIControls()
 
    Bind_ImageList($g_hGUI_BOT_TAB)
 
-   Bind_ImageList($g_hGUI_MOD_TAB)
-	  Bind_ImageList($g_hGUI_MOD_SWITCH_TAB)
-
    Bind_ImageList($g_hGUI_STATS_TAB)
 
    ; Show Tab LOG
@@ -318,17 +311,17 @@ Func CreateMainGUIControls()
    _GUICtrlStatusBar_SetSimple($g_hStatusBar)
    GUISetDefaultFont($g_hStatusBar)
    _GUICtrlStatusBar_SetText($g_hStatusBar, "Status : Idle")
-   $g_hTiShow = TrayCreateItem(GetTranslated(500,31,"Show bot"))
+   $g_hTiShow = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_01", "Show bot"))
    TrayItemSetOnEvent($g_hTiShow, "tiShow")
-   $g_hTiHide = TrayCreateItem(GetTranslated(500,32, "Hide when minimized"))
+   $g_hTiHide = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_02", "Hide when minimized"))
    TrayItemSetOnEvent($g_hTiHide, "tiHide")
    TrayCreateItem("")
-   $g_hTiDonate = TrayCreateItem(GetTranslated(500,33, "Support Development"))
+   $g_hTiDonate = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_03", "Support Development"))
    TrayItemSetOnEvent($g_hTiDonate, "tiDonate")
-   $g_hTiAbout = TrayCreateItem(GetTranslated(500,34, "About"))
+   $g_hTiAbout = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_04", "About"))
    TrayItemSetOnEvent($g_hTiAbout, "tiAbout")
    TrayCreateItem("")
-   $g_hTiExit = TrayCreateItem(GetTranslated(500,35, "Exit"))
+   $g_hTiExit = TrayCreateItem(GetTranslatedFileIni("MBR GUI Design - Loading", "StatusBar_Item_05", "Exit"))
    TrayItemSetOnEvent($g_hTiExit, "tiExit")
 
    ;~ -------------------------------------------------------------

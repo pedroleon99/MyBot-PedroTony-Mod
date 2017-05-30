@@ -85,6 +85,7 @@ Func BotCommand()
 				$g_bDonationEnabled = False
 			Case 19 ; Have shield - Online/Train/Collect/Donate
 				If $g_bWaitShield = True Then $g_bMeetCondStop = True
+				If ( $g_bQuickTrainEnable = True ) Then Qt_SimpleQuickTrain( True, 2 )
 			Case 20 ; Have shield - Online/Collect/Donate
 				If $g_bWaitShield = True Then
 					$g_bMeetCondStop = True
@@ -107,6 +108,7 @@ Func BotCommand()
 						SetLog("Halt Attack, Stay Online/Collect/Donate...", $COLOR_INFO)
 					Else
 						SetLog("Halt Attack, Stay Online/Train/Collect/Donate...", $COLOR_INFO)
+						If ( $g_bQuickTrainEnable = True ) Then Qt_SimpleQuickTrain( True, 2 )
 					EndIf
 					$g_iCommandStop = 0 ; Halt Attack
 					If _Sleep($DELAYBOTCOMMAND1) Then Return

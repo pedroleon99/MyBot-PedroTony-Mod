@@ -19,7 +19,7 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 
 	If _Sleep($DELAYALGORITHM_ALLTROOPS1) Then Return
 
-	If $g_aiAttackStdDropSides[$g_iMatchMode] <> 4 Then ; ! FourFinger
+	If $g_aiAttackStdDropSides[$g_iMatchMode] <> 4 Then	; ! FourFinger
 		SmartAttackStrategy($g_iMatchMode) ; detect redarea first to drop any troops
 	EndIf
 
@@ -66,13 +66,13 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 	;########################################################################################################################
 	Local $nbSides = 0
 	Switch $g_aiAttackStdDropSides[$g_iMatchMode]
-		Case 0 ;Single sides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		Case 0 ;Single sides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			SetLog("Attacking on a single side", $COLOR_INFO)
 			$nbSides = 1
 		Case 1 ;Two sides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			SetLog("Attacking on two sides", $COLOR_INFO)
 			$nbSides = 2
-		Case 2 ;Three sides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		Case 2 ;Three sides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			SetLog("Attacking on three sides", $COLOR_INFO)
 			$nbSides = 3
 		Case 3 ;All sides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -96,19 +96,13 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 	If ($nbSides = 0) Then Return
 	If _Sleep($DELAYALGORITHM_ALLTROOPS2) Then Return
 
-	Local $SlotsGiants = 1 ; standard on middle of village
-	LocaL $GiantComp = $g_ahTxtTrainArmyTroopCount[$eTroopGiant]
-
-	If Number($GiantComp) > 16 Or (Number($GiantComp) >= 8 And $nbSides = 5) Then $SlotsGiants = 2
-	If Number($GiantComp) > 20 Or (Number($GiantComp) >= 12 And $nbSides = 5) Then $SlotsGiants = 0
-
 	; $ListInfoDeploy = [Troop, No. of Sides, $WaveNb, $MaxWaveNb, $slotsPerEdge]
 	If $g_iMatchMode = $LB And $g_aiAttackStdDropSides[$LB] = 5 Then ; Customise DE side wave deployment here
 		Switch $g_aiAttackStdDropOrder[$g_iMatchMode]
 			Case 0
 				Local $listInfoDeploy[21][5] = [[$eGole, $nbSides, 1, 1, 2] _
 						, [$eLava, $nbSides, 1, 1, 2] _
-						, [$eGiant, $nbSides, 1, 1, $SlotsGiants] _
+						, [$eGiant, $nbSides, 1, 1, 2] _
 						, [$eDrag, $nbSides, 1, 1, 0] _
 						, [$eBall, $nbSides, 1, 1, 0] _
 						, [$eBabyD, $nbSides, 1, 1, 1] _
@@ -137,7 +131,7 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 						, ["HEROES", 1, 2, 1, 1] _
 						]
 			Case 2
-				Local $listInfoDeploy[13][5] = [[$eGiant, $nbSides, 1, 1, $SlotsGiants] _
+				Local $listInfoDeploy[13][5] = [[$eGiant, $nbSides, 1, 1, 2] _
 						, [$eWall, $nbSides, 1, 1, 2] _
 						, [$eBarb, $nbSides, 1, 2, 2] _
 						, [$eArch, $nbSides, 1, 3, 3] _
@@ -154,11 +148,10 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 		EndSwitch
 	; Classic Four Fingers
 	ElseIf $nbSides = 5 Then
-		Local $listInfoDeploy[21][5] = [[$eGiant, $nbSides, 1, 1, $SlotsGiants], _
+		Local $listInfoDeploy[21][5] = [[$eGiant, $nbSides, 1, 1, 2], _
 						[$eGole, $nbSides, 1, 1, 2], _
 						[$eLava, $nbSides, 1, 1, 2], _
 						[$eBarb, $nbSides, 1, 1, 0], _
-						["CC", 1, 1, 1, 1], _
 						[$eWall, $nbSides, 1, 1, 2], _
 						[$eHogs, $nbSides, 1, 1, 2], _
 						[$eValk, $nbSides, 1, 1, 2], _
@@ -173,16 +166,15 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 						[$eWiza, $nbSides, 1, 1, 2], _
 						[$eWitc, $nbSides, 1, 1, 2], _
 						[$eMini, $nbSides, 1, 1, 0], _
+						["CC", 1, 1, 1, 1], _
 						["HEROES", 1, 2, 1, 1]]
 
 	; Multi-Finger
 	ElseIf $nbSides = 6 Then
-	   	CmbGiantSlot()				
-	Local $listInfoDeploy[21][5] = [[$eGiant, $nbSides, 1, 1, $SlotsGiantsVN], _
+		Local $listInfoDeploy[21][5] = [[$eGiant, $nbSides, 1, 1, 2], _
 						[$eGole, $nbSides, 1, 1, 2], _
 						[$eLava, $nbSides, 1, 1, 2], _
 						[$eBarb, $nbSides, 1, 1, 0], _
-						["CC", 1, 1, 1, 1], _
 						[$eWall, $nbSides, 1, 1, 2], _
 						[$eHogs, $nbSides, 1, 1, 2], _
 						[$eValk, $nbSides, 1, 1, 2], _
@@ -197,6 +189,7 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 						[$eWiza, $nbSides, 1, 1, 2], _
 						[$eWitc, $nbSides, 1, 1, 2], _
 						[$eMini, $nbSides, 1, 1, 0], _
+						["CC", 1, 1, 1, 1], _
 						["HEROES", 1, 2, 1, 1]]
 	Else
 		If $g_iDebugSetlog = 1 Then SetLog("listdeploy standard for attack", $COLOR_DEBUG)
@@ -204,7 +197,7 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 			Case 0
 				Local $listInfoDeploy[21][5] = [[$eGole, $nbSides, 1, 1, 2] _
 						, [$eLava, $nbSides, 1, 1, 2] _
-						, [$eGiant, $nbSides, 1, 1, $SlotsGiants] _
+						, [$eGiant, $nbSides, 1, 1, 2] _
 						, [$eDrag, $nbSides, 1, 1, 0] _
 						, [$eBall, $nbSides, 1, 1, 0] _
 						, [$eBabyD, $nbSides, 1, 1, 0] _
@@ -233,7 +226,7 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 						, ["HEROES", 1, 2, 1, 1] _
 						]
 			Case 2
-				Local $listInfoDeploy[13][5] = [[$eGiant, $nbSides, 1, 1, $SlotsGiants] _
+				Local $listInfoDeploy[13][5] = [[$eGiant, $nbSides, 1, 1, 2] _
 						, [$eBarb, $nbSides, 1, 2, 0] _
 						, [$eWall, $nbSides, 1, 1, 1] _
 						, [$eArch, $nbSides, 1, 2, 0] _
@@ -249,7 +242,7 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 						]
 			Case Else
 				SetLog("Algorithm type unavailable, defaulting to regular", $COLOR_ERROR)
-				Local $listInfoDeploy[13][5] = [[$eGiant, $nbSides, 1, 1, $SlotsGiants] _
+				Local $listInfoDeploy[13][5] = [[$eGiant, $nbSides, 1, 1, 2] _
 						, [$eBarb, $nbSides, 1, 2, 0] _
 						, [$eWall, $nbSides, 1, 1, 1] _
 						, [$eArch, $nbSides, 1, 2, 0] _
@@ -280,6 +273,7 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 		SetLog(_PadStringCenter("Standard Attack", 50, "="), $COLOR_BLUE)
 		LaunchTroop2($listInfoDeploy, $g_iClanCastleSlot, $g_iKingSlot, $g_iQueenSlot, $g_iWardenSlot)
 	EndIf
+
 	CheckHeroesHealth()
 
 	If _Sleep($DELAYALGORITHM_ALLTROOPS4) Then Return

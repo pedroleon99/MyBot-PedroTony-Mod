@@ -14,7 +14,21 @@
 ; Example .......: No
 ; ===============================================================================================================================
 
-Func VillageSearch() ;Control for searching a village that meets conditions
+Func VillageSearch()
+
+	$g_bVillageSearchActive = True
+	$g_bCloudsActive = True
+
+	Local $Result = _VillageSearch()
+
+	$g_bVillageSearchActive = False
+	$g_bCloudsActive = False
+
+	Return $Result
+
+EndFunc   ;==>VillageSearch
+
+Func _VillageSearch() ;Control for searching a village that meets conditions
 	Local $Result
 	Local $weakBaseValues
 	Local $logwrited = False
@@ -74,6 +88,8 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 		; cleanup some vars used by imgloc just in case. usend in TH and DeadBase ( imgloc functions)
 		ResetTHsearch()
 
+		_ObjDeleteKey($g_oBldgAttackInfo, "") ; Remove all keys from building dictionary
+
 		If $g_iDebugVillageSearchImages = 1 Then DebugImageSave("villagesearch")
 		$logwrited = False
 		$g_bBtnAttackNowPressed = False
@@ -87,6 +103,8 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 		; ----------------- READ ENEMY VILLAGE RESOURCES  -----------------------------------
 		WaitForClouds() ; Wait for clouds to disappear
 		If $g_bRestart = True Then Return ; exit func
+
+		$g_bCloudsActive = False
 
 		GetResources(False) ;Reads Resource Values
 		If $g_bRestart = True Then Return ; exit func
@@ -230,26 +248,26 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 			SetLog($GetResourcesTXT, $COLOR_SUCCESS, "Lucida Console", 7.5)
 			SetLog("      " & "Dead Base Found!", $COLOR_SUCCESS, "Lucida Console", 7.5)
 			$logwrited = True
+
+			; Collectors Outside
 			If $ichkDBMeetCollOutside = 1 Then
 				If AreCollectorsOutside($iDBMinCollOutsidePercent) Then
 					SetLog("Collectors are outside, match found !", $COLOR_GREEN, "Lucida Console", 7.5)
 					$g_iMatchMode = $DB
-					cmbCSVSpeed()
 					ExitLoop
 				Else
 					SetLog("Collectors are not outside, skipping search !", $COLOR_RED, "Lucida Console", 7.5)
 				EndIf
 			Else
 				$g_iMatchMode = $DB
-				cmbCSVSpeed()
 				ExitLoop
 			EndIf
+
 		ElseIf $match[$LB] And Not $dbBase Then
 			SetLog($GetResourcesTXT, $COLOR_SUCCESS, "Lucida Console", 7.5)
 			SetLog("      " & "Live Base Found!", $COLOR_SUCCESS, "Lucida Console", 7.5)
 			$logwrited = True
 			$g_iMatchMode = $LB
-			cmbCSVSpeed()
 			ExitLoop
 		ElseIf $match[$LB] And $g_bCollectorFilterDisable Then
 			SetLog($GetResourcesTXT, $COLOR_SUCCESS, "Lucida Console", 7.5)
@@ -288,7 +306,7 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 		If $noMatchTxt <> "" Then
 			;SetLog(_PadStringCenter(" " & StringMid($noMatchTxt, 3) & " ", 50, "~"), $COLOR_DEBUG)
 			SetLog($GetResourcesTXT, $COLOR_BLACK, "Lucida Console", 7.5)
-			SetLog("      " & StringMid($noMatchTxt, 3), $COLOR_ORANGE, "Lucida Console", 7.5)
+			SetLog("      " & StringMid($noMatchTxt, 3), $COLOR_BLACK, "Lucida Console", 7.5)
 			$logwrited = True
 		EndIf
 
@@ -380,6 +398,7 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 			$i += 1
 			_CaptureRegions()
 			If ( _ColorCheck(_GetPixelColor($NextBtn[0], $NextBtn[1]), Hex($NextBtn[2], 6), $NextBtn[3])) And IsAttackPage(False) Then
+				$g_bCloudsActive = True
 				If $g_bUseRandomClick = False Then
 					ClickP($NextBtn, 1, 0, "#0155") ;Click Next
 				Else
@@ -470,7 +489,7 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 
 	$g_bIsClientSyncError = False
 
-EndFunc   ;==>VillageSearch
+EndFunc   ;==>_VillageSearch
 
 Func SearchLimit($iSkipped)
 	If $g_bSearchRestartEnable And $iSkipped >= Number($g_iSearchRestartLimit) Then

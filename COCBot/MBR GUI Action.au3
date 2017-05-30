@@ -14,6 +14,7 @@
 ; ===============================================================================================================================
 
 Func BotStart($bAutostartDelay = 0)
+
 	ResumeAndroid()
 	CalCostCamp()
 	CalCostSpell()
@@ -75,6 +76,10 @@ Func BotStart($bAutostartDelay = 0)
 		_SleepStatus($bAutostartDelay)
 	EndIf
 
+	; wait for slot
+	LockBotSlot(True)
+	If $g_bRunState = False Then Return
+
 	Local $Result = False
 	If WinGetAndroidHandle() = 0 Then
 		$Result = OpenAndroid(False)
@@ -105,7 +110,6 @@ Func BotStart($bAutostartDelay = 0)
 		EndIf
 		If Not $g_bRunState Then Return
 		If $hWndActive = $g_hAndroidWindow And ($g_bAndroidBackgroundLaunched = True Or AndroidControlAvailable())  Then ; Really?
-			AutoHide() ; Auto Hide - NguyenAnhHD
 			Initiate() ; Initiate and run bot
 		Else
 			SetLog("Cannot use " & $g_sAndroidEmulator & ", please check log", $COLOR_ERROR)
@@ -118,6 +122,10 @@ Func BotStart($bAutostartDelay = 0)
 EndFunc   ;==>BotStart
 
 Func BotStop()
+
+	; release bot slot
+	LockBotSlot(False)
+
 	ResumeAndroid()
 
 	$g_bRunState = False
@@ -145,8 +153,6 @@ Func BotStop()
 	If $g_iTownHallLevel > 2 Then GUICtrlSetState($g_hBtnSearchMode, $GUI_ENABLE)
 	GUICtrlSetState($g_hBtnSearchMode, $GUI_SHOW)
 	;GUICtrlSetState($g_hBtnMakeScreenshot, $GUI_ENABLE)
-	GUICtrlSetState($g_hBtnEnableGUI, $GUI_HIDE) ; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen
-	GUICtrlSetState($g_hBtnDisableGUI, $GUI_HIDE) ; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen
 
 	; hide attack buttons if show
 	GUICtrlSetState($g_hBtnAttackNowDB, $GUI_HIDE)
@@ -190,7 +196,7 @@ Func BotSearchMode()
 	If _Sleep(100) Then Return
 	$g_aiCurrentLoot[$eLootTrophy] = getTrophyMainScreen($aTrophies[0], $aTrophies[1]) ; get OCR to read current Village Trophies
 	If _Sleep(100) Then Return
-	CheckArmySpellCastel()
+	CheckIfArmyIsReady()
 	ClickP($aAway, 2, 0, "") ;Click Away
 	If _Sleep(100) Then Return
 	If (IsSearchModeActive($DB) And checkCollectors(True, False)) Or IsSearchModeActive($LB) Or IsSearchModeActive($TS) Then

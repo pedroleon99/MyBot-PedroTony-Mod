@@ -501,8 +501,3 @@ Func FindClosestToAxis(Const ByRef $PixelList)
 	Next
 	Return $Search
 EndFunc   ;==>FindClosestToAxis
-
-Func ResetRedLines()
-	_ArrayClear($CurBaseRedLine)
-	Return True
-EndFunc

@@ -40,14 +40,14 @@
 #include "functions\Attack\AttackCSV\AttackCSVDebugImage.au3"
 #include "functions\Attack\AttackCSV\CheckCSVValues.au3"
 #include "functions\Attack\AttackCSV\DebugAttackCSV.au3"
-;~ #include "functions\Attack\AttackCSV\DropTroopFromINI.au3" ; Move for CSV Command (Mr.Viper)
+#include "functions\Attack\AttackCSV\DropTroopFromINI.au3"
 #include "functions\Attack\AttackCSV\GetListPixel3.au3"
 #include "functions\Attack\AttackCSV\IsInsideDiamondRedArea.au3"
 #include "functions\Attack\AttackCSV\Line2Points.au3"
 #include "functions\Attack\AttackCSV\MakeDropLine.au3"
 #include "functions\Attack\AttackCSV\MakeDropPoints.au3"
-;~ #include "functions\Attack\AttackCSV\ParseAttackCSV.au3" ; Move for CSV Command (Mr.Viper)
-;~ #include "functions\Attack\AttackCSV\ParseAttackCSV_Read_SIDE_variables.au3" ; Move for CSV Command (Mr.Viper)
+#include "functions\Attack\AttackCSV\ParseAttackCSV.au3"
+#include "functions\Attack\AttackCSV\ParseAttackCSV_Read_SIDE_variables.au3"
 #include "functions\Attack\AttackCSV\Slice8.au3"
 #include "functions\Attack\AttackCSV\CleanRedArea.au3"
 #include "functions\Attack\AttackCSV\ChkAttackCSVConfig.au3"
@@ -71,7 +71,7 @@
 
 #include "functions\Attack\RedArea\_FindPixelCloser.au3"
 #include "functions\Attack\RedArea\_GetOffsetTroopFurther.au3"
-;~ #include "functions\Attack\RedArea\_GetRedArea.au3" ; Move for CSV Command (Mr.Viper)
+#include "functions\Attack\RedArea\_GetRedArea.au3"
 #include "functions\Attack\RedArea\_GetVectorOutZone.au3"
 #include "functions\Attack\RedArea\DebugRedArea.au3"
 #include "functions\Attack\RedArea\DropOnPixel.au3"
@@ -83,22 +83,24 @@
 #include "functions\Attack\RedArea\GetVectorPixelAverage.au3"
 #include "functions\Attack\RedArea\GetVectorPixelOnEachSide.au3"
 #include "functions\Attack\RedArea\GetVectorPixelToDeploy.au3"
+#include "functions\Attack\RedArea\PointInPoly.au3"
 
 #include "functions\Attack\Troops\CheckHeroesHealth.au3"
 #include "functions\Attack\Troops\dropCC.au3"
 #include "functions\Attack\Troops\dropHeroes.au3"
 #include "functions\Attack\Troops\DropOnEdge.au3"
 #include "functions\Attack\Troops\DropOnEdges.au3"
-;~ #include "functions\Attack\Troops\GetXPosOfArmySlot.au3" ; Move for CSV Command (Mr.Viper)
+#include "functions\Attack\Troops\GetXPosOfArmySlot.au3"
 #include "functions\Attack\Troops\GetSlotIndexFromXPos.au3"
 #include "functions\Attack\Troops\LauchTroop.au3"
 #include "functions\Attack\Troops\NameOfTroop.au3"
 #include "functions\Attack\Troops\OldDropTroop.au3"
-;~ #include "functions\Attack\Troops\ReadTroopQuantity.au3" ; Move for CSV Command (Mr.Viper)
+#include "functions\Attack\Troops\ReadTroopQuantity.au3"
 #include "functions\Attack\Troops\SelectDropTroop.au3"
 #include "functions\Attack\Troops\SetSleep.au3"
 
 #include "functions\Attack\SmartZap\drillSearch.au3"
+#include "functions\Attack\SmartZap\easyPreySearch.au3"
 #include "functions\Attack\SmartZap\smartZap.au3"
 
 #include "functions\CreateArmy\CheckFullArmy.au3"
@@ -107,12 +109,12 @@
 #include "functions\CreateArmy\getArmyCCStatus.au3"
 #include "functions\CreateArmy\getArmyHeroCount.au3"
 #include "functions\CreateArmy\getArmyHeroTime.au3"
-#include "functions\CreateArmy\getArmyHeroStatus.au3"
 #include "functions\CreateArmy\getArmySpellCapacity.au3"
+#include "functions\CreateArmy\getArmyCCSpellCapacity.au3"
 #include "functions\CreateArmy\getArmySpellCount.au3"
 #include "functions\CreateArmy\getArmySpellTime.au3"
 #include "functions\CreateArmy\getArmyTroopTime.au3"
-#include "functions\CreateArmy\openArmyOverview.au3"
+#include "functions\CreateArmy\OpenArmyOverview.au3"
 #include "functions\CreateArmy\SmartWait4Train.au3"
 #include "functions\CreateArmy\TrainClick.au3"
 #include "functions\CreateArmy\TrainRevamp.au3"
@@ -138,6 +140,7 @@
 #include "functions\Main Screen\checkAttackDisable.au3"
 #include "functions\Main Screen\RemoveGhostTrayIcons.au3"
 #include "functions\Main Screen\waitMainScreen.au3"
+#include "functions\Main Screen\isOnBuilderIsland.au3"
 
 ; Android support for MEmu, LeapDroid, Droid4X, Nox, BlueStacks...
 #include "functions\Android\AndroidMenuShortcuts.au3"
@@ -192,6 +195,7 @@
 #include "functions\Other\WindowSystemMenu.au3"
 #include "functions\Other\image_get_info.au3"
 #include "functions\Other\SetWakeUpTime.au3"
+#include "functions\Other\ScriptingDictionaryTools.au3"
 
 #include "functions\Other\IsPage.au3"
 #include "functions\Other\MoveMouseOutBS.au3"
@@ -269,26 +273,10 @@
 #include "functions\Village\ConvertOCRTime.au3"
 #include "functions\Other\ClickZoneR.au3"
 #include "functions\Village\CheckNeedOpenTrain.au3"
+#include "functions\Village\GoToNormalVillage.au3"
 
 #include "functions\Other\Api.au3"
 #include "functions\Other\ApiClient.au3"
 
-; Team++ AIO MOD
-#include "MOD_Team++AIO\Functions_Team++AIO.au3"
-
-; OLD CODE
-
-;#include "functions\Image Search\checkWall.au3"
-;#include "functions\CreateArmy\getArmyTroopCount.au3" we don't use this anymore
-;#include "functions\Other\MBRFunc.au3"
-;#include "functions\CreateArmy\Spell.au3"
-;#include "functions\CreateArmy\_TrainMoveBtn.au3"
-;#include "functions\CreateArmy\isBarrack.au3"ateArmy\TrainIt.au3"
-;#include "functions\CreateArmy\Train.au3"
-;#include "functions\Image Search\THSearch.au3"
-;#include "functions\CreateArmy\BarracksStatus.au3"
-;#include "functions\Image Search\checkTownhall.au3"
-;#include "functions\Village\LocateBarrack.au3"
-;#include "functions\Village\ClanLevel.au3"
-;#include "functions\Village\LocateSpell.au3"
-;#include "functions\Other\UpdateStatsWall.au3"
+; Mod
+#include "MOD\Include_Files.au3"

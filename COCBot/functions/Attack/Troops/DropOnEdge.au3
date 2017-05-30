@@ -49,7 +49,7 @@ Func DropOnEdge($troop, $edge, $number, $slotsPerEdge = 0, $edge2 = -1, $x = -1,
 		Local $maxX = $edge[4][0]
 		Local $minY = $edge[0][1]
 		Local $maxY = $edge[4][1]
-		If $FourFingers = 5 Then ; if $nbSide = 5
+		If $FourFingers = 5 Then
 			Local $minXTL = $g_aaiTopLeftDropPoints[0][0]
 			Local $maxXTL = $g_aaiTopLeftDropPoints[4][0]
 			Local $minYTL = $g_aaiTopLeftDropPoints[0][1]
@@ -60,7 +60,7 @@ Func DropOnEdge($troop, $edge, $number, $slotsPerEdge = 0, $edge2 = -1, $x = -1,
 			Local $maxX2 = $edge2[4][0]
 			Local $minY2 = $edge2[0][1]
 			Local $maxY2 = $edge2[4][1]
-			If $FourFingers = 5 Then ; if $nbSide = 5
+			If $FourFingers = 5 Then
 				Local $minX2TR = $g_aaiTopRightDropPoints[0][0]
 				Local $maxX2TR = $g_aaiTopRightDropPoints[4][0]
 				Local $minY2TR = $g_aaiTopRightDropPoints[0][1]
@@ -70,7 +70,7 @@ Func DropOnEdge($troop, $edge, $number, $slotsPerEdge = 0, $edge2 = -1, $x = -1,
 		Local $nbTroopsLeft = $number
 		For $i = 0 To $slotsPerEdge - 1
 			Local $nbtroopPerSlot = Round($nbTroopsLeft / ($slotsPerEdge - $i)) ; progressively adapt the number of drops to fill at the best
-			If $FourFingers = 5 Then ; if $nbSide = 5
+			If $FourFingers = 5 Then
 				Local $posX = $minX + (($maxX - $minX) * ($slotsPerEdge - $i)) / ($slotsPerEdge - 1)
 				Local $posY = $minY + (($maxY - $minY) * ($slotsPerEdge - $i)) / ($slotsPerEdge - 1)
 				AttackClick($posX, $posY, $nbtroopPerSlot, SetSleep(0), 0, "#0108")
@@ -91,9 +91,6 @@ Func DropOnEdge($troop, $edge, $number, $slotsPerEdge = 0, $edge2 = -1, $x = -1,
 				Else
 					Local $posX2 = Round($maxX2 - (($maxX2 - $minX2) * $i) / ($slotsPerEdge - 1))
 					Local $posY2 = Round($maxY2 - (($maxY2 - $minY2) * $i) / ($slotsPerEdge - 1))
-					;If $x = 0 Then
-					;  If _SleepAttack(SetSleep(0)) Then Return ; add delay for first wave attack to prevent skip dropping troops, must add for 4 sides attack
-					;EndIf
 				EndIf
 				AttackClick($posX2, $posY2, $nbtroopPerSlot, SetSleep(0), 0, "#0109")
 			EndIf

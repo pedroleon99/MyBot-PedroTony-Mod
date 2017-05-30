@@ -102,6 +102,9 @@ Func GetNoxRtPath()
 	If FileExists($path) = 0 Then
 		$path = EnvGet("ProgramFiles(x86)") & "\Bignox\BigNoxVM\RT\"
 	EndIf
+	If FileExists($path) = 0 Then
+		$path = EnvGet("ProgramFiles") & "\Bignox\BigNoxVM\RT\"
+	EndIf
 	SetError(0, 0, 0)
 	Return StringReplace($path, "\\", "\")
 EndFunc   ;==>GetNoxRtPath
@@ -200,13 +203,33 @@ Func InitNox($bCheckOnly = False)
 			$g_bAndroidSharedFolderAvailable = True
 			$g_sAndroidPicturesHostPath = $aRegExResult[UBound($aRegExResult) - 1] & "\"
 		Else
-			$g_bAndroidSharedFolderAvailable = False
-			$g_bAndroidAdbScreencap = False
-			$g_sAndroidPicturesHostPath = ""
-			SetLog($g_sAndroidEmulator & " Background Mode is not available", $COLOR_ERROR)
+			; Check the shared folder 'Nox_share' , this is the default path on last version
+			If FileExists(@MyDocumentsDir & "\Nox_share\") then
+				$g_bAndroidSharedFolderAvailable = True
+				$g_sAndroidPicturesHostPath = @MyDocumentsDir & "\Nox_share\Other\"
+				If not FileExists($g_sAndroidPicturesHostPath) then
+					; Just in case of 'Other' Folder doesn't exist
+					DirCreate($g_sAndroidPicturesHostPath)
+				EndIf
+			Else
+				$g_bAndroidSharedFolderAvailable = False
+				$g_bAndroidAdbScreencap = False
+				$g_sAndroidPicturesHostPath = ""
+				SetLog($g_sAndroidEmulator & " Background Mode is not available", $COLOR_ERROR)
+			EndIf
 		EndIf
 
 		$__VBoxGuestProperties = LaunchConsole($__VBoxManage_Path, "guestproperty enumerate " & $g_sAndroidInstance, $process_killed)
+
+		Local $v = GetVersionNormalized($g_sAndroidVersion)
+		For $i = 0 To UBound($__Nox_Config) - 1
+			Local $v2 = GetVersionNormalized($__Nox_Config[$i][0])
+			If $v >= $v2 Then
+				SetDebugLog("Using Android Config of " & $g_sAndroidEmulator & " " & $__Nox_Config[$i][0])
+				$g_sAppClassInstance = $__Nox_Config[$i][1]
+				ExitLoop
+			EndIf
+		Next
 
 		; Update Android Screen and Window
 		;UpdateNoxConfig()
@@ -233,7 +256,25 @@ Func SetScreenNox()
 		; remove tailing backslash
 		Local $path = $g_sAndroidPicturesHostPath
 		If StringRight($path, 1) = "\" Then $path = StringLeft($path, StringLen($path) - 1)
+		$cmdOutput = LaunchConsole($__VBoxManage_Path, "sharedfolder remove " & $g_sAndroidInstance & " --name Other", $process_killed)
 		$cmdOutput = LaunchConsole($__VBoxManage_Path, "sharedfolder add " & $g_sAndroidInstance & " --name Other --hostpath """ & $path & """  --automount", $process_killed)
+	EndIf
+
+	; find Nox conf.ini in C:\Users\User\AppData\Local\Nox and set "Fix window size" to Enable, "Remember size and position" to Disable and screen res also
+	Local $sLocalAppData = EnvGet("LOCALAPPDATA")
+	Local $sPre = ""
+	If $g_sAndroidInstance <> "nox" Then $sPre = "clone_" & $g_sAndroidInstance & "_"
+	Local $sConfig = $sLocalAppData & "\Nox\" & $sPre & "conf.ini"
+	If FileExists($sConfig) Then
+		SetDebugLog("Configure Nox screen config: " & $sConfig)
+		IniWrite($sConfig, "setting", "h_resolution", $g_iAndroidClientWidth & "x" & $g_iAndroidClientHeight)
+		IniWrite($sConfig, "setting", "h_dpi", "160")
+		IniWrite($sConfig, "setting", "fixsize", "true")
+		IniWrite($sConfig, "setting", "is_save_pos_and_size", "false")
+		IniWrite($sConfig, "setting", "last_player_width", "864")
+		IniWrite($sConfig, "setting", "last_player_height", "770")
+	Else
+		SetDebugLog("Cannot find Nox config to cnfigure screen: " & $sConfig, $COLOR_ERROR)
 	EndIf
 
 	Return True
@@ -317,7 +358,7 @@ Func GetNoxRunningInstance($bStrictCheck = True)
 EndFunc   ;==>GetNoxRunningInstance
 
 Func RedrawNoxWindow()
-	;Return SetError(1)
+	Return SetError(1)
 	Local $aPos = WinGetPos($g_hAndroidWindow)
 	;_PostMessage_ClickDrag($aPos[0] + Int($aPos[2] / 2), $aPos[1] + 3, $aPos[0] + Int($aPos[2] / 2), $aPos[1] + 53)
 	;_PostMessage_ClickDrag($aPos[0] + Int($aPos[2] / 2), $aPos[1] + 53, $aPos[0] + Int($aPos[2] / 2), $aPos[1] + 3)
