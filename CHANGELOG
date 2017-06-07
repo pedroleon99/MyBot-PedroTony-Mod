@@ -1,4 +1,4 @@
-﻿* **V7.2**
+* **V7.2**
  * Add Nox 3.8.2 and DirectX support, fix Click&Drag and automatic screen config
  * Add new system to use translate
  * Add Suspend Android options under Bot/Android to suspend Android (CoC process) during Search/Attack or also for every ImgLoc call

@@ -1,4 +1,4 @@
-; #FUNCTION# ====================================================================================================================
+﻿; #FUNCTION# ====================================================================================================================
 ; Name ..........: MBR Bot
 ; Description ...: This file contains the initialization and main loop sequences f0r the MBR Bot
 ; Author ........:  (2014)
@@ -579,6 +579,13 @@ Func MainLoop()
 				BotStart($iStartDelay)
 				$iStartDelay = 0 ; don't autostart delay in future
 				If $g_iBotAction = $eBotStart Then $g_iBotAction = $eBotNoAction
+
+				; test error handling when bot started and then stopped
+				; force app crash for debugging/testing purposes
+				;DllCallAddress("NONE", 0)
+				; force au3 script error for debugging/testing purposes
+				;Local $iTmp = $iStartDelay[0]
+
 			Case $eBotStop
 				BotStop()
 				If $g_iBotAction = $eBotStop Then $g_iBotAction = $eBotNoAction
@@ -903,7 +910,12 @@ Func Idle() ;Sequence that runs until Full Army
 
 		If $g_iCommandStop = -1 Then ; Check if closing bot/emulator while training and not in halt mode
 			If $ichkSwitchAcc = 1 Then ; SwitchAcc Demen
-				checkSwitchAcc()
+				If $bWaitForCCTroopSpell Then
+					Setlog("Still waiting for CC troops/ spells, switching to another Account")
+					ForceSwitchAcc($eDonate)
+				Else
+					checkSwitchAcc()
+				EndIf
 			Else
 				SmartWait4Train()
 			EndIf
@@ -964,14 +976,14 @@ Func AttackMain() ;Main control for attack functions
 		Else
 			Setlog("No one of search condition match:", $COLOR_WARNING)
 			Setlog("Waiting on troops, heroes and/or spells according to search settings", $COLOR_WARNING)
+			$g_bIsSearchLimit = False
+			$g_bIsClientSyncError = False
+			$g_bQuickAttack = False
 			If $ichkSwitchAcc = 1 Then ; SwitchAcc Demen
 				checkSwitchAcc()
 			Else
 				SmartWait4Train()
 			EndIf
-			$g_bIsSearchLimit = False
-			$g_bIsClientSyncError = False
-			$g_bQuickAttack = False
 		EndIf
 	Else
 		SetLog("Attacking Not Planned, Skipped..", $COLOR_WARNING)

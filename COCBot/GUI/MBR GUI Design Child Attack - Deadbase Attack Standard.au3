@@ -44,14 +44,14 @@ Func CreateAttackSearchDeadBaseStandard()
 			   _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Info_01", "Attack on a single side, penetrates through base") & @CRLF & _
 								  GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Info_02", "Attack on two sides, penetrates through base") & @CRLF & _
 								  GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Info_03", "Attack on three sides, gets outer and some inside of base") & @CRLF & _
-								  GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Info_03", "Attack on Classic Four Fingers"), _
-								  GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Info_03", "Attack on Multi Finger"), _
 								  GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Info_04", "Select the No. of sides to attack on."))
-			   GUICtrlSetData(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Item_01", "one side") & "|" & GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Item_02", "two sides") & "|" & _
-								  GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Item_03", "three sides") & "|" & "Four Fingers" & "|" &  "Multi Fingers" & "|" & GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Item_04", "all sides equally" ), _
+			   GUICtrlSetData(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Item_01", "one side") & "|" & _
+								  GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Item_02", "two sides") & "|" & _
+								  GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Item_03", "three sides") &"|" & _
+								  GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Item_04", "all sides equally" ) &"|" & _
+							      "Classic Four Fingers", _	; Classic FourFinger - Demen
 								  GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "CmbStandardDropSides_Item_04", -1))
-				GUICtrlSetOnEvent(-1, "Bridge") ; Uncheck SmartAttack Red Area when enable FourFinger to avoid conflict
-;				GUICtrlSetOnEvent(-1,"cmbStandardDropSidesDB") ; Uncheck SmartAttack Red Area when enable FourFinger to avoid conflict - Demen
+			   GUICtrlSetOnEvent(-1,"cmbStandardDropSidesDB") ; Uncheck SmartAttack Red Area when enable FourFinger to avoid conflict - Demen
 
 		   $y += 25
 		   GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Standard", "Lbl-CmbStandardUnitDelay", "Delay Unit") & ":", $x, $y + 5, -1, -1)
@@ -108,28 +108,5 @@ Func CreateAttackSearchDeadBaseStandard()
 			   _GUICtrlSetTip(-1, $sTxtTip)
 	   GUICtrlCreateGroup("", -99, -99, 1, 1)
 
-; ================================================ COMBO MULTI FINGER ================================================
-	$x = 25
-	$y += 60
-	$LblDBMultiFinger = GUICtrlCreateLabel(GetTranslated(671,44, "Style:"), $x, $y + 3, 30, -1, $SS_RIGHT)
-	GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
-	$CmbDBMultiFinger = GUICtrlCreateCombo("", $x + 56, $y, 122, 25, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
-		$sTxtTip = GetTranslated(671,45, "Select a Multi-Fingers Attack Style.") & @CRLF & @CRLF & _
-			GetTranslated(671,46, "* Random Mode, Chooses One Of The Attack Styles By Random.") & @CRLF & _
-			GetTranslated(671,47, "* 4Fingers And 8Fingers Styles, Will Attack From All 4 Sides At Once.") & @CRLF & _
-			GetTranslated(671,48, "* 4Fingers And 8Fingers Styles, Are Risky And Bot Like!")
-	GUICtrlSetTip(-1, $sTxtTip)
-	GUICtrlSetData(-1,  GetTranslated(671,49, "Random Mode") & "|" & _
-						GetTranslated(671,50, "4Fingers Standard") & "|" & _
-						GetTranslated(671,51, "4Fingers Spiral Left") & "|" & _
-						GetTranslated(671,52, "4Fingers Spiral Right") & "|" & _
-						GetTranslated(671,53, "8Fingers Blossom") & "|" & _
-						GetTranslated(671,54, "8Fingers Implosion") & "|" & _
-						GetTranslated(671,55, "8Fingers Spiral Left") & "|" & _
-						GetTranslated(671,56, "8Fingers Spiral Right"), GetTranslated(671,50, "4Fingers Standard"))
-	GUICtrlSetOnEvent(-1, "cmbDBMultiFinger")
-	GUICtrlCreateGroup("", -99, -99, 1, 1)
-
- GUICtrlCreateGroup("", -99, -99, 1, 1)
-
+   ;GUISetState()
 EndFunc

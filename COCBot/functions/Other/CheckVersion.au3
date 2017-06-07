@@ -75,7 +75,7 @@ Func CheckVersionHTML()
 		FileCopy(@ScriptDir & "\TestVersion.txt", $versionfile, 1)
 	Else
 		;download page from site contains last bot version
-		Local $hDownload = InetGet("https://raw.githubusercontent.com/pedroleon99/MyBot-PedroTony-Mod/master/LastVersion.txt", $versionfile, 0, 1)
+		Local $hDownload = InetGet("https://raw.githubusercontent.com/MyBotRun/MyBot/master/LastVersion.txt", $versionfile, 0, 1)
 
 		; Wait for the download to complete by monitoring when the 2nd index value of InetGetInfo returns True.
 		Local $i = 0
@@ -98,7 +98,7 @@ Func CheckVersionHTML()
 			FileCopy(@ScriptDir & "\TestVersion_" & $g_sLanguage & ".txt", $versionfilelocalized, 1)
 		Else
 			;download page from site contains last bot version localized messages
-			$hDownload = InetGet("https://raw.githubusercontent.com/pedroleon99/MyBot-PedroTony-Mod/master/LastVersion_" & $g_sLanguage & ".txt", $versionfilelocalized, 0, 1)
+			$hDownload = InetGet("https://raw.githubusercontent.com/MyBotRun/MyBot/master/LastVersion_" & $g_sLanguage & ".txt", $versionfilelocalized, 0, 1)
 
 			; Wait for the download to complete by monitoring when the 2nd index value of InetGetInfo returns True.
 			Local $i = 0
@@ -185,21 +185,4 @@ Func GetVersionNormalized($VersionString, $Chars = 5)
 		If StringLen($a[$i]) < $Chars Then $a[$i] = _StringRepeat("0", $Chars - StringLen($a[$i])) & $a[$i]
 	Next
 	Return _ArrayToString($a, ".")
- EndFunc   ;==>GetVersionNormalized
-
-Func CheckModVersion()
-	If $g_sLastVersion = "" Then
-		MsgBox($MB_ICONWARNING, "", "WE CANNOT OBTAIN MOD VERSION AT THIS TIME" & @CRLF & _
-				"BAD CONNECTION", 10) ;10s timeout
-	ElseIf VersionNumFromVersionTXT($g_sModversion) < VersionNumFromVersionTXT($g_sLastVersion) Then
-		PushMsg("Update")
-		If MsgBox(BitOR($MB_ICONWARNING, $MB_YESNO), "BOT Update Detected", "Chief, there is a new version of the bot available (" & $g_sLastVersion & ")" & @CRLF & @CRLF & _
-				"Do you want to download the latest version ?", 30) = $IDYES Then ;30s timeout
-			ShellExecute($g_sModDownloadUrl)
-			Return False
-		EndIf
-	Else
-		MsgBox($MB_ICONINFORMATION, "Notify", "You Are Using The Latest Version Of Pedro&Tony Mod" & @CRLF & _
-				"Thanks..", 15) ;15s timeout
-	EndIf
-EndFunc   ;==>CheckModVersion
+EndFunc   ;==>GetVersionNormalized

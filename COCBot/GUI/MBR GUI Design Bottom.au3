@@ -24,6 +24,7 @@ Global $g_hLblResultDENow = 0, $g_hLblResultDEHourNow = 0, $g_hPicResultDENow = 
 Global $g_hLblResultTrophyNow = 0, $g_hPicResultTrophyNow = 0, $g_hLblResultRuntimeNow = 0, $g_hPicResultRuntimeNow = 0, $g_hLblResultBuilderNow = 0, $g_hPicResultBuilderNow = 0
 Global $g_hLblResultAttackedHourNow = 0, $g_hPicResultAttackedHourNow = 0, $g_hLblResultGemNow = 0, $g_hPicResultGemNow = 0, $g_hLblResultSkippedHourNow = 0, $g_hPicResultSkippedHourNow = 0
 Global $g_hLblVillageReportTemp = 0, $g_hBtnTestVillage = 0
+Global $g_hBtnEnableGUI = 0, $g_hBtnDisableGUI = 0	; Adding button to enable/disable GUI while botting (as requested by YScorpion) - Demen
 
 Func CreateBottomPanel()
    Local $sTxtTip = ""
@@ -70,7 +71,7 @@ Func CreateBottomPanel()
 		   If $g_bBtnColor Then GUICtrlSetBkColor(-1, 0x22C4F5)
 		   GUICtrlSetState(-1, $GUI_DISABLE)
 		   GUICtrlSetOnEvent(-1, "btnEmbed")
-	   $g_hChkBackgroundMode = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Bottom", "ChkBackgroundMode", "Background Mode"), $x + 1, $y + 72, 180, 24)
+	   $g_hChkBackgroundMode = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Bottom", "ChkBackgroundMode", "Background Mode"), $x + 1, $y + 72, 90, 24)
 		   GUICtrlSetFont(-1, 7)
 		   _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Bottom", "ChkBackgroundMode_Info_01", "Check this to ENABLE the Background Mode of the Bot.") & @CRLF & _
 						      GetTranslatedFileIni("MBR GUI Design Bottom", "ChkBackgroundMode_Info_02", "With this you can also hide the Android Emulator window out of sight."))
@@ -86,6 +87,20 @@ Func CreateBottomPanel()
 		   GUICtrlSetState(-1, $GUI_HIDE)
 	   $g_hBtnAttackNowTS = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Bottom", "BtnAttackNowTS", "TH Snipe!"), $x + 190, $y + 50, 60, -1)
 		   GUICtrlSetState(-1, $GUI_HIDE)
+
+		; Adding button to enable/disable GUI while botting (as requested by YScorpion) - Demen
+		$g_hBtnEnableGUI = GUICtrlCreateButton("Enable GUI", $x + 100, $y + 72, 80, 22)
+			_GUICtrlSetTip(-1, 	"Enable GUI control while botting" & @CRLF & _
+								"   Warning:  USE THIS WITH CAUTION!" & @CRLF & _
+								"   This function may create errors that require bot/PC restart" & @CRLF & _
+								" 	Better to stop the Bot completely if you need to change the setting" )
+			GUICtrlSetOnEvent(-1, "btnEnableGUI")
+			GUICtrlSetState(-1, $GUI_HIDE)
+		$g_hBtnDisableGUI = GUICtrlCreateButton("Disable GUI", $x + 100, $y + 72, 80, 22)
+			_GUICtrlSetTip(-1, "Enable GUI control while botting")
+			GUICtrlSetOnEvent(-1, "btnDisableGUI")
+			GUICtrlSetState(-1, $GUI_HIDE)
+
    GUICtrlCreateGroup("", -99, -99, 1, 1)
 
    If $g_bAndroidAdbScreencap = True Then chkBackground() ; update background mode GUI
@@ -93,6 +108,8 @@ Func CreateBottomPanel()
    $g_hPicTwoArrowShield = GUICtrlCreateIcon($g_sLibIconPath, $eIcn2Arrow, $x + 190, $y + 10, 48, 48)
 
    $g_hLblVersion = GUICtrlCreateLabel($g_sBotVersion, 200, $y + 60, 60, 17, $SS_CENTER)
+	   GUICtrlSetColor(-1, $COLOR_MEDGRAY)
+   GUICtrlCreateLabel($g_sModversion, 200, $y + 80, 70, 17, $SS_CENTER) ;- Adding DEMEN Mod Version
 	   GUICtrlSetColor(-1, $COLOR_MEDGRAY)
 
    $g_hPicArrowLeft = GUICtrlCreateIcon($g_sLibIconPath, $eIcnArrowLeft, $x + 249, $y + 30, 16, 16)

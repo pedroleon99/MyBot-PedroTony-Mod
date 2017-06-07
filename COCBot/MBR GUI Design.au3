@@ -112,9 +112,8 @@ Global $g_bFrmBotMinimized = False ; prevents bot flickering
 #include "GUI\MBR GUI Design Attack.au3"
 #include "GUI\MBR GUI Design Bot.au3"
 #include "GUI\MBR GUI Design About.au3"
-
 ;Demen Mod
-#include "MOD\GUI Design_Demen.au3"
+#include "MOD_Demen\GUI Design_Demen.au3"
 
 Func CreateMainGUI()
 

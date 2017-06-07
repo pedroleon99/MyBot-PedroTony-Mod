@@ -225,7 +225,7 @@ Func ReadRegularConfig()
 	ReadConfig_600_35()
 	; <><><> Attack Plan / Train Army / Troops/Spells <><><>
 	; Quick train
-	ReadConfig_600_52_1()
+;~ 	ReadConfig_600_52_1()	; Included in SimpleTrain - Demen
 	; troop/spell levels and counts
 	ReadConfig_600_52_2()
 	; <><><> Attack Plan / Train Army / Train Order <><><>
@@ -250,9 +250,9 @@ Func ReadRegularConfig()
 	; <><><><> Bot / Stats <><><><>
 	; <<< nothing here >>>
 
-	; <><><><> Mod <><><><>
-	ReadConfig_MOD()
+	; Demen Mod
 	ReadConfig_SwitchAcc()
+	ReadConfig_SimpleTrain()
 
 EndFunc   ;==>ReadRegularConfig
 
@@ -1045,7 +1045,7 @@ EndFunc   ;==>ReadConfig_600_32
 Func ReadConfig_600_35()
 	; <><><><> Bot / Options <><><><>
 	$g_bDisableSplash = (IniRead($g_sProfileConfigPath, "General", "ChkDisableSplash", "0") = "1")
-	$g_bCheckVersion = (IniRead($g_sProfileConfigPath, "General", "ChkVersion", "1") = "0")
+	$g_bCheckVersion = (IniRead($g_sProfileConfigPath, "General", "ChkVersion", "1") = "1")
 	IniReadS($g_bDeleteLogs, $g_sProfileConfigPath, "deletefiles", "DeleteLogs", True, "Bool")
 	IniReadS($g_iDeleteLogsDays, $g_sProfileConfigPath, "deletefiles", "DeleteLogsDays", 2, "int")
 	IniReadS($g_bDeleteTemp, $g_sProfileConfigPath, "deletefiles", "DeleteTemp", True, "Bool")
@@ -1076,6 +1076,7 @@ Func ReadConfig_600_35()
 	$g_bForceClanCastleDetection = (IniRead($g_sProfileConfigPath, "other", "ChkFixClanCastle", "0") = "1")
 EndFunc   ;==>ReadConfig_600_35
 
+#CS	; Included in SimpleTrain - Demen
 Func ReadConfig_600_52_1()
 	; <><><><> Attack Plan / Train Army / Troops/Spells <><><><>
 	$g_bQuickTrainEnable = (IniRead($g_sProfileConfigPath, "other", "ChkUseQTrain", "0") = "1")
@@ -1094,6 +1095,7 @@ Func ReadConfig_600_52_1()
 		Next
 	EndIf
 EndFunc   ;==>ReadConfig_600_52_1
+#CE
 
 Func ReadConfig_600_52_2()
 	For $T = 0 To $eTroopCount - 1

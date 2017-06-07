@@ -49,7 +49,7 @@ Global $g_hFrmBot_WNDPROC_ptr = 0
 #include "MBR GUI Action.au3"
 
 ; Demen Mod
-#include "MOD\GUI Control_Demen.au3"
+#include "MOD_Demen\GUI Control_Demen.au3"
 
 Func InitializeMainGUI()
    InitializeControlVariables()
@@ -1358,7 +1358,7 @@ EndFunc   ;==>ControlRedraw
 Func SetTime($bForceUpdate = False)
 	If $g_hTimerSinceStarted = 0 Then Return ; GIGO, no setTime when timer hasn't started yet
 	Local $day = 0, $hour = 0, $min = 0, $sec = 0
-	Local $DisplayLoop = 0
+	Local Static $DisplayLoop = 0		; Showing troops time in ProfileStats - SwitchAcc - Demen
 
 	If GUICtrlRead($g_hGUI_STATS_TAB, 1) = $g_hGUI_STATS_TAB_ITEM2 Or $bForceUpdate = True Then
 		_TicksToDay(Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed), $day, $hour, $min, $sec)

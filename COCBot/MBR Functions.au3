@@ -278,5 +278,22 @@
 #include "functions\Other\Api.au3"
 #include "functions\Other\ApiClient.au3"
 
-; Mod
-#include "MOD\Include_Files.au3"
+;Demen Mod
+#include "MOD_Demen\Functions_Demen.au3"
+
+; OLD CODE
+
+;#include "functions\Image Search\checkWall.au3"
+;#include "functions\CreateArmy\getArmyTroopCount.au3" we don't use this anymore
+;#include "functions\Other\MBRFunc.au3"
+;#include "functions\CreateArmy\Spell.au3"
+;#include "functions\CreateArmy\_TrainMoveBtn.au3"
+;#include "functions\CreateArmy\isBarrack.au3"ateArmy\TrainIt.au3"
+;#include "functions\CreateArmy\Train.au3"
+;#include "functions\Image Search\THSearch.au3"
+;#include "functions\CreateArmy\BarracksStatus.au3"
+;#include "functions\Image Search\checkTownhall.au3"
+;#include "functions\Village\LocateBarrack.au3"
+;#include "functions\Village\ClanLevel.au3"
+;#include "functions\Village\LocateSpell.au3"
+;#include "functions\Other\UpdateStatsWall.au3"

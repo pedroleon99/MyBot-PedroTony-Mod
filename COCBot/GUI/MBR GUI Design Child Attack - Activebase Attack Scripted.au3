@@ -36,7 +36,7 @@ Func CreateAttackSearchActiveBaseScripted()
 			   GUICtrlSetOnEvent(-1, 'UpdateComboScriptNameAB') ; Run this function when the secondary GUI [X] is clicked
 
 		   $y +=25
-		   $g_hLblNotesScriptAB =  GUICtrlCreateLabel("", $x, $y + 5, 200, 140)
+		   $g_hLblNotesScriptAB =  GUICtrlCreateLabel("", $x, $y + 5, 200, 180)
 		   $g_hCmbScriptRedlineImplAB = GUICtrlCreateCombo("", $x, $y + 195, 230, -1, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
 			   GUICtrlSetData(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Scripted", "CmbScriptRedlineImpl", "ImgLoc Raw Redline (default)|ImgLoc Redline Drop Points|Original Redline|External Edges"))
 			   _GUICtrlComboBox_SetCurSel(-1, $g_aiAttackScrRedlineRoutine[$LB])
@@ -62,12 +62,6 @@ Func CreateAttackSearchActiveBaseScripted()
 		   GUICtrlCreateIcon($g_sLibIconPath, $eIcnCopy, $x + 210, $y + 2, 16, 16)
 			   _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Attack Scripted", "IconCopy_Info_01", -1))
 			   GUICtrlSetOnEvent(-1, "DuplicateScriptAB")
-
-		   $y += 130
-		   GUICtrlCreateButton(GetTranslated(607, 34, -1), $x + 75, $y - 20, 80, -1)
-			   ;GUISetState(@SW_SHOW)
-			   GUICtrlSetOnEvent(-1, "AttackNowLB")
-
 	   GUICtrlCreateGroup("", -99, -99, 1, 1)
 
    ;GUISetState()
