@@ -40,6 +40,11 @@ Global $aLocateAccConfig[8], $aAccPosY[8]
 ; SimpleTrain - Demen
 Global $g_bQuickTrainArmy[3] = [True, False, False] ; QuickTrainCombo (Checkbox)
 Global $ichkSimpleTrain, $ichkPreciseTroops, $ichkFillArcher, $iFillArcher, $ichkFillEQ
-Global $bWaitForCCTroopSpell = False	; ForceSwitch while waiting for CC troops - Demen
+Global $g_bWaitForCCTroopSpell = False	; ForceSwitch while waiting for CC troops - Demen
 Global Enum $g_eFull, $g_eRemained, $g_eNoTrain
 Global $g_abRCheckWrongTroops[2] = [False, False] ; Result of checking wrong troops & spells
+
+
+Global $g_bNeedLocateLab = True, $g_bLabReady[9]
+Global $g_aLabTimeAcc[8], $g_aLabTime[4] = [0, 0, 0, 0] ; day | hour | minute | time in minutes
+Global $g_aLabTimerStart[8], $g_aLabTimerEnd[8]

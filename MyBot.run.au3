@@ -23,18 +23,16 @@
 #pragma compile(Icon, "Images\MyBot.ico")
 #pragma compile(FileDescription, Clash of Clans Bot - A Free Clash of Clans bot - https://mybot.run)
 #pragma compile(ProductName, My Bot)
-#pragma compile(ProductVersion, 7.2)
-#pragma compile(FileVersion, 7.2)
+#pragma compile(ProductVersion, 7.2.1)
+#pragma compile(FileVersion, 7.2.1
 #pragma compile(LegalCopyright, © https://mybot.run)
 #pragma compile(Out, MyBot.run.exe) ; Required
 
 ; Enforce variable declarations
 Opt("MustDeclareVars", 1)
 
-Global $g_sBotVersion = "v7.2" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it is also use on Checkversion()
-Global $g_sModversion = "v3.3" ;<== Just Change This to Version Number
-Global $g_sModSupportUrl = "https://drive.google.com/file/d/0BxtxwQwk8kUaRzhCRGRZWUhsaEk/view?usp=sharing" ;<== Our Website Link Support Or Link Download
-Global $g_sModDownloadUrl = "https://github.com/pedroleon99/MyBot-PedroTony-Mod/releases" ;<== Our Website Link Download
+Global $g_sBotVersion = "v7.2.1" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it is also use on Checkversion()
+Global $g_sModversion = "v3.4"; <== Just Change This to Version Number
 Global $g_sBotTitle = "" ;~ Don't assign any title here, use Func UpdateBotTitle()
 Global $g_hFrmBot = 0 ; The main GUI window
 
@@ -647,6 +645,8 @@ Func runBot() ;Bot that runs everything in order
 			If $g_bRestart = True Then ContinueLoop
 			If _Sleep($DELAYRUNBOT3) Then Return
 			VillageReport()
+			UpdateHeroStatus() ; Demen
+			UpdateLabStatus() ; Demen
 			If $g_bOutOfGold = True And (Number($g_aiCurrentLoot[$eLootGold]) >= Number($g_iTxtRestartGold)) Then ; check if enough gold to begin searching again
 				$g_bOutOfGold = False ; reset out of gold flag
 				Setlog("Switching back to normal after no gold to search ...", $COLOR_SUCCESS)
@@ -700,7 +700,7 @@ Func runBot() ;Bot that runs everything in order
 					If Unbreakable() = True Then ContinueLoop
 				EndIf
 			EndIf
-			Local $aRndFuncList = ['Laboratory', 'UpgradeHeroes', 'UpgradeBuilding']
+			Local $aRndFuncList = ['Laboratory', 'UpgradeHeroes', 'UpgradeBuilding', 'BuilderBase']
 			While 1
 				If $g_bRunState = False Then Return
 				If $g_bRestart = True Then ContinueLoop 2 ; must be level 2 due to loop-in-loop
@@ -910,7 +910,7 @@ Func Idle() ;Sequence that runs until Full Army
 
 		If $g_iCommandStop = -1 Then ; Check if closing bot/emulator while training and not in halt mode
 			If $ichkSwitchAcc = 1 Then ; SwitchAcc Demen
-				If $bWaitForCCTroopSpell Then
+				If $g_bWaitForCCTroopSpell Then
 					Setlog("Still waiting for CC troops/ spells, switching to another Account")
 					ForceSwitchAcc($eDonate)
 				Else
@@ -919,6 +919,7 @@ Func Idle() ;Sequence that runs until Full Army
 			Else
 				SmartWait4Train()
 			EndIf
+
 			If $g_bRestart = True Then ExitLoop ; if smart wait activated, exit to runbot in case user adjusted GUI or left emulator/bot in bad state
 		EndIf
 
@@ -1124,6 +1125,14 @@ Func _RunFunction($action)
 			_Sleep($DELAYRUNBOT3)
 		Case "UpgradeBuilding"
 			UpgradeBuilding()
+			_Sleep($DELAYRUNBOT3)
+		Case "BuilderBase"
+			If isOnBuilderIsland() Or (($g_bChkCollectBuilderBase Or $g_bChkStartClockTowerBoost) And SwitchBetweenBases()) Then
+				CollectBuilderBase()
+				StartClockTowerBoost()
+				; switch back to normal village
+				SwitchBetweenBases()
+			EndIf
 			_Sleep($DELAYRUNBOT3)
 		Case ""
 			SetDebugLog("Function call doesn't support empty string, please review array size", $COLOR_ERROR)

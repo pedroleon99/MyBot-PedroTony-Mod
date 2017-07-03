@@ -1358,8 +1358,6 @@ EndFunc   ;==>ControlRedraw
 Func SetTime($bForceUpdate = False)
 	If $g_hTimerSinceStarted = 0 Then Return ; GIGO, no setTime when timer hasn't started yet
 	Local $day = 0, $hour = 0, $min = 0, $sec = 0
-	Local Static $DisplayLoop = 0		; Showing troops time in ProfileStats - SwitchAcc - Demen
-
 	If GUICtrlRead($g_hGUI_STATS_TAB, 1) = $g_hGUI_STATS_TAB_ITEM2 Or $bForceUpdate = True Then
 		_TicksToDay(Int(__TimerDiff($g_hTimerSinceStarted) + $g_iTimePassed), $day, $hour, $min, $sec)
 		GUICtrlSetData($g_hLblResultRuntime, $day > 0 ? StringFormat("%2u Day(s) %02i:%02i:%02i", $day, $hour, $min, $sec) : StringFormat("%02i:%02i:%02i", $hour, $min, $sec))
@@ -1370,6 +1368,7 @@ Func SetTime($bForceUpdate = False)
 	EndIf
 
 ; Showing troops time in ProfileStats - SwitchAcc - Demen
+	Local Static $DisplayLoop = 0
 	If $DisplayLoop >= 10 Then ; Conserve Clock Cycles on Updating times
 		$DisplayLoop = 0
 		;Update Multi Stat Page _ SwitchAcc_Demen_Style
@@ -1380,16 +1379,47 @@ Func SetTime($bForceUpdate = False)
 							$i <> $nCurProfile - 1 And _
 							$aTimerStart[$i] <> 0 Then
 						$aTimerEnd[$i] = TimerDiff($aTimerStart[$i])
-						$aUpdateRemainTrainTime[$i] = Round($aRemainTrainTime[$i] * 60 * 1000 - $aTimerEnd[$i], 2)
-						If $aUpdateRemainTrainTime[$i] < 0 Then
-							GUICtrlSetData($g_lblTroopsTime[$i], Round($aUpdateRemainTrainTime[$i] / 60 / 1000, 2))
+						Local $TrainTimerEnd = TimerDiff($aTimerStart[$i]) / 60 / 1000 ; in minutes
+						Local $UpdateTrainTime = $aRemainTrainTime[$i] - $TrainTimerEnd ; in minutes
+						Local $sReadyTime = ""
+						If Abs($UpdateTrainTime) >= 60 Then
+						   $sReadyTime &= Int($UpdateTrainTime/60) & "h " & Abs(Round(Mod($UpdateTrainTime,60),0)) & "m"
+						Else
+						   $sReadyTime &= Int($UpdateTrainTime) & "m " & Abs(Round(($UpdateTrainTime - Int($UpdateTrainTime))*60, 0)) & "s"
+						EndIf
+
+						If $UpdateTrainTime < 0 Then
 							GUICtrlSetBkColor($g_lblTroopsTime[$i], $COLOR_RED)
 							GUICtrlSetColor($g_lblTroopsTime[$i], $COLOR_WHITE)
 						Else
-							GUICtrlSetData($g_lblTroopsTime[$i], Round($aUpdateRemainTrainTime[$i] / 60 / 1000, 2))
 							GUICtrlSetBkColor($g_lblTroopsTime[$i], $COLOR_YELLOW)
 							GUICtrlSetColor($g_lblTroopsTime[$i], $COLOR_BLACK)
 						EndIf
+						GUICtrlSetData($g_lblTroopsTime[$i], $sReadyTime)
+					EndIf
+
+					If $i <> $nCurProfile - 1 And $g_aLabTimerStart[$i] <> 0 Then	; update lab time of all accounts on multi stats
+						Local $sLabtime = ""
+						Local $TimerEnd = Round(TimerDiff($g_aLabTimerStart[$i]) / 60 / 1000, 0)
+						Local $UpdateLabTime = $g_aLabTimeAcc[$i] - $TimerEnd
+						If $UpdateLabTime <= 0 Then
+							GUICtrlSetColor($g_ahLblLab[$i], $COLOR_GREEN)
+							GUICtrlSetColor($g_ahLblLabTime[$i], $COLOR_GREEN)
+							$sLabtime = "Ready"
+						Else
+							Local $UpdateDay = Int($UpdateLabTime/1440)
+							Local $UpdateHour = Int(($UpdateLabTime- 1440*$UpdateDay)/60)
+							Local $UpdateMin = $UpdateLabTime- 1440*$UpdateDay - 60 * $UpdateHour
+
+							If $UpdateDay > 0 Then
+								$sLabtime = $UpdateDay & "d " & $UpdateHour & "h"
+							ElseIf $UpdateHour > 0 Then
+								$sLabtime = $UpdateHour & "h " & $UpdateMin & "m"
+							ElseIf $UpdateMin > 0 Then
+								$sLabtime = $UpdateMin & "m"
+							EndIf
+						EndIf
+						GUICtrlSetData($g_ahLblLabTime[$i], $sLabtime)
 					EndIf
 				Next
 			EndIf
@@ -1441,7 +1471,7 @@ Func tabMain()
 				GUISetState(@SW_HIDE, $g_hGUI_BOT)
 				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_ABOUT)
 
-			Case ELSE
+			Case Else
 				GUISetState(@SW_HIDE, $g_hGUI_LOG)
 				GUISetState(@SW_HIDE, $g_hGUI_VILLAGE)
 				GUISetState(@SW_HIDE, $g_hGUI_ATTACK)
@@ -1453,21 +1483,30 @@ EndFunc   ;==>tabMain
 Func tabVillage()
 	Local $tabidx = GUICtrlRead($g_hGUI_VILLAGE_TAB)
 		Select
+			Case $tabidx = 0 ; Misc Tab
+				GUISetState(@SW_HIDE, $g_hGUI_UPGRADE)
+				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_MISC)
+				GUISetState(@SW_HIDE, $g_hGUI_DONATE)
+				GUISetState(@SW_HIDE, $g_hGUI_NOTIFY)
 			Case $tabidx = 1 ; Donate tab
 				GUISetState(@SW_HIDE, $g_hGUI_UPGRADE)
+				GUISetState(@SW_HIDE, $g_hGUI_MISC)
 				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_DONATE)
 				GUISetState(@SW_HIDE, $g_hGUI_NOTIFY)
-			Case $tabidx = 2 ; NOTIFY tab
-				GUISetState(@SW_HIDE, $g_hGUI_DONATE)
+			Case $tabidx = 2 ; Upgrade tab
 				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_UPGRADE)
+				GUISetState(@SW_HIDE, $g_hGUI_MISC)
+				GUISetState(@SW_HIDE, $g_hGUI_DONATE)
 				GUISetState(@SW_HIDE, $g_hGUI_NOTIFY)
-			Case $tabidx = 4 ; Upgrade tab
-				GUISetState(@SW_HIDE, $g_hGUI_DONATE)
+			Case $tabidx = 4 ; NOTIFY tab
 				GUISetState(@SW_HIDE, $g_hGUI_UPGRADE)
+				GUISetState(@SW_HIDE, $g_hGUI_MISC)
+				GUISetState(@SW_HIDE, $g_hGUI_DONATE)
 				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_NOTIFY)
-			Case ELSE
-				GUISetState(@SW_HIDE, $g_hGUI_DONATE)
+			Case Else
 				GUISetState(@SW_HIDE, $g_hGUI_UPGRADE)
+				GUISetState(@SW_HIDE, $g_hGUI_MISC)
+				GUISetState(@SW_HIDE, $g_hGUI_DONATE)
 				GUISetState(@SW_HIDE, $g_hGUI_NOTIFY)
 		EndSelect
 
@@ -1816,6 +1855,9 @@ Func Bind_ImageList($nCtrl)
 		Case $g_hGUI_TRAINARMY_TAB
 			; the icons for army tab
 			Local $aIconIndex[4] = [$eIcnTrain, $eIcnGem, $eIcnReOrder, $eIcnOptions]
+
+		Case $g_hGUI_MISC_TAB
+			Local $aIconIndex[2] = [$eIcnTH1, $eIcnBuilderHall]
 
 		Case $g_hGUI_DONATE_TAB
 			 ; the icons for donate tab

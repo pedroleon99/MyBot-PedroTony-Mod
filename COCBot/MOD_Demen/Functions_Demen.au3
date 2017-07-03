@@ -18,10 +18,14 @@
 #include "Config Read_Demen.au3"
 #include "Config Apply_Demen.au3"
 
-; SwitchAcc_Demen_Style
+; SwitchAcc
 #include "SwitchAcc.au3"
 #include "UpdateProfileStats.au3"
 
-; SimpleTrain (Demen)
+; SimpleTrain
 #include "SimpleTrain.au3"
+
+; HeroLabStatus
+#include "UpdateLabStatus.au3"
+
 

@@ -42,12 +42,12 @@ DROP  |I          |2-3        |1          |RSpell     |0          |0          |3
 DROP  |J          |3-4        |1          |RSpell     |0          |0          |1000-1600  |           |,was 2-3
 DROP  |K          |1          |2          |PSpell     |0          |0          |66-100     |           |,was 1 (make sure to use all 2 poison)
 DROP  |K          |1          |1          |RSpell     |0          |0          |66-100     |           |,
-DROP  |L          |4          |1          |RSpell     |0          |0          |66-100     |           |,new (make sure to use all rage)
-DROP  |L          |4          |1          |HaSpell    |0          |0          |66-100     |           |,new (make sure to use all 2 haste)
+RECALC|           |           |           |           |           |           |           |           |,recalc to use CC spell
+DROP  |L          |4          |1          |RSpell     |0          |0          |66-100     |           |,drop CC rage
+DROP  |L          |4          |1          |HSpell     |0          |0          |66-100     |           |,drop CC heal (if any)
+RECALC|           |           |           |           |           |           |           |           |,recalc again
+DROP  |L          |4          |1          |RSpell     |0          |0          |66-100     |           |,drop CC rage
 WAIT  |4000-4500  |           |           |           |           |           |           |           |,wait 4" more to activate GW ability
-DROP  |N          |1          |1          |Warden     |0          |0          |100        |           |,
-DROP  |F-G        |1-2        |4          |Wall       |0          |0          |0          |           |,
-DROP  |F-G        |1-2        |8          |Wall       |0          |0          |0          |           |,
 WAIT  |4000-6000  |           |           |           |           |           |           |           |,
 WAIT  |4000-5500  |           |           |           |           |           |           |           |,
 DROP  |N-A        |1-8        |40         |arch       |50         |0          |10-20      |           |,

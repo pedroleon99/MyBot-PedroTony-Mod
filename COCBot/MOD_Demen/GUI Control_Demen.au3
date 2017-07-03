@@ -124,14 +124,14 @@ Func btnUpdateProfile($Config = True)
 					GUICtrlSetData($grpVillageAcc[$i], $ProfileList[$i + 1] & " (Active)")
 				Case 2
 					GUICtrlSetData($grpVillageAcc[$i], $ProfileList[$i + 1] & " (Donate)")
-					For $j = $aSecondHide[$i] To $aEndHide[$i]
-						GUICtrlSetState($j, $GUI_HIDE)
-					Next
+;~ 					For $j = $aSecondHide[$i] To $aEndHide[$i]
+;~ 						GUICtrlSetState($j, $GUI_HIDE)
+;~ 					Next
 				Case Else
 					GUICtrlSetData($grpVillageAcc[$i], $ProfileList[$i + 1] & " (Idle)")
-					For $j = $aSecondHide[$i] To $aEndHide[$i]
-						GUICtrlSetState($j, $GUI_HIDE)
-					Next
+;~ 					For $j = $aSecondHide[$i] To $aEndHide[$i]
+;~ 						GUICtrlSetState($j, $GUI_HIDE)
+;~ 					Next
 			EndSwitch
 		Else
 			GUICtrlSetData($lblProfileName[$i], "")

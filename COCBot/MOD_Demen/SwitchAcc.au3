@@ -72,6 +72,9 @@ Func InitiateSwitchAcc() ; Checking profiles setup in Mybot, First matching CoC 
 		$aTimerEnd[$i] = 0
 		$aRemainTrainTime[$i] = 0
 		$aUpdateRemainTrainTime[$i] = 0
+
+		$g_aLabTimeAcc[$i] = 0
+		$g_aLabTimerStart[$i] = 0
 	Next
 
 	If $aProfileType[$nCurProfile - 1] = $eActive Then
@@ -108,7 +111,7 @@ Func CheckWaitHero() ; get hero regen time remaining if enabled
 		Return
 	EndIf
 
-	Setlog("Getting Hero's recover time, King: " & $aHeroResult[0] & " m, Queen: " & $aHeroResult[1] & " m, GW: " & $aHeroResult[2] & " m.")
+;	Setlog("Getting Hero's recover time, King: " & $aHeroResult[0] & " m, Queen: " & $aHeroResult[1] & " m, GW: " & $aHeroResult[2] & " m.")
 
 	If _Sleep($DELAYRESPOND) Then Return
 	If $aHeroResult[0] > 0 Or $aHeroResult[1] > 0 Or $aHeroResult[2] > 0 Then ; check if hero is enabled to use/wait and set wait time
@@ -130,7 +133,7 @@ Func CheckWaitHero() ; get hero regen time remaining if enabled
 		Next
 	EndIf
 
-	Setlog("Hero recover wait time: " & $g_aiTimeTrain[2] & " minute(s)", $COLOR_BLUE)
+;	Setlog("Hero recover wait time: " & $g_aiTimeTrain[2] & " minute(s)", $COLOR_BLUE)
 
 EndFunc   ;==>CheckWaitHero
 
@@ -250,7 +253,7 @@ Func CheckSwitchAcc() ; Switch CoC Account with or without sleep combo - DEMEN
 
 	Local $SwitchCase, $bReachAttackLimit
 
-	SetLog("Start SwitchAcc Mode")
+	SetLog("Start SwitchAcc")
 
 	If IsMainPage() = False Then ClickP($aAway, 2, 250, "#0335") ; Sometimes the bot cannot open Army Overview Window, trying to click away first
 	If IsMainPage() = False Then checkMainScreen() ; checkmainscreen (may restart CoC) if still fail to locate main page.
@@ -323,7 +326,10 @@ Func CheckSwitchAcc() ; Switch CoC Account with or without sleep combo - DEMEN
 		EndIf
 
 		If $ichkCloseTraining >= 1 And $nMinRemainTrain > 3 And $SwitchCase <> $eDonate And $SwitchCase <> $eContinuous Then
+			checkMainScreen()
 			VillageReport()
+            UpdateLabStatus()
+            UpdateHeroStatus()
 			ReArm()
 			If $g_bRequestTroopsEnable = True And $g_bCanRequestCC = True Then
 				Setlog("Try Request troops before going to sleep", $COLOR_BLUE)
@@ -347,6 +353,7 @@ Func CheckSwitchAcc() ; Switch CoC Account with or without sleep combo - DEMEN
 			readConfig()
 			applyConfig()
 			DisableGuiControls()
+			checkMainScreen()
 		EndIf
 		If $SwitchCase <> $eStay Then runBot()
 	EndIf
@@ -505,7 +512,7 @@ Func SwitchCOCAcc()
 			$g_abNotNeedAllTime[1] = 1
 			$aAttackedCountSwitch[$nCurProfile - 1] = $aAttackedCountAcc[$nCurProfile - 1]
 
-			If IsMainPage(80) Then ExitLoop; Waiting for fully load CoC in 8 sec
+			If IsMainPage(100) Then ExitLoop; Waiting for fully load CoC in 10 sec
 			ExitLoop
 
 		Else
@@ -515,8 +522,6 @@ Func SwitchCOCAcc()
 
 		EndIf
 	WEnd
-
-	If isOnBuilderIsland(True) Then GoToNormalVillage()
 
 EndFunc   ;==>SwitchCOCAcc
 

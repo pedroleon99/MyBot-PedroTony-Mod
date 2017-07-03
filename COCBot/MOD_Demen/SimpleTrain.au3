@@ -50,11 +50,16 @@ Func SimpleTrain()
 			EndIf
 
 		Else ; Wrong troops or Wrong spells
+			If $g_bForceBrewSpells And $g_abRCheckWrongTroops[1] Then
+				Setlog (" »» Force brew spell is active, skip checking spell precision")
+				$g_abRCheckWrongTroops[1] = False
+			EndIf
+
 			$text = ""
 			If $g_abRCheckWrongTroops[0] Then $text &= " Troops &"
 			If $g_abRCheckWrongTroops[1] Then $text &= " Spells &"
 			If StringRight($text, 1) = "&" Then $text = StringTrimRight($text, 2) ; Remove last " &" as it is not needed
-			Setlog(" »» Need to clear queued" & $text & " before removing")
+			If $text <> "" Then Setlog(" »» Need to clear queued" & $text & " before removing")
 			If $g_abRCheckWrongTroops[0] Then ClearTrainingTroops(False, True)
 			If $g_abRCheckWrongTroops[1] Then ClearTrainingTroops(True, True)
 			If _Sleep(200) Then Return
@@ -82,12 +87,12 @@ Func SimpleTrain()
 	If $ichkFillArcher <> 1 Then $iFillArcher = 0
 
 	Switch $ArmyCamp[0]
-		Case 0 ;	0/480
+		Case 0 ;	0/240
 			SetLog(" »» No troop")
 			$eTrainMethod = $g_eFull
 			$eTrainMethod2 = $g_eFull
 
-		Case 1 To $ArmyCamp[1]/2 - $iFillArcher - 1 ; 1-234/480
+		Case 1 To $ArmyCamp[1] - $iFillArcher - 1 ; 1-234/240
 			If $g_bQuickTrainEnable = False And _ColorCheck(_GetPixelColor(820, 220, True), Hex(0xCFCFC8, 6), 15) = False Then
 				SetLog(" »» Not full troop camp. Let's clear training troops")
 				ClearTrainingTroops(False, False)
@@ -98,16 +103,16 @@ Func SimpleTrain()
 			$eTrainMethod = $g_eRemained
 			$eTrainMethod2 = $g_eFull
 
-		Case $ArmyCamp[1]/2 -$iFillArcher To $ArmyCamp[1]/2 ; 235-240/480
-			If $ArmyCamp[0] - $ArmyCamp[1]/2 < 0 Then
+		Case $ArmyCamp[1] -$iFillArcher To $ArmyCamp[1] ; 235-240/240
+			If $ArmyCamp[0] - $ArmyCamp[1] < 0 Then
 				SetLog(" »» Fill some archers")
-				FillArcher($ArmyCamp[1]/2 - $ArmyCamp[0])
+				FillArcher($ArmyCamp[1] - $ArmyCamp[0])
 			Else
 				SetLog(" »» Zero queue")
 			EndIf
 			$eTrainMethod = $g_eFull
 
-		Case $ArmyCamp[1]/2 + 1 To $ArmyCamp[1] - $iFillArcher - 1 ; 241-474/480
+		Case $ArmyCamp[1] + 1 To $ArmyCamp[1]*2 - $iFillArcher - 1 ; 241-474/240
 			SetLog(" »» Not full queue. Delete queued troops")
 			DeleteQueue()
 			If CheckBlockTroops() = False Then ; check if camp is not full after delete queue
@@ -119,10 +124,10 @@ Func SimpleTrain()
 				$eTrainMethod2 = $g_eFull
 			EndIf
 
-		Case $ArmyCamp[1] - $iFillArcher To $ArmyCamp[1] ; 475-480/480
-			If $ArmyCamp[0] - $ArmyCamp[1] < 0 Then
+		Case $ArmyCamp[1]*2 - $iFillArcher To $ArmyCamp[1]*2 ; 475-480/240
+			If $ArmyCamp[0] - $ArmyCamp[1]*2 < 0 Then
 				SetLog(" »» Fill some archers")
-				FillArcher($ArmyCamp[1] - $ArmyCamp[0])
+				FillArcher($ArmyCamp[1]*2 - $ArmyCamp[0])
 			Else
 				SetLog(" »» Full queue")
 			EndIf
@@ -164,13 +169,13 @@ Func SimpleTrain()
 		Setlog(" - Current queue/capacity: " & $SpellCamp[0] & "/" & $SpellCamp[1])
 
 		Switch $SpellCamp[0]
-			Case 0 ; 0/22
+			Case 0 ; 0/11
 				SetLog(" »» No spell")
 				$eBrewMethod = $g_eFull
 				$eBrewMethod2 = $g_eFull
 
-			Case 1 To $SpellCamp[1]/2 - 1 ; 10/22
-				If $ichkFillEQ = 0 Or $SpellCamp[0] - $SpellCamp[1]/2 < -1 Then
+			Case 1 To $SpellCamp[1] - 1 ; 10/11
+				If $ichkFillEQ = 0 Or $SpellCamp[0] - $SpellCamp[1] < -1 Then
 					If $g_bQuickTrainEnable = False Then
 						SetLog(" »» Not full spell camp. Let's clear brewing spells")
 						If ISArmyWindow(False, $BrewSpellsTAB) Then ClearTrainingTroops(True, False)
@@ -187,12 +192,12 @@ Func SimpleTrain()
 					$eBrewMethod = $g_eFull
 				EndIf
 
-			Case $SpellCamp[1]/2 ; 11/22
+			Case $SpellCamp[1] ; 11/11
 				SetLog(" »» Full spell camp, Zero queue")
 				$eBrewMethod = $g_eFull
 
-			Case $SpellCamp[1]/2 To $SpellCamp[1] - 1 ; 21/22
-				If $ichkFillEQ = 0 Or $SpellCamp[0] - $SpellCamp[1] < -1 Then
+			Case $SpellCamp[1] + 1 To $SpellCamp[1]*2 - 1 ; 21/11
+				If $ichkFillEQ = 0 Or $SpellCamp[0] - $SpellCamp[1]*2 < -1 Then
 					SetLog(" »» Not full queue, Delete queued spells")
 					DeleteQueue(True)
 					If CheckBlockTroops(True) = False Then ; check if spell camp is not full after delete queue
@@ -210,7 +215,7 @@ Func SimpleTrain()
 					$eBrewMethod = $g_eNoTrain
 				EndIf
 
-			Case $SpellCamp[1] ; 22/22
+			Case $SpellCamp[1]*2 ; 22/11
 				If $g_bFullArmySpells Then
 					SetLog(" »» Full queue")
 					$eBrewMethod = $g_eNoTrain
@@ -527,11 +532,12 @@ Func MakeCustomTrain($eTrainMethod, $eBrewMethod)
 		If $eBrewMethod = $g_eRemained Then
 			Setlog("Custom brew spells left")
 			For $i = 0 To ($eSpellCount - 1)
+				Local $BrewIndex = $g_aiBrewOrder[$i]
 				If $g_bRunState = False Then Return
 				If TotalSpellsToBrewInGUI() = 0 Then ExitLoop
-				If $g_aiArmyCompSpells[$i] - $g_aiCurrentSpells[$i] > 0 Then
-					$rWTT[UBound($rWTT) - 1][0] = $g_asSpellShortNames[$i]
-					$rWTT[UBound($rWTT) - 1][1] = $g_aiArmyCompSpells[$i] - $g_aiCurrentSpells[$i]
+				If $g_aiArmyCompSpells[$BrewIndex] - $g_aiCurrentSpells[$BrewIndex] > 0 Then
+					$rWTT[UBound($rWTT) - 1][0] = $g_asSpellShortNames[$BrewIndex]
+					$rWTT[UBound($rWTT) - 1][1] = $g_aiArmyCompSpells[$BrewIndex] - $g_aiCurrentSpells[$BrewIndex]
 					Local $iSpellIndex = TroopIndexLookup($rWTT[UBound($rWTT) - 1][0])
 					Local $sSpellName = $g_asSpellNames[$iSpellIndex - $eLSpell]
 					setlog(UBound($rWTT) & ". " & $sSpellName & " x " & $rWTT[UBound($rWTT) - 1][1])
@@ -541,11 +547,12 @@ Func MakeCustomTrain($eTrainMethod, $eBrewMethod)
 		ElseIf $eBrewMethod = $g_eFull Then
 			Setlog("Custom brew full set of spells")
 			For $i = 0 To ($eSpellCount - 1)
+				Local $BrewIndex = $g_aiBrewOrder[$i]
 				If $g_bRunState = False Then Return
 				If TotalSpellsToBrewInGUI() = 0 Then ExitLoop
-				If $g_aiArmyCompSpells[$i] > 0 Then
-					$rWTT[UBound($rWTT) - 1][0] = $g_asSpellShortNames[$i]
-					$rWTT[UBound($rWTT) - 1][1] = $g_aiArmyCompSpells[$i]
+				If $g_aiArmyCompSpells[$BrewIndex] > 0 Then
+					$rWTT[UBound($rWTT) - 1][0] = $g_asSpellShortNames[$BrewIndex]
+					$rWTT[UBound($rWTT) - 1][1] = $g_aiArmyCompSpells[$BrewIndex]
 					Local $iSpellIndex = TroopIndexLookup($rWTT[UBound($rWTT) - 1][0])
 					Local $sSpellName = $g_asSpellNames[$iSpellIndex - $eLSpell]
 					setlog(UBound($rWTT) & ". " & $sSpellName & " x " & $rWTT[UBound($rWTT) - 1][1])

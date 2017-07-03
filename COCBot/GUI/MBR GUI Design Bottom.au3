@@ -25,6 +25,7 @@ Global $g_hLblResultTrophyNow = 0, $g_hPicResultTrophyNow = 0, $g_hLblResultRunt
 Global $g_hLblResultAttackedHourNow = 0, $g_hPicResultAttackedHourNow = 0, $g_hLblResultGemNow = 0, $g_hPicResultGemNow = 0, $g_hLblResultSkippedHourNow = 0, $g_hPicResultSkippedHourNow = 0
 Global $g_hLblVillageReportTemp = 0, $g_hBtnTestVillage = 0
 Global $g_hBtnEnableGUI = 0, $g_hBtnDisableGUI = 0	; Adding button to enable/disable GUI while botting (as requested by YScorpion) - Demen
+Global $g_ahLblHero[3], $g_hLblLab, $g_hLblLabTime	; Hero & Lab Status - Demen
 
 Func CreateBottomPanel()
    Local $sTxtTip = ""
@@ -77,8 +78,7 @@ Func CreateBottomPanel()
 						      GetTranslatedFileIni("MBR GUI Design Bottom", "ChkBackgroundMode_Info_02", "With this you can also hide the Android Emulator window out of sight."))
 		   GUICtrlSetOnEvent(-1, "chkBackground")
 		   GUICtrlSetState(-1, (($g_bAndroidAdbScreencap = True) ? ($GUI_CHECKED) : ($GUI_UNCHECKED)))
-	   $g_hLblDonate = GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Bottom", "LblDonate", "Support the development"), $x + 224, $y + 80, 220, 24, $SS_RIGHT)
-		   GUICtrlSetCursor(-1, 0) ; https://www.autoitscript.com/autoit3/docs/functions/MouseGetCursor.htm
+	   $g_hLblDonate = GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Bottom", "LblDonate", "Support the development"), $x + 224, $y + 85, 220, 20, $SS_RIGHT) ; was y+80 x height 24. Sorry I have to move this down a little bit - Demen		   GUICtrlSetCursor(-1, 0) ; https://www.autoitscript.com/autoit3/docs/functions/MouseGetCursor.htm
 		   GUICtrlSetFont(-1, 8.5, $FW_BOLD) ;, $GUI_FONTITALIC + $GUI_FONTUNDER)
 		   _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Bottom", "LblDonate_Info_01", "Paypal Donate?"))
 	   $g_hBtnAttackNowDB = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Bottom", "BtnAttackNowDB", "DB Attack!"), $x + 190, $y - 4, 60, -1)
@@ -105,62 +105,80 @@ Func CreateBottomPanel()
 
    If $g_bAndroidAdbScreencap = True Then chkBackground() ; update background mode GUI
 
-   $g_hPicTwoArrowShield = GUICtrlCreateIcon($g_sLibIconPath, $eIcn2Arrow, $x + 190, $y + 10, 48, 48)
+   $g_hPicTwoArrowShield = _GUICtrlCreateIcon($g_sLibIconPath, $eIcn2Arrow, $x + 190, $y + 10, 48, 48)
 
    $g_hLblVersion = GUICtrlCreateLabel($g_sBotVersion, 200, $y + 60, 60, 17, $SS_CENTER)
 	   GUICtrlSetColor(-1, $COLOR_MEDGRAY)
    GUICtrlCreateLabel($g_sModversion, 200, $y + 80, 70, 17, $SS_CENTER) ;- Adding DEMEN Mod Version
 	   GUICtrlSetColor(-1, $COLOR_MEDGRAY)
 
-   $g_hPicArrowLeft = GUICtrlCreateIcon($g_sLibIconPath, $eIcnArrowLeft, $x + 249, $y + 30, 16, 16)
+   $g_hPicArrowLeft = _GUICtrlCreateIcon($g_sLibIconPath, $eIcnArrowLeft, $x + 249, $y + 30, 16, 16)
 	  $sTxtTip = GetTranslatedFileIni("MBR GUI Design Bottom", "GrpVillage_Info_01", "Switch between village info and stats")
 	  _GUICtrlSetTip(-1, $sTxtTip)
-   $g_hPicArrowRight = GUICtrlCreateIcon($g_sLibIconPath, $eIcnArrowRight, $x + 247 + 198, $y + 30, 16, 16)
+   $g_hPicArrowRight = _GUICtrlCreateIcon($g_sLibIconPath, $eIcnArrowRight, $x + 247 + 198, $y + 30, 16, 16)
 	  _GUICtrlSetTip(-1, $sTxtTip)
 
    ;~ Village
-   Local $x = 295, $y = $y_bottom + 20
-   $g_hGrpVillage = GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Bottom", "GrpVillage", "Village"), $x - 20, $y - 20, 180, 85)
+   Local $x = 295, $y = $y_bottom + 20	; y was +20 - Demen
+   $g_hGrpVillage = GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Bottom", "GrpVillage", "Village"), $x - 20, $y - 20, 180, 95) ; y height was 85
+	   $y = $y_bottom + 17	; Move up a little bit - Demen
 	   $g_hLblResultGoldNow = GUICtrlCreateLabel("", $x - 5, $y + 2, 60, 15, $SS_RIGHT)
 	   $g_hLblResultGoldHourNow = GUICtrlCreateLabel("", $x, $y + 2, 60, 15, $SS_RIGHT)
 		   GUICtrlSetState(-1, $GUI_HIDE)
-	   $g_hPicResultGoldNow = GUICtrlCreateIcon ($g_sLibIconPath, $eIcnGold, $x + 60, $y, 16, 16)
+	   $g_hPicResultGoldNow = _GUICtrlCreateIcon ($g_sLibIconPath, $eIcnGold, $x + 60, $y, 16, 16)
 		   GUICtrlSetState(-1, $GUI_HIDE)
-	   $g_hPicResultGoldTemp = GUICtrlCreateIcon ($g_sLibIconPath, $eIcnGold, $x - 5, $y, 16, 16)
+	   $g_hPicResultGoldTemp = _GUICtrlCreateIcon ($g_sLibIconPath, $eIcnGold, $x - 5, $y, 16, 16)
 	   $g_hLblResultElixirNow = GUICtrlCreateLabel("", $x - 5, $y + 22, 60, 15, $SS_RIGHT)
 	   $g_hLblResultElixirHourNow = GUICtrlCreateLabel("", $x, $y + 22, 60, 15, $SS_RIGHT)
 		   GUICtrlSetState(-1, $GUI_HIDE)
-	   $g_hPicResultElixirNow = GUICtrlCreateIcon ($g_sLibIconPath, $eIcnElixir, $x + 60, $y + 20, 16, 16)
+	   $g_hPicResultElixirNow = _GUICtrlCreateIcon ($g_sLibIconPath, $eIcnElixir, $x + 60, $y + 20, 16, 16)
 		   GUICtrlSetState(-1, $GUI_HIDE)
-	   $g_hPicResultElixirTemp = GUICtrlCreateIcon ($g_sLibIconPath, $eIcnElixir, $x - 5, $y + 20, 16, 16)
+	   $g_hPicResultElixirTemp = _GUICtrlCreateIcon ($g_sLibIconPath, $eIcnElixir, $x - 5, $y + 20, 16, 16)
 	   $g_hLblResultDENow = GUICtrlCreateLabel("", $x, $y + 42, 55, 15, $SS_RIGHT)
 	   $g_hLblResultDEHourNow = GUICtrlCreateLabel("", $x, $y + 42, 60, 15, $SS_RIGHT)
 		   GUICtrlSetState(-1, $GUI_HIDE)
-	   $g_hPicResultDENow = GUICtrlCreateIcon ($g_sLibIconPath, $eIcnDark, $x + 60, $y + 40, 16, 16)
+	   $g_hPicResultDENow = _GUICtrlCreateIcon ($g_sLibIconPath, $eIcnDark, $x + 60, $y + 40, 16, 16)
 		   GUICtrlSetState(-1, $GUI_HIDE)
-	   $g_hPicResultDETemp = GUICtrlCreateIcon ($g_sLibIconPath, $eIcnDark, $x - 5, $y + 40, 16, 16)
+	   $g_hPicResultDETemp = _GUICtrlCreateIcon ($g_sLibIconPath, $eIcnDark, $x - 5, $y + 40, 16, 16)
+
+	   ;Hero & Lab status - Demen
+	   $g_ahLblHero[0] = GUICtrlCreateLabel("K", $x - 5, $y + 60, 12, 14, $SS_CENTER)
+	   GUICtrlSetFont(-1, 8.5)
+	   GUICtrlSetColor(-1, $COLOR_MEDGRAY)
+	   $g_ahLblHero[1] = GUICtrlCreateLabel("Q", $x + 25, $y + 60, 12, 14, $SS_CENTER)
+	   GUICtrlSetFont(-1, 8.5)
+	   GUICtrlSetColor(-1, $COLOR_MEDGRAY)
+	   $g_ahLblHero[2] = GUICtrlCreateLabel("W", $x + 55, $y + 60, 12, 14, $SS_CENTER)
+	   GUICtrlSetFont(-1, 8.5)
+	   GUICtrlSetColor(-1, $COLOR_MEDGRAY)
+	   $g_hLblLab = GUICtrlCreateLabel("Lab:", $x + 85, $y + 60, 22, 14, $SS_CENTER)
+	   GUICtrlSetFont(-1, 8.5)
+	   GUICtrlSetColor(-1, $COLOR_MEDGRAY)
+	   $g_hlblLabTime = GUICtrlCreateLabel("", $x + 108, $y + 60, 45, 14, $SS_LEFT)
+	   GUICtrlSetFont(-1, 8.5)
+	   GUICtrlSetColor(-1, $COLOR_MEDGRAY)
 
 	   $x += 75
 	   ;trophy / runtime
 	   $g_hLblResultTrophyNow = GUICtrlCreateLabel("", $x, $y + 2, 55, 15, $SS_RIGHT)
-	   $g_hPicResultTrophyNow = GUICtrlCreateIcon ($g_sLibIconPath, $eIcnTrophy, $x + 59, $y , 16, 16)
+	   $g_hPicResultTrophyNow = _GUICtrlCreateIcon ($g_sLibIconPath, $eIcnTrophy, $x + 59, $y , 16, 16)
 	   $g_hLblResultRuntimeNow = GUICtrlCreateLabel("00:00:00", $x, $y + 2, 50, 15, $SS_RIGHT)
 	   GUICtrlSetState(-1, $GUI_HIDE)
-	   $g_hPicResultRuntimeNow = GUICtrlCreateIcon($g_sLibIconPath, $eIcnHourGlass, $x +57, $y, 16, 16)
+	   $g_hPicResultRuntimeNow = _GUICtrlCreateIcon($g_sLibIconPath, $eIcnHourGlass, $x +57, $y, 16, 16)
 	   GUICtrlSetState(-1, $GUI_HIDE)
 	   ;builders/attacked
 	   $g_hLblResultBuilderNow = GUICtrlCreateLabel("", $x, $y + 22, 55, 15, $SS_RIGHT)
-	   $g_hPicResultBuilderNow = GUICtrlCreateIcon ($g_sLibIconPath, $eIcnBuilder, $x + 59, $y + 20, 16, 16)
+	   $g_hPicResultBuilderNow = _GUICtrlCreateIcon ($g_sLibIconPath, $eIcnBuilder, $x + 59, $y + 20, 16, 16)
 	   $g_hLblResultAttackedHourNow = GUICtrlCreateLabel("0", $x, $y + 22, 50, 15, $SS_RIGHT)
 	   GUICtrlSetState(-1, $GUI_HIDE)
-	   $g_hPicResultAttackedHourNow = GUICtrlCreateIcon($g_sLibIconPath, $eIcnBldgTarget, $x +59, $y + 20, 16, 16)
+	   $g_hPicResultAttackedHourNow = _GUICtrlCreateIcon($g_sLibIconPath, $eIcnBldgTarget, $x +59, $y + 20, 16, 16)
 	   GUICtrlSetState(-1, $GUI_HIDE)
 	   ;gems/skipped
 	   $g_hLblResultGemNow = GUICtrlCreateLabel("", $x + 5, $y + 42, 50, 15, $SS_RIGHT)
-	   $g_hPicResultGemNow = GUICtrlCreateIcon ($g_sLibIconPath, $eIcnGem, $x + 59, $y + 40, 16, 16)
+	   $g_hPicResultGemNow = _GUICtrlCreateIcon ($g_sLibIconPath, $eIcnGem, $x + 59, $y + 40, 16, 16)
 	   $g_hLblResultSkippedHourNow = GUICtrlCreateLabel("0", $x, $y + 42, 50, 15, $SS_RIGHT)
 	   GUICtrlSetState(-1, $GUI_HIDE)
-	   $g_hPicResultSkippedHourNow = GUICtrlCreateIcon ($g_sLibIconPath, $eIcnBldgX, $x + 59, $y + 40, 16, 16)
+	   $g_hPicResultSkippedHourNow = _GUICtrlCreateIcon ($g_sLibIconPath, $eIcnBldgX, $x + 59, $y + 40, 16, 16)
 	   GUICtrlSetState(-1, $GUI_HIDE)
 
 	   $x = 285
