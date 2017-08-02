@@ -99,12 +99,14 @@ Global $hImageList = 0
 Global $g_hFrmBotButtons, $g_hFrmBotLogoUrlSmall, $g_hFrmBotEx = 0, $g_hLblBotTitle, $g_hLblBotShrink = 0, $g_hLblBotExpand = 0, $g_hLblBotMinimize = 0, $g_hLblBotClose = 0, $g_hFrmBotBottom = 0
 Global $g_hFrmBotEmbeddedShield = 0, $g_hFrmBotEmbeddedShieldInput = 0, $g_hFrmBotEmbeddedGraphics = 0
 Global $g_hFrmBot_MAIN_PIC = 0, $g_hFrmBot_URL_PIC = 0, $g_hFrmBot_URL_PIC2 = 0
-Global $g_hTabMain = 0, $g_hTabLog = 0, $g_hTabVillage = 0, $g_hTabAttack = 0, $g_hTabBot = 0, $g_hTabAbout = 0
+Global $g_hTabMain = 0, $g_hTabLog = 0, $g_hTabVillage = 0, $g_hTabAttack = 0, $g_hTabBot = 0, $g_hTabMOD = 0, $g_hTabAbout = 0
 Global $g_hStatusBar = 0
 Global $g_hTiShow = 0, $g_hTiHide = 0, $g_hTiDonate = 0, $g_hTiAbout = 0, $g_hTiExit = 0
 Global $g_aFrmBotPosInit[8] = [0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_hFirstControlToHide = 0, $g_hLastControlToHide = 0, $g_aiControlPrevState[1]
 Global $g_bFrmBotMinimized = False ; prevents bot flickering
+
+Global $g_oCtrlIconData = ObjCreate("Scripting.Dictionary")
 
 #include "GUI\MBR GUI Design Bottom.au3"
 #include "GUI\MBR GUI Design Log.au3"
@@ -112,8 +114,8 @@ Global $g_bFrmBotMinimized = False ; prevents bot flickering
 #include "GUI\MBR GUI Design Attack.au3"
 #include "GUI\MBR GUI Design Bot.au3"
 #include "GUI\MBR GUI Design About.au3"
-;Demen Mod
-#include "MOD_Demen\GUI Design_Demen.au3"
+; Team AiO MOD++ (2017)
+#include "Team__AiO__MOD++\GUI\MOD GUI Design.au3"
 
 Func CreateMainGUI()
 
@@ -257,6 +259,9 @@ Func CreateMainGUIControls()
    SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_06", "Loading Bot tab..."))
    CreateBotTab()
 
+   SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_10", "Loading Mods tab..."))
+   CreateMODTab()
+
    SplashStep(GetTranslatedFileIni("MBR GUI Design - Loading", "SplashStep_07", "Loading About Us tab..."))
    CreateAboutTab()
 
@@ -271,6 +276,7 @@ Func CreateMainGUIControls()
    $g_hTabVillage = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_02", "Village"))
    $g_hTabAttack = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_03", "Attack Plan"))
    $g_hTabBot = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_04", "Bot"))
+   $g_hTabMOD = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_06", "Mods"))
    $g_hTabAbout = GUICtrlCreateTabItem(GetTranslatedFileIni("MBR Main GUI", "Tab_05", "About Us"))
    GUICtrlCreateTabItem("")
    GUICtrlSetResizing(-1, $GUI_DOCKBORDERS)
@@ -297,6 +303,9 @@ Func CreateMainGUIControls()
 	  Bind_ImageList($g_hGUI_STRATEGIES_TAB)
 
    Bind_ImageList($g_hGUI_BOT_TAB)
+
+   Bind_ImageList($g_hGUI_MOD_TAB)
+	  Bind_ImageList($g_hGUI_MOD_SWITCH_TAB)
 
    Bind_ImageList($g_hGUI_STATS_TAB)
 
@@ -496,6 +505,7 @@ EndFunc   ;==>GetDPIRatio
 ; Example .......: No
 ; ===============================================================================================================================
 Func _GUICtrlCreateIcon($filename, $iconName, $left, $top, $width = 32, $height = 32, $style = -1, $exStyle = -1)
+	;Return GUICtrlCreateIcon($filename, $iconName, $left, $top, $width, $height, $style, $exStyle)
 	Static $s_hLibIcon = 0
 	Local $hLib
 	If $filename = $g_sLibIconPath Then
@@ -512,7 +522,57 @@ Func _GUICtrlCreateIcon($filename, $iconName, $left, $top, $width = 32, $height 
 	EndIf
 	Local $hBmp = _WinAPI_Create32BitHBITMAP($hIcon, False, True)
 	Local $controlID = GUICtrlCreatePic("", $left, $top, $width, $height, $style, $exStyle)
-	GUICtrlSendMsg($controlID, $STM_SETIMAGE, 0, $hBmp)
+	_WinAPI_DeleteObject(GUICtrlSendMsg($controlID, $STM_SETIMAGE, 0, $hBmp))
 	_WinAPI_DeleteObject($hBmp)
+	; required for later icon change using _GUICtrlSetImage
+	Local $aIconData = [$width, $height]
+	$g_oCtrlIconData("Icon:" & GUICtrlGetHandle($controlID)) = $aIconData
 	Return $controlID
-EndFunc
+EndFunc   ;==>_GUICtrlCreateIcon
+
+; #FUNCTION# ====================================================================================================================
+; Name ..........: _GUICtrlSetImage
+; Description ...: Support icon change for _GUICtrlCreateIcon
+; Syntax ........: see GUICtrlSetImage
+; Parameters ....: see GUICtrlSetImage
+; Return values .:
+; Author ........: cosote
+; Modified ......:
+; Remarks .......: Optimized for $g_sLibIconPath
+; Related .......:
+; Link ..........: http://www.autoitscript.com/forum/topic/159612-dpi-resolution-problem/?hl=%2Bdpi#entry1158317
+; Example .......: No
+; ===============================================================================================================================
+Func _GUICtrlSetImage($controlID, $filename, $iconName = -1, $iconType = 1)
+
+	Local $aIconData = $g_oCtrlIconData("Icon:" & GUICtrlGetHandle($controlID))
+
+	If IsArray($aIconData) = 0 Then
+		Return GUICtrlSetImage($controlID, $filename, $iconName, $iconType)
+	EndIf
+
+	Static $s_hLibIcon = 0
+	Local $hLib
+	If $filename = $g_sLibIconPath Then
+		If $s_hLibIcon = 0 Then
+			$s_hLibIcon = _WinAPI_LoadLibraryEx($filename, $LOAD_LIBRARY_AS_DATAFILE)
+		EndIf
+		$hLib = $s_hLibIcon
+	Else
+		$hLib = _WinAPI_LoadLibraryEx($filename, $LOAD_LIBRARY_AS_DATAFILE)
+	EndIf
+	If $hLib = 0 Then Return 0
+	Local $width = $aIconData[0], $height = $aIconData[1]
+	Local $hIcon = _WinAPI_LoadImage($hLib, $iconName, $IMAGE_ICON, $width, $height, $LR_DEFAULTCOLOR)
+	If $hLib <> $s_hLibIcon Then
+		_WinAPI_FreeLibrary($hLib)
+	EndIf
+	If $hIcon = 0 Then Return 0
+	Local $hBmp = _WinAPI_Create32BitHBITMAP($hIcon, False, True)
+	If $hBmp = 0 Then Return 0
+	_WinAPI_DeleteObject(GUICtrlSendMsg($controlID, $STM_SETIMAGE, 0, 0))
+	GUICtrlSendMsg($controlID, $STM_SETIMAGE, 0, $hBmp)
+	_WinAPI_InvalidateRect(GUICtrlGetHandle($controlID), 0, False)
+	_WinAPI_DeleteObject($hBmp)
+	Return 1
+EndFunc   ;==>_GUICtrlSetImage

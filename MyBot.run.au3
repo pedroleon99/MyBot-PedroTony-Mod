@@ -23,16 +23,18 @@
 #pragma compile(Icon, "Images\MyBot.ico")
 #pragma compile(FileDescription, Clash of Clans Bot - A Free Clash of Clans bot - https://mybot.run)
 #pragma compile(ProductName, My Bot)
-#pragma compile(ProductVersion, 7.2.1)
-#pragma compile(FileVersion, 7.2.1
+#pragma compile(ProductVersion, 7.2.2)
+#pragma compile(FileVersion, 7.2.2
 #pragma compile(LegalCopyright, © https://mybot.run)
 #pragma compile(Out, MyBot.run.exe) ; Required
 
 ; Enforce variable declarations
 Opt("MustDeclareVars", 1)
 
-Global $g_sBotVersion = "v7.2.1" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it is also use on Checkversion()
-Global $g_sModversion = "v3.4"; <== Just Change This to Version Number
+Global $g_sBotVersion = "v7.2.2" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it is also use on Checkversion()
+Global $g_sModversion = "v3.5" ;<== Just Change This to Version Number
+Global $g_sModSupportUrl = "https://drive.google.com/drive/u/0/folders/0BxtxwQwk8kUaLUhfSjZ3MmwwV1k" ;<== Our Website Link Support Or Link Download
+Global $g_sModDownloadUrl = "https://github.com/pedroleon99/MyBot-PedroTony-Mod/releases" ;<== Our Website Link Download
 Global $g_sBotTitle = "" ;~ Don't assign any title here, use Func UpdateBotTitle()
 Global $g_hFrmBot = 0 ; The main GUI window
 
@@ -70,7 +72,7 @@ InitializeBot()
 MainLoop()
 
 Func UpdateBotTitle()
-	Local $sTitle = "My Bot " & $g_sBotVersion & "- Pedro&Tony Mod " & $g_sModversion & " "
+	Local $sTitle = "My Bot " & $g_sBotVersion & " - " & " Pedro&Tony MOD" & " " & $g_sModversion & " - "
 	If $g_sBotTitle = "" Then
 		$g_sBotTitle = $sTitle
 	Else
@@ -572,6 +574,10 @@ Func MainLoop()
 	While 1
 		_Sleep($DELAYSLEEP, True, False)
 
+		If $g_bRunState = False And ($g_bNotifyPBEnable = True Or $g_bNotifyTGEnable = True) And $g_bNotifyRemoteEnable = True Then
+			NotifyRemoteControlProcBtnStart()
+		EndIf
+
 		Switch $g_iBotAction
 			Case $eBotStart
 				BotStart($iStartDelay)
@@ -645,8 +651,9 @@ Func runBot() ;Bot that runs everything in order
 			If $g_bRestart = True Then ContinueLoop
 			If _Sleep($DELAYRUNBOT3) Then Return
 			VillageReport()
-			UpdateHeroStatus() ; Demen
 			UpdateLabStatus() ; Demen
+			UpdateHeroStatus() ; Demen
+			ProfileSwitch()
 			If $g_bOutOfGold = True And (Number($g_aiCurrentLoot[$eLootGold]) >= Number($g_iTxtRestartGold)) Then ; check if enough gold to begin searching again
 				$g_bOutOfGold = False ; reset out of gold flag
 				Setlog("Switching back to normal after no gold to search ...", $COLOR_SUCCESS)
@@ -660,6 +667,13 @@ Func runBot() ;Bot that runs everything in order
 			If _Sleep($DELAYRUNBOT5) Then Return
 			checkMainScreen(False)
 			If $g_bRestart = True Then ContinueLoop
+
+			$g_bcanRequestCC = True
+			If ($g_bReqCCFirst) Then
+				RequestCC()
+				If _Sleep($DELAYRUNBOT1) = False Then checkMainScreen(False)
+			EndIf
+
 			Local $aRndFuncList = ['Collect', 'CheckTombs', 'ReArm', 'CleanYard']
 			While 1
 				If $g_bRunState = False Then Return
@@ -678,6 +692,21 @@ Func runBot() ;Bot that runs everything in order
 			AddIdleTime()
 			If $g_bRunState = False Then Return
 			If $g_bRestart = True Then ContinueLoop
+			If $iChkForecastBoost = 1 Then
+				$currentForecast = readCurrentForecast()
+					If $currentForecast >= Number($iTxtForecastBoost, 3) Then
+						If _GUICtrlComboBox_GetCurSel($g_hCmbBoostBarracks) > 0 Then
+							SetLog("Boost Time !", $COLOR_GREEN)
+						Else
+							SetLog("Boost barracks disabled!", $COLOR_GREEN)
+						EndIf
+					Else
+					SetLog("Forecast index is below the required value, no boost !", $COLOR_RED)
+					EndIf
+ 			EndIf
+			If $iChkForecastPause = 1 Then
+				$currentForecast = readCurrentForecast()
+			EndIf
 			If IsSearchAttackEnabled() Then ; if attack is disabled skip reporting, requesting, donating, training, and boosting
 				Local $aRndFuncList = ['ReplayShare', 'NotifyReport', 'DonateCC,Train', 'BoostBarracks', 'BoostSpellFactory', 'BoostKing', 'BoostQueen', 'BoostWarden', 'RequestCC']
 				While 1
@@ -700,6 +729,8 @@ Func runBot() ;Bot that runs everything in order
 					If Unbreakable() = True Then ContinueLoop
 				EndIf
 			EndIf
+			AutoUpgrade()
+			MainSuperXPHandler()
 			Local $aRndFuncList = ['Laboratory', 'UpgradeHeroes', 'UpgradeBuilding', 'BuilderBase']
 			While 1
 				If $g_bRunState = False Then Return
@@ -715,11 +746,12 @@ Func runBot() ;Bot that runs everything in order
 				EndIf
 				If checkAndroidReboot() = True Then ContinueLoop 2 ; must be level 2 due to loop-in-loop
 			WEnd
+			ClanHop()
 			If $g_bRunState = False Then Return
 			If $g_bRestart = True Then ContinueLoop
 			If IsSearchAttackEnabled() Then ; If attack scheduled has attack disabled now, stop wall upgrades, and attack.
 				$g_iNbrOfWallsUpped = 0
-				UpgradeWall()
+				If Not $g_bChkClanHop Then UpgradeWall()
 				If _Sleep($DELAYRUNBOT3) Then Return
 				If $g_bRestart = True Then ContinueLoop
 				If $ichkSwitchAcc = 1 And $aProfileType[$nCurProfile - 1] = $eDonate Then	; SwitchAcc Demen
@@ -788,6 +820,8 @@ Func Idle() ;Sequence that runs until Full Army
 	Local $TimeIdle = 0 ;In Seconds
 	If $g_iDebugSetlog = 1 Then SetLog("Func Idle ", $COLOR_DEBUG)
 
+	If $g_bChkClanHop Then Return
+
 	While $g_bIsFullArmywithHeroesAndSpells = False
 
 		checkAndroidReboot()
@@ -799,6 +833,8 @@ Func Idle() ;Sequence that runs until Full Army
 		Local $hTimer = __TimerInit()
 		Local $iReHere = 0
 		;PrepareDonateCC()
+
+		BotHumanization()
 
 		;If $g_bDonateSkipNearFullEnable = True Then getArmyCapacity(true,true)
 		If $g_iActiveDonate And $g_bChkDonate Then
@@ -872,6 +908,7 @@ Func Idle() ;Sequence that runs until Full Army
 		If $g_iCommandStop = 0 And $g_bTrainEnabled = True Then
 			If Not ($g_bFullArmy) Then
 				If $g_iActualTrainSkip < $g_iMaxTrainSkip Then
+					MainSuperXPHandler()
 					If CheckNeedOpenTrain($g_sTimeBeforeTrain) Then TrainRevamp()
 					If $g_bRestart = True Then ExitLoop
 					If _Sleep($DELAYIDLE1) Then ExitLoop
@@ -883,6 +920,7 @@ Func Idle() ;Sequence that runs until Full Army
 					EndIf
 					CheckArmyCamp(True, True)
 				EndIf
+				MainSuperXPHandler()
 			EndIf
 			If $g_bFullArmy And $g_bTrainEnabled = True Then
 				SetLog("Army Camp and Barracks are full, stop Training...", $COLOR_ACTION)
@@ -919,7 +957,6 @@ Func Idle() ;Sequence that runs until Full Army
 			Else
 				SmartWait4Train()
 			EndIf
-
 			If $g_bRestart = True Then ExitLoop ; if smart wait activated, exit to runbot in case user adjusted GUI or left emulator/bot in bad state
 		EndIf
 
@@ -928,6 +965,11 @@ EndFunc   ;==>Idle
 
 Func AttackMain() ;Main control for attack functions
 	;LoadAmountOfResourcesImages() ; for debug
+	If $ichkEnableSuperXP = 1 And $irbSXTraining = 2 Then
+		MainSuperXPHandler()
+		Return
+	EndIf
+	If checkForecastPause($currentForecast) = True Then Return
 	getArmyCapacity(True, True)
 	If IsSearchAttackEnabled() Then
 		If (IsSearchModeActive($DB) And checkCollectors(True, False)) Or IsSearchModeActive($LB) Or IsSearchModeActive($TS) Then
@@ -975,6 +1017,7 @@ Func AttackMain() ;Main control for attack functions
 			If _Sleep($DELAYATTACKMAIN2) Then Return
 			Return True
 		Else
+			If Not $g_bChkClanHop Then
 			Setlog("No one of search condition match:", $COLOR_WARNING)
 			Setlog("Waiting on troops, heroes and/or spells according to search settings", $COLOR_WARNING)
 			$g_bIsSearchLimit = False
@@ -984,6 +1027,9 @@ Func AttackMain() ;Main control for attack functions
 				checkSwitchAcc()
 			Else
 				SmartWait4Train()
+			EndIf
+			Else
+				SetLog("Skipping Attack because Clan Hop is enabled!", $COLOR_INFO)
 			EndIf
 		EndIf
 	Else
@@ -1066,18 +1112,22 @@ Func _RunFunction($action)
 			ReArm()
 			_Sleep($DELAYRUNBOT3)
 		Case "ReplayShare"
+			If $g_bChkClanHop Then Return
 			ReplayShare($g_bShareAttackEnableNow)
 			_Sleep($DELAYRUNBOT3)
 		Case "NotifyReport"
+			If $g_bChkClanHop Then Return
 			NotifyReport()
 			_Sleep($DELAYRUNBOT3)
 		Case "DonateCC"
+			If $g_bChkClanHop Then Return
 			If $g_iActiveDonate And $g_bChkDonate Then
 				;If $g_bDonateSkipNearFullEnable = True and $g_bFirstStart = False Then getArmyCapacity(True, True)
 				If SkipDonateNearFullTroops(True) = False And BalanceDonRec(True) Then DonateCC()
 				If _Sleep($DELAYRUNBOT1) = False Then checkMainScreen(False)
 			EndIf
 		Case "DonateCC,Train"
+			If $g_bChkClanHop Then Return
 			If $g_iActiveDonate And $g_bChkDonate Then
 				If $g_bFirstStart Then
 					getArmyCapacity(True, False)
@@ -1109,21 +1159,28 @@ Func _RunFunction($action)
 		Case "BoostSpellFactory"
 			BoostSpellFactory()
 		Case "BoostKing"
+			If $g_bChkClanHop Then Return
 			BoostKing()
 		Case "BoostQueen"
+			If $g_bChkClanHop Then Return
 			BoostQueen()
 		Case "BoostWarden"
+			If $g_bChkClanHop Then Return
 			BoostWarden()
 		Case "RequestCC"
-			RequestCC()
+			If $g_bChkClanHop Then Return
+			If Not ($g_bReqCCFirst) Then RequestCC()
 			If _Sleep($DELAYRUNBOT1) = False Then checkMainScreen(False)
 		Case "Laboratory"
+			If $g_bChkClanHop Then Return
 			Laboratory()
 			If _Sleep($DELAYRUNBOT3) = False Then checkMainScreen(False)
 		Case "UpgradeHeroes"
+			If $g_bChkClanHop Then Return
 			UpgradeHeroes()
 			_Sleep($DELAYRUNBOT3)
 		Case "UpgradeBuilding"
+			If $g_bChkClanHop Then Return
 			UpgradeBuilding()
 			_Sleep($DELAYRUNBOT3)
 		Case "BuilderBase"
@@ -1133,6 +1190,9 @@ Func _RunFunction($action)
 				; switch back to normal village
 				SwitchBetweenBases()
 			EndIf
+			_Sleep($DELAYRUNBOT3)
+		Case "SuperXP"
+			MainSuperXPHandler()
 			_Sleep($DELAYRUNBOT3)
 		Case ""
 			SetDebugLog("Function call doesn't support empty string, please review array size", $COLOR_ERROR)

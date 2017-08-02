@@ -379,3 +379,9 @@ Global $DELAYSWITCHBASES2 = 200
 ;ClockTower
 Global $DELAYCLOCKTOWER1 = 200
 Global $DELAYCLOCKTOWER2 = 100
+
+;SuperXP / GoblinXP
+Global Const $DELAYDROPSuperXP1= 500
+Global Const $DELAYDROPSuperXP2 = 1000
+Global Const $DELAYDROPSuperXP3 = 250
+Global Const $DELAYPREPARESearchSuperXP = 500

@@ -553,6 +553,8 @@ Func ResetStats()
 	If $ichkSwitchAcc = 1 Then ResetStatsForSwitchAcc()		;	ProfileStats - SwitchAcc - Demen
 	ResetHeroLabStatus()	;	Demen
 
+	ResetGoblinsXP()
+
 	UpdateStats()
  EndFunc   ;==>ResetStats
 

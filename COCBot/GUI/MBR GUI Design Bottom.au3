@@ -26,6 +26,7 @@ Global $g_hLblResultAttackedHourNow = 0, $g_hPicResultAttackedHourNow = 0, $g_hL
 Global $g_hLblVillageReportTemp = 0, $g_hBtnTestVillage = 0
 Global $g_hBtnEnableGUI = 0, $g_hBtnDisableGUI = 0	; Adding button to enable/disable GUI while botting (as requested by YScorpion) - Demen
 Global $g_ahLblHero[3], $g_hLblLab, $g_hLblLabTime	; Hero & Lab Status - Demen
+Global $g_hModSupportConfig = 0
 
 Func CreateBottomPanel()
    Local $sTxtTip = ""
@@ -79,6 +80,7 @@ Func CreateBottomPanel()
 		   GUICtrlSetOnEvent(-1, "chkBackground")
 		   GUICtrlSetState(-1, (($g_bAndroidAdbScreencap = True) ? ($GUI_CHECKED) : ($GUI_UNCHECKED)))
 	   $g_hLblDonate = GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Bottom", "LblDonate", "Support the development"), $x + 224, $y + 85, 220, 20, $SS_RIGHT) ; was y+80 x height 24. Sorry I have to move this down a little bit - Demen		   GUICtrlSetCursor(-1, 0) ; https://www.autoitscript.com/autoit3/docs/functions/MouseGetCursor.htm
+		   GUICtrlSetCursor(-1, 0) ; https://www.autoitscript.com/autoit3/docs/functions/MouseGetCursor.htm
 		   GUICtrlSetFont(-1, 8.5, $FW_BOLD) ;, $GUI_FONTITALIC + $GUI_FONTUNDER)
 		   _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Bottom", "LblDonate_Info_01", "Paypal Donate?"))
 	   $g_hBtnAttackNowDB = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Bottom", "BtnAttackNowDB", "DB Attack!"), $x + 190, $y - 4, 60, -1)
@@ -88,16 +90,21 @@ Func CreateBottomPanel()
 	   $g_hBtnAttackNowTS = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Bottom", "BtnAttackNowTS", "TH Snipe!"), $x + 190, $y + 50, 60, -1)
 		   GUICtrlSetState(-1, $GUI_HIDE)
 
+	   $g_hModSupportConfig = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Bottom", "ModSupport", "Support"), $x + 100, $y + 70, 80, -1)
+		   $sTxtTip = GetTranslatedFileIni("MBR GUI Design Bottom", "ModSupport_Info_01", "Support Mod Mybot All Versions.")
+		   _GUICtrlSetTip(-1, $sTxtTip)
+		   GUICtrlSetBkColor(-1, 0x00FF2F)
+
 		; Adding button to enable/disable GUI while botting (as requested by YScorpion) - Demen
-		$g_hBtnEnableGUI = GUICtrlCreateButton("Enable GUI", $x + 100, $y + 72, 80, 22)
-			_GUICtrlSetTip(-1, 	"Enable GUI control while botting" & @CRLF & _
-								"   Warning:  USE THIS WITH CAUTION!" & @CRLF & _
-								"   This function may create errors that require bot/PC restart" & @CRLF & _
-								" 	Better to stop the Bot completely if you need to change the setting" )
+		$g_hBtnEnableGUI = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Bottom", "EnableGUI", "Enable GUI"), $x + 100, $y + 72, 80, 22)
+			_GUICtrlSetTip(-1, 	GetTranslatedFileIni("MBR GUI Design Bottom", "EnableGUI_Info_01", "Enable GUI control while botting") & @CRLF & _
+								GetTranslatedFileIni("MBR GUI Design Bottom", "EnableGUI_Info_02", "   Warning:  USE THIS WITH CAUTION!") & @CRLF & _
+								GetTranslatedFileIni("MBR GUI Design Bottom", "EnableGUI_Info_03", "   This function may create errors that require bot/PC restart") & @CRLF & _
+								GetTranslatedFileIni("MBR GUI Design Bottom", "EnableGUI_Info_04", " 	Better to stop the Bot completely if you need to change the setting"))
 			GUICtrlSetOnEvent(-1, "btnEnableGUI")
 			GUICtrlSetState(-1, $GUI_HIDE)
-		$g_hBtnDisableGUI = GUICtrlCreateButton("Disable GUI", $x + 100, $y + 72, 80, 22)
-			_GUICtrlSetTip(-1, "Enable GUI control while botting")
+		$g_hBtnDisableGUI = GUICtrlCreateButton(GetTranslatedFileIni("MBR GUI Design Bottom", "DisableGUI", "Disable GUI"), $x + 100, $y + 72, 80, 22)
+			_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Bottom", "DisableGUI_Info_01", "Enable GUI control while botting"))
 			GUICtrlSetOnEvent(-1, "btnDisableGUI")
 			GUICtrlSetState(-1, $GUI_HIDE)
 
@@ -108,8 +115,6 @@ Func CreateBottomPanel()
    $g_hPicTwoArrowShield = _GUICtrlCreateIcon($g_sLibIconPath, $eIcn2Arrow, $x + 190, $y + 10, 48, 48)
 
    $g_hLblVersion = GUICtrlCreateLabel($g_sBotVersion, 200, $y + 60, 60, 17, $SS_CENTER)
-	   GUICtrlSetColor(-1, $COLOR_MEDGRAY)
-   GUICtrlCreateLabel($g_sModversion, 200, $y + 80, 70, 17, $SS_CENTER) ;- Adding DEMEN Mod Version
 	   GUICtrlSetColor(-1, $COLOR_MEDGRAY)
 
    $g_hPicArrowLeft = _GUICtrlCreateIcon($g_sLibIconPath, $eIcnArrowLeft, $x + 249, $y + 30, 16, 16)

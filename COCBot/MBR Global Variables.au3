@@ -55,6 +55,7 @@
 #include <Crypt.au3>
 
 Global Const $g_sLogoPath = @ScriptDir & "\Images\Logo.png"
+Global Const $g_sLogoPath2 = @ScriptDir & "\Images\Logo2.png"
 Global Const $g_sLogoUrlPath = @ScriptDir & "\Images\LogoURL.png"
 Global Const $g_sLogoUrlSmallPath = @ScriptDir & "\Images\LogoURLsmall.png"
 Global Const $g_iGAME_WIDTH = 860
@@ -493,7 +494,10 @@ Global Enum $eIcnArcher = 1, $eIcnDonArcher, $eIcnBalloon, $eIcnDonBalloon, $eIc
 		$eWall04, $eWall05, $eWall06, $eWall07, $eWall08, $eWall09, $eWall10, $eWall11, $eIcnPBNotify, $eIcnCCTroops, _
 		$eIcnCCSpells, $eIcnSpellsGroup, $eBahasaIND, $eChinese_S, $eChinese_T, $eEnglish, $eFrench, $eGerman, $eItalian, $ePersian, _
 		$eRussian, $eSpanish, $eTurkish, $eMissingLangIcon, $eWall12, $ePortuguese, $eIcnDonPoisonSpell, $eIcnDonEarthQuakeSpell, $eIcnDonHasteSpell, $eIcnDonSkeletonSpell, $eVietnamese, $eKorean, $eAzerbaijani, _
-		$eArabic, $eIcnElixirCollectorL5, $eIcnClockTower, $eIcnBuilderHall, $eIcnGoldMineL5, $eIcnGemMine
+		$eArabic, $eIcnElixirCollectorL5, $eIcnClockTower, $eIcnBuilderHall, $eIcnGoldMineL5, $eIcnGemMine, _
+		$eIcnMods, $eIcnDebug, $eIcnUpgrade, $eIcnSwitchOptions, $eIcnSwitchAcc, $eIcnSwitchProfiles, $eIcnHumanization, $eIcnGoblinXP, $eIcnStats, $eIcnForecast, _ ; Icn For Mods Tab
+		$eIcnChat, $eIcnRepeat, $eIcnClan, $eIcnTarget, $eIcnSettings, _ ; Icn for Bot Humanization
+		$eIcnClanHop
 
 Global $eIcnDonBlank = $eIcnDonBlacklist
 Global $eIcnOptions = $eIcnDonBlacklist
@@ -577,25 +581,25 @@ Global Const $g_aiTroopTrainTime[$eTroopCount] = [ _
 		36, 90, 180, 600, 360, 600, 120]
 ; Zero element contains number of levels, elements 1 thru n contain cost of that level troop
 Global Const $g_aiTroopCostPerLevel[$eTroopCount][9] = [ _
-		[7, 25, 40, 60, 100, 150, 200, 250], _ 				 ; Archer
-		[7, 50, 80, 120, 200, 300, 400, 500], _ 				 ;Barbarian
-		[8, 250, 750, 1250, 1750, 2250, 3000, 3500, 4000], _ ; Giant
-		[7, 25, 40, 60, 80, 100, 150, 200], _ 				 ; Goblin
-		[6, 1000, 1500, 2000, 2500, 3000, 3500], _ 			 ; WallBreaker
-		[7, 2000, 2500, 3000, 3500, 4000, 4500, 5000], _ 	 ; Balloon
-		[7, 1500, 2000, 2500, 3000, 3500, 4000, 4500], _ 	 ; Wizard
-		[4, 5000, 6000, 8000, 10000], _						 ;Healer
-		[6, 25000, 29000, 33000, 37000, 42000, 46000], _ 	 ; Dragon
-		[5, 28000, 32000, 36000, 40000, 45000], _ 			 ; Pekka
-		[5, 15000, 16000, 17000, 18000, 19000], _ 			 ; BabyDragon
-		[4, 4200, 4800, 5400, 6000], _  						 ; Miner
-		[7, 6, 7, 8, 9, 10, 11, 12], _ 						 ; Minion
-		[7, 40, 45, 52, 58, 65, 90, 115], _					 ; HogRider
-		[5, 70, 100, 130, 160, 190], _ 						 ;Valkyrie
-		[6, 450, 525, 600, 675, 750, 825], _ 				 ; Golem
-		[3, 250, 350, 450], _ 								 ; Witch
-		[4, 390, 450, 510, 570], _  							 ;Lavahound
-		[3, 130, 150, 170]] ; Bowler
+		[7, 25, 40, 60, 100, 150, 200, 250], _ 				 	; Barbarian
+		[7, 50, 80, 120, 200, 300, 400, 500], _ 			 	; Archer
+		[8, 250, 750, 1250, 1750, 2250, 3000, 3500, 4000], _	; Giant
+		[7, 25, 40, 60, 80, 100, 150, 200], _ 				 	; Goblin
+		[7, 1000, 1500, 2000, 2500, 3000, 3500, 4000], _ 	 	; WallBreaker
+		[7, 2000, 2500, 3000, 3500, 4000, 4500, 5000], _ 	 	; Balloon
+		[8, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000], _ 	; Wizard
+		[5, 5000, 6000, 8000, 10000, 15000], _					; Healer
+		[6, 25000, 29000, 33000, 37000, 42000, 46000], _ 		; Dragon
+		[6, 28000, 32000, 36000, 40000, 45000, 50000], _ 		; Pekka
+		[5, 15000, 16000, 17000, 18000, 19000], _ 			 	; BabyDragon
+		[5, 4200, 4800, 5200, 5600, 6000], _  					; Miner
+		[7, 6, 7, 8, 9, 10, 11, 12], _ 						 	; Minion
+		[7, 40, 45, 52, 58, 65, 90, 115], _					 	; HogRider
+		[5, 70, 100, 130, 160, 190], _ 						 	; Valkyrie
+		[6, 450, 525, 600, 675, 750, 825], _ 				 	; Golem
+		[3, 250, 350, 450], _ 								 	; Witch
+		[4, 390, 450, 510, 570], _  						 	; Lavahound
+		[3, 130, 150, 170]]										; Bowler
 Global Const $g_aiTroopDonateXP[$eTroopCount] = [1, 1, 5, 1, 2, 5, 4, 14, 20, 25, 10, 5, 2, 5, 8, 30, 12, 30, 6]
 
 ; Spells
@@ -607,16 +611,16 @@ Global Const $g_aiSpellSpace[$eSpellCount] = [2, 2, 2, 2, 2, 4, 1, 1, 1, 1]
 Global Const $g_aiSpellTrainTime[$eSpellCount] = [360, 360, 360, 360, 360, 720, 180, 180, 180, 180]
 ; Zero element contains number of levels, elements 1 thru n contain cost of that level spell
 Global Const $g_aiSpellCostPerLevel[$eSpellCount][8] = [ _
-		[7, 15000, 16500, 18000, 20000, 22000, 24000, 26000], _ ;LightningSpell
-		[6, 15000, 16500, 18000, 20000, 22000, 24000], _ 	 ;HealSpell
-		[5, 23000, 25000, 27000, 30000, 33000], _     		 ;RageSpell
-		[3, 23000, 27000, 31000], _        					 ;JumpSpell
-		[5, 26000, 29000, 31000, 33000, 35000], _ ;FreezeSpell
-		[4, 38000, 40000, 42000, 44000], _					 ;CloneSpell
-		[5, 95, 110, 125, 140, 155], _         				 ;PoisonSpell
-		[4, 125, 140, 160, 180], _    						 ;EarthquakeSpell
-		[4, 80, 85, 60, 95], _								 ;HasteSpell
-		[4, 110, 120, 130, 140]] ;SkeletonSpell
+		[7, 15000, 16500, 18000, 20000, 22000, 24000, 26000], _	 ; LightningSpell
+		[7, 15000, 16500, 18000, 19000, 21000, 23000, 25000], _  ; HealSpell
+		[5, 23000, 25000, 27000, 30000, 33000], _     		 	 ; RageSpell
+		[3, 23000, 27000, 31000], _        					 	 ; JumpSpell
+		[6, 23000, 26000, 29000, 31000, 33000, 35000], _ 		 ; FreezeSpell
+		[5, 38000, 39000, 41000, 43000, 45000], _				 ; CloneSpell
+		[5, 95, 110, 125, 140, 155], _         				 	 ; PoisonSpell
+		[4, 125, 140, 160, 180], _    						 	 ; EarthquakeSpell
+		[4, 80, 85, 90, 95], _								 	 ; HasteSpell
+		[4, 110, 120, 130, 140]] 								 ; SkeletonSpell
 Global Const $g_aiSpellDonateXP[$eSpellCount] = [10, 10, 10, 10, 10, 0, 5, 5, 5, 5]
 
 ; Hero Bitmaped Values
@@ -835,7 +839,7 @@ Global $g_abNotifyScheduleWeekDays[7] = [False, False, False, False, False, Fals
 
 ; <><><><> Attack Plan / Train Army / Troops/Spells <><><><>
 Global $g_bQuickTrainEnable = False
-Global $g_iQuickTrainArmyNum = 1
+Global $g_bQuickTrainArmy[3] = [True, False, False] ; QuickTrainCombo (Checkbox)
 Global $g_aiArmyCompTroops[$eTroopCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_aiArmyCompSpells[$eSpellCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_aiTrainArmyTroopLevel[$eTroopCount] = [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -875,8 +879,8 @@ Global $g_aiBrewOrder[$eSpellCount] = [ _
 
 
 ; <><><><> Attack Plan / Train Army / Options <><><><>
-Global $g_bCloseWhileTrainingEnable = True, $g_bCloseWithoutShield = False, $g_bCloseEmulator = False, $g_bSuspendComputer = False, $g_bCloseRandom = False, _
-		$g_bCloseExactTime = False, $g_bCloseRandomTime = True, $g_iCloseRandomTimePercent = 10, $g_iCloseMinimumTime = 2
+Global $g_bCloseWhileTrainingEnable = True, $g_bCloseWithoutShield = True, $g_bCloseEmulator = False, $g_bSuspendComputer = False, $g_bCloseRandom = False, _
+		$g_bCloseExactTime = True, $g_bCloseRandomTime = False, $g_iCloseRandomTimePercent = 10, $g_iCloseMinimumTime = 2
 Global $g_iTrainClickDelay = 40
 Global $g_bTrainAddRandomDelayEnable = False, $g_iTrainAddRandomDelayMin = 5, $g_iTrainAddRandomDelayMax = 60
 
@@ -964,7 +968,7 @@ Global $g_bMilkFarmForceToleranceEnable = False, $g_iMilkFarmForceToleranceNorma
 Global $g_abCollectorLevelEnabled[13] = [-1, -1, -1, -1, -1, -1, True, True, True, True, True, True, True] ; elements 0 thru 5 are never referenced
 Global $g_aiCollectorLevelFill[13] = [-1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1] ; elements 0 thru 5 are never referenced
 Global $g_bCollectorFilterDisable = False
-Global $g_iCollectorMatchesMin = 3
+Global $g_iCollectorMatchesMin = 4
 Global $g_iCollectorToleranceOffset = 0
 
 ; <><><><> Attack Plan / Search & Attack / Activebase / Search <><><><>
@@ -1179,13 +1183,11 @@ Global $g_iImglocTHLevel = 0
 Global $g_aiTownHallDetails[4] = [-1, -1, -1, -1] ; [LocX, LocY, BldgLvl, Quantity]
 
 ; Attack
-#CS ;	Fix drop on edge from DocOc - Demen
-Global Const $g_aaiTopLeftDropPoints[5][2] = [[83, 306], [174, 238], [240, 188], [303, 142], [390, 76]]
-Global Const $g_aaiTopRightDropPoints[5][2] = [[466, 66], [556, 134], [622, 184], [684, 231], [775, 300]]
-Global Const $g_aaiBottomLeftDropPoints[5][2] = [[81, 363], [174, 434], [235, 481], [299, 530], [390, 600]]
-Global Const $g_aaiBottomRightDropPoints[5][2] = [[466, 590], [554, 523], [615, 477], [678, 430], [765, 364]]
-Global Const $g_aaiEdgeDropPoints[4] = [$g_aaiBottomRightDropPoints, $g_aaiTopLeftDropPoints, $g_aaiBottomLeftDropPoints, $g_aaiTopRightDropPoints]
-#CE
+;~ Global Const $g_aaiTopLeftDropPoints[5][2] = [[83, 306], [174, 238], [240, 188], [303, 142], [390, 76]]
+;~ Global Const $g_aaiTopRightDropPoints[5][2] = [[466, 66], [556, 134], [622, 184], [684, 231], [775, 300]]
+;~ Global Const $g_aaiBottomLeftDropPoints[5][2] = [[81, 363], [174, 434], [235, 481], [299, 530], [390, 600]]
+;~ Global Const $g_aaiBottomRightDropPoints[5][2] = [[466, 590], [554, 523], [615, 477], [678, 430], [765, 364]]
+;~ Global Const $g_aaiEdgeDropPoints[4] = [$g_aaiBottomRightDropPoints, $g_aaiTopLeftDropPoints, $g_aaiBottomLeftDropPoints, $g_aaiTopRightDropPoints]
 Global Const $g_aiUseAllTroops[33] = [$eBarb, $eArch, $eGiant, $eGobl, $eWall, $eBall, $eWiza, $eHeal, $eDrag, $ePekk, $eBabyD, $eMine, $eMini, $eHogs, $eValk, $eGole, $eWitc, $eLava, $eBowl, $eKing, $eQueen, $eWarden, $eCastle, $eLSpell, $eHSpell, $eRSpell, $eJSpell, $eFSpell, $eCSpell, $ePSpell, $eESpell, $eHaSpell]
 Global Const $g_aiUseBarracks[26] = [$eBarb, $eArch, $eGiant, $eGobl, $eWall, $eBall, $eWiza, $eHeal, $eDrag, $ePekk, $eBabyD, $eMine, $eKing, $eQueen, $eWarden, $eCastle, $eLSpell, $eHSpell, $eRSpell, $eJSpell, $eFSpell, $eCSpell, $ePSpell, $eESpell, $eHaSpell, $eSkSpell]
 Global Const $g_aiUseBarbs[15] = [$eBarb, $eKing, $eQueen, $eWarden, $eCastle, $eLSpell, $eHSpell, $eRSpell, $eJSpell, $eFSpell, $eCSpell, $ePSpell, $eESpell, $eHaSpell, $eSkSpell]
@@ -1525,7 +1527,7 @@ $g_oBldgImages.add($eBldgWizTower & "_" & "1", @ScriptDir & "\imgxml\Buildings\W
 $g_oBldgImages.add($eBldgMortar & "_" & "0", @ScriptDir & "\imgxml\Buildings\Mortars")
 $g_oBldgImages.add($eBldgAirDefense & "_" & "0", @ScriptDir & "\imgxml\Buildings\ADefense")
 
-; EOF
+; Team AiO MOD++ (2017)
+#include "Team__AiO__MOD++\Globals_Team__AiO__MOD++.au3"
 
-; Demen MOD
-#include "MOD_Demen\Globals_Demen.au3"
+; EOF

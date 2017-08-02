@@ -87,6 +87,7 @@ Func dropHeroes($x, $y, $KingSlot = -1, $QueenSlot = -1, $WardenSlot = -1) ;Drop
 		If $g_iActivateKQCondition = "Manual" Or $g_bActivateWardenCondition Then
 			$g_aHeroesTimerActivation[$eHeroGrandWarden] = __TimerInit() ; initialize fixed activation timer
 		EndIf
+		; Small delay just for Warden icon to be all maximize to check green bar from health
 		If _Sleep($DELAYDROPHEROES2) Then Return
 	EndIf
 

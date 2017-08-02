@@ -33,7 +33,7 @@ Func _VillageSearch() ;Control for searching a village that meets conditions
 	Local $weakBaseValues
 	Local $logwrited = False
 	Local $iSkipped = 0
-	$iProfileBeforeForceSwitch = 0;	Force SwitchAcc - Demen
+	$iProfileBeforeForceSwitch = 0;	Force SwitchAcc
 
 	If $g_iDebugDeadBaseImage = 1 Or $g_aiSearchEnableDebugDeadBaseImage > 0 Then
 		DirCreate($g_sProfileTempDebugPath & "\SkippedZombies\")
@@ -248,18 +248,32 @@ Func _VillageSearch() ;Control for searching a village that meets conditions
 			SetLog($GetResourcesTXT, $COLOR_SUCCESS, "Lucida Console", 7.5)
 			SetLog("      " & "Dead Base Found!", $COLOR_SUCCESS, "Lucida Console", 7.5)
 			$logwrited = True
-			$g_iMatchMode = $DB
-			ExitLoop
+			If $ichkDBMeetCollOutside = 1 Then
+				If AreCollectorsOutside($iDBMinCollOutsidePercent) Then
+					SetLog("Collectors are outside, match found !", $COLOR_SUCCESS, "Lucida Console", 7.5)
+					$g_iMatchMode = $DB
+					cmbCSVSpeed()
+					ExitLoop
+				Else
+					SetLog("Collectors are not outside, skipping search !", $COLOR_ERROR, "Lucida Console", 7.5)
+				EndIf
+			Else
+				$g_iMatchMode = $DB
+				cmbCSVSpeed()
+				ExitLoop
+			EndIf
 		ElseIf $match[$LB] And Not $dbBase Then
 			SetLog($GetResourcesTXT, $COLOR_SUCCESS, "Lucida Console", 7.5)
 			SetLog("      " & "Live Base Found!", $COLOR_SUCCESS, "Lucida Console", 7.5)
 			$logwrited = True
+			cmbCSVSpeed()
 			$g_iMatchMode = $LB
 			ExitLoop
 		ElseIf $match[$LB] And $g_bCollectorFilterDisable Then
 			SetLog($GetResourcesTXT, $COLOR_SUCCESS, "Lucida Console", 7.5)
 			SetLog("      " & "Live Base Found!*", $COLOR_SUCCESS, "Lucida Console", 7.5)
 			$logwrited = True
+			cmbCSVSpeed()
 			$g_iMatchMode = $LB
 			ExitLoop
 		ElseIf $g_abAttackTypeEnable[$TB] = 1 And ($g_iSearchCount >= $g_iAtkTBEnableCount) Then ; TH bully doesn't need the resources conditions
@@ -293,7 +307,7 @@ Func _VillageSearch() ;Control for searching a village that meets conditions
 		If $noMatchTxt <> "" Then
 			;SetLog(_PadStringCenter(" " & StringMid($noMatchTxt, 3) & " ", 50, "~"), $COLOR_DEBUG)
 			SetLog($GetResourcesTXT, $COLOR_BLACK, "Lucida Console", 7.5)
-			SetLog("      " & StringMid($noMatchTxt, 3), $COLOR_BLACK, "Lucida Console", 7.5)
+			SetLog("      " & StringMid($noMatchTxt, 3), $COLOR_ORANGE, "Lucida Console", 7.5)
 			$logwrited = True
 		EndIf
 
@@ -304,7 +318,7 @@ Func _VillageSearch() ;Control for searching a village that meets conditions
 		; Return Home on Search limit
 		If SearchLimit($iSkipped + 1) Then Return True
 
-		; Force SwitchAcc when long search - DEMEN
+		; Force SwitchAcc when long search
 		If $ichkForceSwitch = 1 And $iSkipped+1 >= $iForceSwitch And Mod(($iSkipped+1), _Min(10, Number($iForceSwitch))) = 0 Then
 			If UBound($aDonateProfile) >= 1 Then
 				Setlog("Reach search limit: " & $iForceSwitch & ". Force switch to Donate Account.")
@@ -345,7 +359,7 @@ Func _VillageSearch() ;Control for searching a village that meets conditions
 				If $i > 5 Or isProblemAffect(True) Then checkMainScreen()
 				ForceSwitchAcc($eForceSwitch, "SearchLimit")
 			EndIf
-		EndIf	; Force SwitchAcc when long search - DEMEN
+		EndIf	; Force SwitchAcc when long search
 
 		If checkAndroidReboot() = True Then
 			$g_bRestart = True

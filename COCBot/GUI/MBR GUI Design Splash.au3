@@ -28,7 +28,7 @@ Global $g_hSplashMutex = 0
 
 Func CreateSplashScreen()
 
-	Local $sSplashImg = $g_sLogoPath
+	Local $sSplashImg = $g_sLogoPath2
 	Local $hImage, $iX, $iY
 	Local $iT = 20 ; Top of logo (additional space)
 	Local $iB = 10 ; Bottom of logo (additional space)

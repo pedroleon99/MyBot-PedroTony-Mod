@@ -31,7 +31,7 @@ Func TrainRevamp()
 		Return
 	EndIf
 
-	If Not $g_bQuickTrainEnable And $ichkSimpleTrain = 0 Then	; SimpleTrain - Demen
+	If Not $g_bQuickTrainEnable And $ichkSimpleTrain = 0 Then	; No SimpleTrain
 		TrainRevampOldStyle()
 		Return
 	EndIf
@@ -44,12 +44,12 @@ Func TrainRevamp()
 
 	If Not $g_bRunState Then Return
 
-	If $ichkSimpleTrain = 1 Then				;	SimpleTrain - Demen
+	If $ichkSimpleTrain = 1 Then				;	SimpleTrain
 		SimpleTrain()
 		ResetVariables("donated")
 		EndGainCost("Train")
 		Return
-	EndIf										;	SimpleTrain - Demen
+	EndIf										;	SimpleTrain
 
 	If $g_bIsFullArmywithHeroesAndSpells Or ($g_CurrentCampUtilization = 0 And $g_bFirstStart) Then
 
@@ -105,7 +105,7 @@ Func CheckCamp($bOpenArmyWindow = False, $bCloseArmyWindow = False)
 	If $iReturnCamp = 1 Then
 		OpenTrainTabNumber($QuickTrainTAB, "CheckCamp()")
 		If _Sleep(1000) Then Return
-		TrainArmyNumber($g_bQuickTrainArmy)	; QuickTrainCombo (check box) - Demen
+		TrainArmyNumber($g_bQuickTrainArmy)	; QuickTrainCombo (check box)
 		If _Sleep(700) Then Return
 	EndIf
 	If $iReturnCamp = 0 Then
@@ -267,7 +267,7 @@ Func CheckIfArmyIsReady()
 			EndIf
 			$g_bIsFullArmywithHeroesAndSpells = False
 		EndIf
-		If $g_bFullArmy And $g_bCheckSpells And $bFullArmyHero Then ; ForceSwitch while waiting for CC - Demen
+		If $g_bFullArmy And $g_bCheckSpells And $bFullArmyHero Then ; ForceSwitch while waiting for CC - SwitchAcc
 			If $bFullArmyCCSpells = False OR $bFullArmyCCTroops = False Then $g_bWaitForCCTroopSpell = True
 		EndIf
 	Else
@@ -1907,14 +1907,14 @@ Func OpenTrainTabNumber($iTabNumber, $sWhereFrom)
 
 	If IsTrainPage() Then
 		Click($aTabNumber[$iTabNumber][0], $aTabNumber[$iTabNumber][1], 2, 200)
-		If _Sleep(700) Then Return			; Too slow with wait time 1.5s. Reduce to 0.7s. - SimpleTrain - Demen
+		If _Sleep(700) Then Return	; was 1500
 		If IsArmyWindow(False, $iTabNumber) Then Setlog("Opening " & $Message[$iTabNumber] & $g_iDebugSetlogTrain = 1 ? "(Called from " & $sWhereFrom & ")" : "", $COLOR_INFO)
 	Else
 		Setlog(" - Error Clicking On " & ($iTabNumber >= 0 And $iTabNumber < UBound($Message)) ? ($Message[$iTabNumber]) : ("Not selectable") & " Tab!", $COLOR_ERROR)
 	EndIf
 EndFunc   ;==>OpenTrainTabNumber
 
-Func TrainArmyNumber($Army) ; QuickTrainCombo (Checkbox) - Demen
+Func TrainArmyNumber($Army) ; QuickTrainCombo (Checkbox)
 
 	Local $a_TrainArmy[3][4] = [[784, 368, 0x71BB2B, 10], [784, 485, 0x74BD2D, 10], [784, 602, 0x73BD2D, 10]]
 	Setlog("Using Quick Train Tab.")
@@ -2059,7 +2059,7 @@ Func MakingDonatedTroops()
 			$Plural = 0
 			If $avDefaultTroopGroup[$i][4] > 0 Then
 				$RemainTrainSpace = GetOCRCurrent(48, 160)
-				If $RemainTrainSpace[0] = $RemainTrainSpace[1] And $ichkSimpleTrain <> 1 Then ; army camps full	;; SimpleTrain - Demen
+				If $RemainTrainSpace[0] = $RemainTrainSpace[1] And $ichkSimpleTrain <> 1 Then ; army camps full
 					;Camps Full All Donate Counters should be zero!!!!
 					For $j = 0 To UBound($avDefaultTroopGroup, 1) - 1
 						$avDefaultTroopGroup[$j][4] = 0
@@ -2069,7 +2069,7 @@ Func MakingDonatedTroops()
 
 				Local $iTroopIndex = TroopIndexLookup($avDefaultTroopGroup[$i][0], "MakingDonatedTroops")
 
-				If $avDefaultTroopGroup[$i][2] * $avDefaultTroopGroup[$i][4] <= $RemainTrainSpace[2] Or $ichkSimpleTrain = 1 Then ; Troopheight x donate troop qty <= avaible train space ;; ;; SimpleTrain - Demen
+				If $avDefaultTroopGroup[$i][2] * $avDefaultTroopGroup[$i][4] <= $RemainTrainSpace[2] Or $ichkSimpleTrain = 1 Then ; Troopheight x donate troop qty <= avaible train space
 					;Local $pos = GetTrainPos(TroopIndexLookup($avDefaultTroopGroup[$i][0]))
 					Local $howMuch = $avDefaultTroopGroup[$i][4]
 					If $avDefaultTroopGroup[$i][5] = "e" Then
@@ -2290,7 +2290,7 @@ Func IIf($Condition, $IfTrue, $IfFalse)
 		Return $IfFalse
 	EndIf
 EndFunc   ;==>IIf
-
+#cs
 Func _ArryRemoveBlanks(ByRef $aArray)
 	Local $iCounter = 0
 	For $i = 0 To UBound($aArray) - 1
@@ -2301,7 +2301,7 @@ Func _ArryRemoveBlanks(ByRef $aArray)
 	Next
 	ReDim $aArray[$iCounter]
 EndFunc   ;==>_ArryRemoveBlanks
-
+#ce
 Func ValidateSearchArmyResult($aSearchResult, $iIndex = 0)
 	If IsArray($aSearchResult) Then
 		If UBound($aSearchResult) > 0 Then

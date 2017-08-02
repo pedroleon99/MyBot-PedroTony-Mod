@@ -92,7 +92,7 @@
 #include "functions\Attack\Troops\DropOnEdges.au3"
 #include "functions\Attack\Troops\GetXPosOfArmySlot.au3"
 #include "functions\Attack\Troops\GetSlotIndexFromXPos.au3"
-#include "functions\Attack\Troops\LauchTroop.au3"
+#include "functions\Attack\Troops\LaunchTroop.au3"
 #include "functions\Attack\Troops\NameOfTroop.au3"
 #include "functions\Attack\Troops\OldDropTroop.au3"
 #include "functions\Attack\Troops\ReadTroopQuantity.au3"
@@ -281,8 +281,8 @@
 #include "functions\Other\Api.au3"
 #include "functions\Other\ApiClient.au3"
 
-;Demen Mod
-#include "MOD_Demen\Functions_Demen.au3"
+; Team AiO MOD++ (2017)
+#include "Team__AiO__MOD++\Functions_Team__AiO__MOD++.au3"
 
 ; OLD CODE
 

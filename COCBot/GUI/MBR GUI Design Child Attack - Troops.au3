@@ -77,7 +77,6 @@ Global $g_ahImgSpellsOrder[$eSpellCount] = [0,0,0,0,0,0,0,0,0,0]
 Global $g_hBtnSpellsOrderSet = 0, $g_ahImgSpellsOrderSet = 0
 Global $g_hBtnRemoveSpells
 
-
 ; Options sub-tab
 Global $g_hChkCloseWhileTraining = 0, $g_hChkCloseWithoutShield = 0, $g_hChkCloseEmulator = 0, $g_hChkSuspendComputer = 0, $g_hChkRandomClose = 0, $g_hRdoCloseWaitExact = 0, _
 	   $g_hRdoCloseWaitRandom = 0, $g_hCmbCloseWaitRdmPercent = 0, $g_hCmbMinimumTimeClose = 0, $g_hSldTrainITDelay = 0, $g_hChkTrainAddRandomDelayEnable = 0, $g_hTxtAddRandomDelayMin = 0, _
@@ -85,6 +84,9 @@ Global $g_hChkCloseWhileTraining = 0, $g_hChkCloseWithoutShield = 0, $g_hChkClos
 
 Global $g_hLblCloseWaitRdmPercent = 0, $g_hLblCloseWaitingTroops = 0, $g_hLblSymbolWaiting = 0, $g_hLblWaitingInMinutes = 0, $g_hLblTrainITDelay = 0, $g_hLblTrainITDelayTime = 0, _
 	   $g_hLblAddDelayIdlePhaseBetween = 0, $g_hLblAddDelayIdlePhaseSec = 0, $g_hPicCloseWaitTrain = 0, $g_hPicCloseWaitStop = 0, $g_hPicCloseWaitExact = 0
+
+; Max logout time
+Global $chkTrainLogoutMaxTime = 0, $txtTrainLogoutMaxTime = 4, $lblTrainLogoutMaxTime
 
 Func CreateAttackTroops()
    $g_hGUI_TRAINARMY = _GUICreate("", $g_iSizeWGrpTab2, $g_iSizeHGrpTab2, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $g_hGUI_ATTACK)
@@ -645,31 +647,31 @@ Func CreateTroopsSpellsSubTab()
 ;========== Adding GUI for SimpleTrain - Demen ==============
 	$x = 10
 	$y = 363
-	GUICtrlCreateGroup("Simple Train (do not empty barracks)", $x - 5, $y, $g_iSizeWGrpTab3, 38)
+	GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", "Group_03", "Simple Train (do not empty barracks)"), $x - 5, $y, $g_iSizeWGrpTab3, 38)
 		$x += 7
 		$y += 16
-			$g_hchkSimpleTrain = GUICtrlCreateCheckbox("Always train queue", $x, $y, -1, 15)
+			$g_hchkSimpleTrain = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", "chkSimpleTrain", "Always train queue"), $x, $y, -1, 15)
 				GUICtrlSetOnEvent(-1, "chkSimpleTrain")
-				_GUICtrlSetTip(-1, 	"Train 2 sets of army to make full camp & full queue" _
-									& @CRLF & "Only delete queued troops or spells if the queue is not full" _
-									& @CRLF & "Not delete training troops up to full camp capacity")
+				_GUICtrlSetTip(-1, 	GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", "chkSimpleTrain_Info_01", "Train 2 sets of army to make full camp & full queue") _
+									& @CRLF & GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", "chkSimpleTrain_Info_02", "Only delete queued troops or spells if the queue is not full") _
+									& @CRLF & GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", "chkSimpleTrain_Info_03", "Not delete training troops up to full camp capacity"))
 		$x += 130
-			$g_hchkPreciseTroops = GUICtrlCreateCheckbox("Precise troops", $x, $y, -1, 15)
+			$g_hchkPreciseTroops = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", "chkPreciseTroops", "Precise troops"), $x, $y, -1, 15)
 				GUICtrlSetOnEvent(-1, "chkPreciseTroops")
-				_GUICtrlSetTip(-1, 	"Check precision of troops & spells before training." _
-									& @CRLF & "Will remove wrong troops or spells if any")
+				_GUICtrlSetTip(-1, 	GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", "chkPreciseTroops_Info_01", "Check precision of troops & spells before training.") _
+									& @CRLF & GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", "chkPreciseTroops_Info_02", "Will remove wrong troops or spells if any"))
 		$x += 103
-			$g_hchkFillArcher = GUICtrlCreateCheckbox("Fill Archer:", $x, $y, -1, 15)
+			$g_hchkFillArcher = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", "chkFillArcher", "Fill Archer:"), $x, $y, -1, 15)
 				GUICtrlSetState(-1, $GUI_DISABLE)
 				GUICtrlSetOnEvent(-1, "chkFillArcher")
-				_GUICtrlSetTip(-1, "Train some archers to top-up the camp or queue if it is nearly full")
+				_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", "chkFillArcher_Info_01", "Train some archers to top-up the camp or queue if it is nearly full"))
 			$g_htxtFillArcher = GUICtrlCreateInput("5", $x + 70, $y-1, 20, 16, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 				GUICtrlSetState(-1, $GUI_DISABLE)
 				GUICtrlSetLimit(-1, 2)
 		$x += 110
-			$g_hchkFillEQ = GUICtrlCreateCheckbox("Fill 1 EQ", $x, $y, -1, 15)
+			$g_hchkFillEQ = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", "chkFillEQ", "Fill 1 EQ"), $x, $y, -1, 15)
 				GUICtrlSetState(-1, $GUI_DISABLE)
-				_GUICtrlSetTip(-1, "Brew 1 EarthQuake Spell to top-up the spell camp or queue")
+				_GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Troops", "chkFillEQ_Info_01", "Brew 1 EarthQuake Spell to top-up the spell camp or queue"))
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 ;========== Adding GUI for SimpleTrain - Demen ==============
 
@@ -783,7 +785,7 @@ Func  CreateBoostSubTab()
 	   $g_hChkBoostBarracksHours[11] = GUICtrlCreateCheckbox("", $x + 195, $y, 15, 15)
 	   GUICtrlSetState(-1, $GUI_CHECKED)
 	   $g_hChkBoostBarracksHoursE1 = GUICtrlCreateCheckbox("", $x + 211, $y + 1, 13, 13, BitOR($BS_PUSHLIKE, $BS_ICON))
-		  GUICtrlSetImage(-1, $g_sLibIconPath, $eIcnGoldStar, 0)
+		  _GUICtrlSetImage(-1, $g_sLibIconPath, $eIcnGoldStar, 0)
 		  GUICtrlSetState(-1, $GUI_UNCHECKED)
 		  _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR Global GUI Design", "Clear_set_row_of_boxes", "This button will clear or set the entire row of boxes"))
 		  GUICtrlSetOnEvent(-1, "chkBoostBarracksHoursE1")
@@ -815,7 +817,7 @@ Func  CreateBoostSubTab()
 	   $g_hChkBoostBarracksHours[23] = GUICtrlCreateCheckbox("", $x + 195, $y, 15, 15)
 	   GUICtrlSetState(-1, $GUI_CHECKED)
 	   $g_hChkBoostBarracksHoursE2 = GUICtrlCreateCheckbox("", $x + 211, $y + 1, 13, 13, BitOR($BS_PUSHLIKE, $BS_ICON))
-		  GUICtrlSetImage(-1, $g_sLibIconPath, $eIcnGoldStar, 0)
+		  _GUICtrlSetImage(-1, $g_sLibIconPath, $eIcnGoldStar, 0)
 		  GUICtrlSetState(-1, $GUI_UNCHECKED)
 		  _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR Global GUI Design", "Clear_set_row_of_boxes", -1))
 		  GUICtrlSetOnEvent(-1, "chkBoostBarracksHoursE2")
@@ -946,7 +948,7 @@ Func CreateOptionsSubTab()
 
    Local $sTxtTip = ""
    Local $x = 25, $y = 45
-   GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "Group_01", "Training Idle Time"), $x - 20, $y - 20, 151, 294)
+   GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "Group_01", "Training Idle Time"), $x - 20, $y - 20, 171, 315)
 	   $g_hChkCloseWhileTraining = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "ChkCloseWhileTraining", "Close While Training"), $x - 12, $y, 140, -1)
 	   GUICtrlSetState(-1, $GUI_CHECKED)
 	   _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "ChkCloseWhileTraining_Info_01", "Option will exit CoC game for time required to complete TROOP training when SHIELD IS ACTIVE") & @CRLF & _
@@ -958,7 +960,7 @@ Func CreateOptionsSubTab()
 	   $g_hChkCloseWithoutShield = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "ChkCloseWithoutShield", "Without Shield"), $x + 18, $y + 1, 110, -1)
 	   $sTxtTip = GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "ChkCloseWithoutShield_Info_01", "Option will ALWAYS close CoC for idle training time and when NO SHIELD IS ACTIVE!") & @CRLF & _
 				  GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "ChkCloseWithoutShield_Info_02", "Note - You can be attacked and lose trophies when this option is enabled!")
-	   GUICtrlSetState(-1, $GUI_UNCHECKED)
+	   GUICtrlSetState(-1, $GUI_CHECKED)
 	   _GUICtrlSetTip(-1, $sTxtTip)
 	   GUICtrlSetOnEvent(-1, "chkCloseWaitTrain")
 	   $g_hPicCloseWaitTrain = _GUICtrlCreateIcon($g_sLibIconPath, $eIcnNoShield, $x - 13, $y, 24, 24)
@@ -993,7 +995,7 @@ Func CreateOptionsSubTab()
    $y += 28
 	   $g_hRdoCloseWaitExact = GUICtrlCreateRadio(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "RdoCloseWaitExact", "Exact Time"), $x + 18, $y + 1, 110, -1)
 	   _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "RdoCloseWaitExact_Info_01", "Select to wait exact time required for troops to complete training"))
-	   GUICtrlSetState(-1, $GUI_UNCHECKED)
+	   GUICtrlSetState(-1, $GUI_CHECKED)
 	   GUICtrlSetOnEvent(-1, "btnCloseWaitRandom")
 	   $g_hPicCloseWaitExact = _GUICtrlCreateIcon($g_sLibIconPath, $eIcnHourGlass, $x - 13, $y + 13, 24, 24)
 	   _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "RdoCloseWaitExact_Info_02", "Select how much time to wait when feature enables"))
@@ -1001,7 +1003,7 @@ Func CreateOptionsSubTab()
    $y += 24
 	   $g_hRdoCloseWaitRandom = GUICtrlCreateRadio(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "RdoCloseWaitRandom", "Random Time"), $x + 18, $y + 1, 110, -1)
 	   _GUICtrlSetTip(-1, GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "RdoCloseWaitRandom_Info_01", "Select to ADD a random extra wait time like human who forgets to clash"))
-	   GUICtrlSetState(-1, $GUI_CHECKED)
+	   GUICtrlSetState(-1, $GUI_UNCHECKED)
 	   GUICtrlSetOnEvent(-1, "btnCloseWaitRandom")
 
    $y += 28
@@ -1030,10 +1032,22 @@ Func CreateOptionsSubTab()
 	   _GUICtrlSetTip(-1, $sTxtTip)
 	   $g_hLblWaitingInMinutes = GUICtrlCreateLabel(GetTranslatedFileIni("MBR Global GUI Design", "min.", "min."), $x + 84, $y + 3, -1, -1)
 	   _GUICtrlSetTip(-1, $sTxtTip)
+
+	; Max logout time (mandryd)
+	$y += 28
+	$chkTrainLogoutMaxTime = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "TrainLogoutMaxTime", "Max Logout Time") & ": ", $x - 14, $y, -1, -1)
+		$sTxtTip = GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "TrainLogoutMaxTime_Info_01", "Only allow logout for a maximum amount of time")
+		_GUICtrlSetTip(-1, $sTxtTip)
+		GUICtrlSetState(-1, $GUI_UNCHECKED)
+		GUICtrlSetOnEvent(-1, "chkTrainLogoutMaxTime")
+	$txtTrainLogoutMaxTime = GUICtrlCreateInput("4", $x + 95, $y, 25, 18, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+		GUICtrlSetTip(-1, $sTxtTip)
+		GUICtrlSetLimit(-1, 2)
+	$lblTrainLogoutMaxTime = GUICtrlCreateLabel("min.", $x + 127, $y + 2, -1, -1)
    GUICtrlCreateGroup("", -99, -99, 1, 1)
 
-   $y += 53
-   GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "Group_02", "Train Click Timing"), $x - 20, $y - 20, 151, 60)
+   $y += 50
+   GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "Group_02", "Train Click Timing"), $x - 20, $y - 20, 171, 60)
 	   $g_hLblTrainITDelay = GUICtrlCreateLabel(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "LblTrainITDelay", "delay"), $x - 10, $y, 37, 30)
 		  $sTxtTip = GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "LblTrainITDelay_Info_01", "Increase the delay if your PC is slow or to create human like training click speed")
 		  _GUICtrlSetTip(-1, $sTxtTip)
@@ -1049,14 +1063,14 @@ Func CreateOptionsSubTab()
 		  GUICtrlSetOnEvent(-1, "sldTrainITDelay")
    GUICtrlCreateGroup("", -99, -99, 1, 1)
 
-   $x = 25 + 151 + 5
+   $x = 55 + 151 + 5
    $y = 45
    GUICtrlCreateGroup(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "Group_03", "Training Add Random Delay"), $x - 20, $y - 20, 173, 81)
    $y += 15
 	   $g_hChkTrainAddRandomDelayEnable = GUICtrlCreateCheckbox(GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "ChkTrainAddRandomDelayEnable", "Add Random Delay"),$x + 18, $y - 11, 130, -1)
 	   $sTxtTip = GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "ChkTrainAddRandomDelayEnable_Info_01", "Add random delay between two calls of train army.")& @CRLF & _
 				  GetTranslatedFileIni("MBR GUI Design Child Attack - Troops_Options", "ChkTrainAddRandomDelayEnable_Info_02", "This option reduces the calls to the training window  humanizing the bot spacing calls each time with a causal interval chosen between the minimum and maximum values indicated below.")
-	   GUICtrlSetState(-1, $GUI_CHECKED)
+	   GUICtrlSetState(-1, $GUI_UNCHECKED)
 	   _GUICtrlSetTip(-1, $sTxtTip)
 	   GUICtrlSetOnEvent(-1, "chkAddDelayIdlePhaseEnable")
 	   _GUICtrlCreateIcon($g_sLibIconPath, $eIcnDelay, $x - 13, $y - 13, 24, 24)

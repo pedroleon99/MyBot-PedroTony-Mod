@@ -33,11 +33,13 @@ Func chkRequestCCHours()
 
 	If GUICtrlRead($g_hChkRequestTroopsEnable) = $GUI_CHECKED Then
 		GUICtrlSetState($g_hTxtRequestCC, $GUI_SHOW + $GUI_ENABLE)
+		GUICtrlSetState($chkReqCCFirst, $GUI_SHOW + $GUI_ENABLE)
 		For $i = $g_hLblRequestCChour To $g_hLblRequestCCHoursPM
 			GUICtrlSetState($i, $GUI_ENABLE)
 		Next
 	Else
 		GUICtrlSetState($g_hTxtRequestCC, $GUI_SHOW + $GUI_DISABLE)
+		GUICtrlSetState($chkReqCCFirst, $GUI_SHOW + $GUI_DISABLE)
 		For $i = $g_hLblRequestCChour To $g_hLblRequestCCHoursPM
 			GUICtrlSetState($i, $GUI_DISABLE)
 		Next
@@ -118,3 +120,11 @@ Func chkDonateHoursE2()
 	Sleep(300)
 	GUICtrlSetState($g_ahChkDonateHoursE2, $GUI_UNCHECKED)
 EndFunc   ;==>chkDonateHoursE2
+
+Func chkReqCCFirst()
+	If GUICtrlRead($chkReqCCFirst) = $GUI_CHECKED Then
+		$g_bReqCCFirst = True
+	Else
+		$g_bReqCCFirst = False
+	EndIf
+EndFunc   ;==>chkReqCCFirst
