@@ -31,7 +31,7 @@ Func TrainRevamp()
 		Return
 	EndIf
 
-	If Not $g_bQuickTrainEnable And $ichkSmartTrain = 0 Then	; SmartTrain - Demen
+	If Not $g_bQuickTrainEnable And $ichkSmartTrain = 0 Then	; SmartTrain - Demen_ST_#9002
 		TrainRevampOldStyle()
 		Return
 	EndIf
@@ -44,12 +44,12 @@ Func TrainRevamp()
 
 	If Not $g_bRunState Then Return
 
-	If $ichkSmartTrain = 1 Then				;	SmartTrain - Demen
+	If $ichkSmartTrain = 1 Then				;	SmartTrain - Demen_ST_#9002
 		SmartTrain()
 		ResetVariables("donated")
 		EndGainCost("Train")
 		Return
-	EndIf									;	SmartTrain
+	EndIf
 
 	If $g_bIsFullArmywithHeroesAndSpells Or ($g_CurrentCampUtilization = 0 And $g_bFirstStart) Then
 
@@ -105,7 +105,7 @@ Func CheckCamp($bOpenArmyWindow = False, $bCloseArmyWindow = False)
 	If $iReturnCamp = 1 Then
 		OpenTrainTabNumber($QuickTrainTAB, "CheckCamp()")
 		If _Sleep(1000) Then Return
-		TrainArmyNumber($g_bQuickTrainArmy)	; QuickTrainCombo (check box)
+		TrainArmyNumber($g_bQuickTrainArmy)	; QuickTrainCombo (check box) - Demen_QT_#9006
 		If _Sleep(700) Then Return
 	EndIf
 	If $iReturnCamp = 0 Then
@@ -215,6 +215,7 @@ Func CheckIfArmyIsReady()
 	Local $bFullArmyCCSpells = False, $bFullArmyCCTroops = False
 	Local $iTotalSpellsToBrew = 0
 	Local $bFullArmyHero = False
+	$g_bWaitForCCTroopSpell = False ; reset for Waiting CC in SwitchAcc - Demen_SA_#9001
 
 	If Not OpenArmyWindow() Then Return
 	If _Sleep(250) Then Return
@@ -267,7 +268,7 @@ Func CheckIfArmyIsReady()
 			EndIf
 			$g_bIsFullArmywithHeroesAndSpells = False
 		EndIf
-		If $g_bFullArmy And $g_bCheckSpells And $bFullArmyHero Then ; ForceSwitch while waiting for CC - SwitchAcc
+		If $g_bFullArmy And $g_bCheckSpells And $bFullArmyHero Then ; ForceSwitch while waiting for CC in SwitchAcc - Demen_SA_#9001
 			If $bFullArmyCCSpells = False OR $bFullArmyCCTroops = False Then $g_bWaitForCCTroopSpell = True
 		EndIf
 	Else
@@ -327,6 +328,8 @@ Func IsFullClanCastleTroops()
 	If Not $g_abSearchCastleTroopsWaitEnable[$DB] And Not $g_abSearchCastleTroopsWaitEnable[$LB] Then
 		Return True
 	EndIf
+
+	CheckCC(False); Demen_CC_#9004
 
 	Local $bColCheck = _ColorCheck(_GetPixelColor(24, 470, True), Hex(0x93C230, 6), 30)
 
@@ -567,7 +570,7 @@ Func CompareCCSpellWithGUI($CCSpell1, $CCSpell2, $CastleCapacity)
 						$aShouldRemove[0] = $CCSpell1[0][3]
 					EndIf
 
-					If $CastleCapacity = 2 and $g_aiSearchCastleSpellsWaitRegular[$Mode] > 5 Then
+                    If $CastleCapacity = 2 and $g_aiSearchCastleSpellsWaitRegular[$Mode] > 5 And $CCSpell2 <> "" Then ; Fix bot crash - (Other mod's Code ref. Demen_OT_#9009)
 						If $sCCSpell2 <> $CCSpell2[0][0] And $sCCSpell2 <> "Any" Then
 							$aShouldRemove[1] = $CCSpell2[0][3]
 						EndIf
@@ -596,13 +599,12 @@ EndFunc   ;==>CompareCCSpellWithGUI
 Func GetCurCCSpell($iSpellSlot = 1)
 	If Not $g_bRunState Then Return
 	Local $directory = @ScriptDir & "\imgxml\ArmySpells"
-	; 508 and 615 ( sometimes the spell stays on the middle )
-	Local $x1 = 508, $x2 = 615, $y1 = 500, $y2 = 570
+	Local $x1 = 508, $x2 = 615, $y1 = 500, $y2 = 570 ; Fix when spell stays on the middle sometimes - (Other mod's Code ref. Demen_OT_#9009)
 
 	If $iSpellSlot = 1 Then
 		;Nothing
 	ElseIf $iSpellSlot = 2 Then
-		$x1 = 600
+		$x1 = 600 ; Fix when spell stays on the middle sometimes - (Other mod's Code ref. Demen_OT_#9009)
 		$x2 = 660
 	Else
 		If $g_iDebugSetlog = 1 Then SetLog("GetCurCCSpell() called with the wrong argument!", $COLOR_ERROR)
@@ -1510,7 +1512,7 @@ Func OpenArmyWindow()
 	While IsArmyWindow(False, $ArmyTAB) = False
 		If _sleep($DELAYTRAIN4) Then Return
 		$iCount += 1
-		If $iCount = 5 And IsMainPage() Then
+		If $iCount = 5 And IsMainPage(1) Then
 			If _Sleep($DELAYTRAIN4) Then Return ; wait before click
 			If $g_iDebugSetlogTrain Then SetLog("Click $aArmyTrainButton", $COLOR_DEBUG)
 			If Not $g_bUseRandomClick Then
@@ -1867,10 +1869,22 @@ Func ResetVariables($sArmyType = "")
 			$g_aiDonateTroops[$i] = 0
 			If _Sleep($DELAYTRAIN6) Then Return ; '20' just to Pause action
 		Next
-		For $i = 0 To $eSpellCount - 1			; fixed making wrong donated spells - Demen
+		For $i = 0 To $eSpellCount - 1			; fixed making wrong donated spells - (Other mod's Code ref. Demen_OT_#9009)
 			If $g_bRunState = False Then Return
 			$g_aiDonateSpells[$i] = 0
 			If _Sleep($DELAYTRAIN6) Then Return
+		Next
+	EndIf
+
+	; CheckCC Troops - Demen_CC_#9004
+	If $sArmyType = "CCTroops" Or $sArmyType = "all" Then
+		For $i = 0 To $eTroopCount - 1
+			If Not $g_bRunState Then Return
+			$g_aiCCTroops[$i] = 0
+			If _Sleep($DELAYTRAIN6) Then Return ; '20' just to Pause action
+			If $i >= $eSpellCount Then ContinueLoop
+			$g_aiCCSpells[$i] = 0
+			If _Sleep($DELAYTRAIN6) Then Return ; '20' just to Pause action
 		Next
 	EndIf
 
@@ -1887,14 +1901,14 @@ Func OpenTrainTabNumber($iTabNumber, $sWhereFrom)
 
 	If IsTrainPage() Then
 		Click($aTabNumber[$iTabNumber][0], $aTabNumber[$iTabNumber][1], 2, 200)
-		If _Sleep(700) Then Return	; was 1500
+		If _Sleep(700) Then Return			; Too slow with wait time 1.5s. Reduce to 0.7s. - SmartTrain - Demen_ST_#9002
 		If IsArmyWindow(False, $iTabNumber) Then Setlog("Opening " & $Message[$iTabNumber] & $g_iDebugSetlogTrain = 1 ? "(Called from " & $sWhereFrom & ")" : "", $COLOR_INFO)
 	Else
 		Setlog(" - Error Clicking On " & ($iTabNumber >= 0 And $iTabNumber < UBound($Message)) ? ($Message[$iTabNumber]) : ("Not selectable") & " Tab!", $COLOR_ERROR)
 	EndIf
 EndFunc   ;==>OpenTrainTabNumber
 
-Func TrainArmyNumber($Army, $iMultiClick = 1) ; QuickTrainCombo (Checkbox)
+Func TrainArmyNumber($Army, $iMultiClick = 1) ; QuickTrainCombo (Checkbox) - Demen_QT_#9006
 
 	Local $a_TrainArmy[3][4] = [[784, 368, 0x71BB2B, 10], [784, 485, 0x74BD2D, 10], [784, 602, 0x73BD2D, 10]]
 	Setlog("Using Quick Train Tab.")
@@ -1953,7 +1967,6 @@ Func DeleteQueued($sArmyTypeQueued, $iOffsetQueued = 802)
 EndFunc   ;==>DeleteQueued
 
 Func Slot($x = 0, $sArmyType = "")
-
 	If $g_bRunState = False Then Return
 	Switch $x
 		Case $x < 94
@@ -2043,7 +2056,7 @@ Func MakingDonatedTroops()
 			$Plural = 0
 			If $avDefaultTroopGroup[$i][4] > 0 Then
 				$RemainTrainSpace = GetOCRCurrent(48, 160)
-				If $RemainTrainSpace[0] = $RemainTrainSpace[1] And $ichkSmartTrain <> 1 Then ; army camps full
+				If $RemainTrainSpace[0] = $RemainTrainSpace[1] And $ichkSmartTrain <> 1 Then ; army camps full	;; SmartTrain - Demen_ST_#9002
 					;Camps Full All Donate Counters should be zero!!!!
 					For $j = 0 To UBound($avDefaultTroopGroup, 1) - 1
 						$avDefaultTroopGroup[$j][4] = 0
@@ -2053,7 +2066,7 @@ Func MakingDonatedTroops()
 
 				Local $iTroopIndex = TroopIndexLookup($avDefaultTroopGroup[$i][0], "MakingDonatedTroops")
 
-				If $avDefaultTroopGroup[$i][2] * $avDefaultTroopGroup[$i][4] <= $RemainTrainSpace[2] Or $ichkSmartTrain = 1 Then ; Troopheight x donate troop qty <= avaible train space
+				If $avDefaultTroopGroup[$i][2] * $avDefaultTroopGroup[$i][4] <= $RemainTrainSpace[2] Or $ichkSmartTrain = 1 Then ; Troopheight x donate troop qty <= avaible train space ;; SmartTrain - Demen_ST_#9002
 					;Local $pos = GetTrainPos(TroopIndexLookup($avDefaultTroopGroup[$i][0]))
 					Local $howMuch = $avDefaultTroopGroup[$i][4]
 					If $avDefaultTroopGroup[$i][5] = "e" Then
@@ -2274,7 +2287,7 @@ Func IIf($Condition, $IfTrue, $IfFalse)
 		Return $IfFalse
 	EndIf
 EndFunc   ;==>IIf
-#cs
+
 Func _ArryRemoveBlanks(ByRef $aArray)
 	Local $iCounter = 0
 	For $i = 0 To UBound($aArray) - 1
@@ -2285,7 +2298,7 @@ Func _ArryRemoveBlanks(ByRef $aArray)
 	Next
 	ReDim $aArray[$iCounter]
 EndFunc   ;==>_ArryRemoveBlanks
-#ce
+
 Func ValidateSearchArmyResult($aSearchResult, $iIndex = 0)
 	If IsArray($aSearchResult) Then
 		If UBound($aSearchResult) > 0 Then

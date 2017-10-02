@@ -278,8 +278,8 @@
 #include "functions\Other\Api.au3"
 #include "functions\Other\ApiClient.au3"
 
-; Team AiO MOD++ (2017)
-#include "Team__AiO__MOD++\Functions_Team__AiO__MOD++.au3"
+;Demen Mod - Demen_GE_#9000
+#include "MOD_Demen\Functions_Demen.au3"
 
 ; OLD CODE
 

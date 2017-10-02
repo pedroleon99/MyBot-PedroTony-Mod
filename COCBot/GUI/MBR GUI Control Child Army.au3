@@ -16,9 +16,9 @@
 
 Func chkUseQTrain()
 	If GUICtrlRead($g_hChkUseQuickTrain) = $GUI_CHECKED Then
-		_GUI_Value_STATE("ENABLE", $g_ahChkArmy[0] & "#" & $g_ahChkArmy[1] & "#" & $g_ahChkArmy[2])		; QuickTrainCombo (checkbox) - Demen
-		chkQuickTrainCombo()																			; QuickTrainCombo (checkbox) - Demen
-		If GUICtrlRead($g_hchkSmartTrain) = $GUI_CHECKED Then 											; Precise troops of SmartTrain - Demen
+		_GUI_Value_STATE("ENABLE", $g_ahChkArmy[0] & "#" & $g_ahChkArmy[1] & "#" & $g_ahChkArmy[2])		; QuickTrainCombo (checkbox) - Demen_QT_#9006
+		chkQuickTrainCombo()																			; QuickTrainCombo (checkbox) - Demen_QT_#9006
+		If GUICtrlRead($g_hchkSmartTrain) = $GUI_CHECKED Then 											; Precise troops of SmartTrain - Demen_ST_#9002
 			GUICtrlSetState($g_hchkPreciseTroops, $GUI_UNCHECKED)
 			GUICtrlSetState($g_hchkPreciseTroops, $GUI_DISABLE)
 		EndIf
@@ -31,34 +31,15 @@ Func chkUseQTrain()
 		GUICtrlSetData($g_hLblElixirCostSpell, "0")
 		GUICtrlSetData($g_hLblDarkCostSpell, "0")
 	Else
-		_GUI_Value_STATE("DISABLE", $g_ahChkArmy[0] & "#" & $g_ahChkArmy[1] & "#" & $g_ahChkArmy[2])	; QuickTrainCombo (checkbox) - Demen
+		_GUI_Value_STATE("DISABLE", $g_ahChkArmy[0] & "#" & $g_ahChkArmy[1] & "#" & $g_ahChkArmy[2])	; QuickTrainCombo (checkbox) - Demen_QT_#9006
 		chkQuickTrainCombo()
-		chkSmartTrain()																				; Precise troops of SmartTrain - Demen
+		chkSmartTrain()																				; Precise troops of SmartTrain - Demen_ST_#9002
 		_GUI_Value_STATE("ENABLE", $grpTrainTroops)
 		_GUI_Value_STATE("ENABLE", $grpCookSpell)
 		lblTotalCountTroop1()
 		TotalSpellCountClick()
 	EndIf
 EndFunc   ;==>chkUseQTrain
-
-; QuickTrainCombo (Demen) - Added By Demen
-Func chkQuickTrainCombo()
-	If GUICtrlRead($g_ahChkArmy[0]) = $GUI_UNCHECKED And GUICtrlRead($g_ahChkArmy[1]) = $GUI_UNCHECKED And GUICtrlRead($g_ahChkArmy[2]) = $GUI_UNCHECKED Then
-		GUICtrlSetState($g_ahChkArmy[0], $GUI_CHECKED)
-		ToolTip("QuickTrainCombo: " & @CRLF & "At least 1 Army Check is required! Default Army1.")
-		Sleep(2000)
-		ToolTip('')
-	EndIf
-
-	If GUICtrlRead($g_ahChkArmy[2]) = $GUI_CHECKED And GUICtrlRead($g_hChkUseQuickTrain) = $GUI_CHECKED Then
-		_GUI_Value_STATE("HIDE", $g_hLblRemoveArmy & "#" & $g_hBtnRemoveArmy)
-		_GUI_Value_STATE("SHOW", $g_hChkMultiClick)
-	Else
-		_GUI_Value_STATE("HIDE", $g_hChkMultiClick)
-		_GUI_Value_STATE("SHOW", $g_hLblRemoveArmy & "#" & $g_hBtnRemoveArmy)
-	EndIf
-
-EndFunc   ;==>chkQuickTrainCombo
 
 Func SetComboTroopComp()
 	Local $bWasRedraw = SetRedrawBotWindow(False, Default, Default, Default, "SetComboTroopComp")
@@ -289,13 +270,11 @@ Func chkCloseWaitEnable()
 	If GUICtrlRead($g_hChkCloseWhileTraining) = $GUI_CHECKED Then
 		$g_bCloseWhileTrainingEnable = True
 		_GUI_Value_STATE("ENABLE", $groupCloseWhileTraining)
-		_GUI_Value_STATE("ENABLE", $g_hLblCloseWaitingTroops & "#" & $g_hCmbMinimumTimeClose & "#" & $g_hLblSymbolWaiting & "#" & $g_hLblWaitingInMinutes & "#" & $chkTrainLogoutMaxTime)
-		chkTrainLogoutMaxTime()
+		_GUI_Value_STATE("ENABLE", $g_hLblCloseWaitingTroops & "#" & $g_hCmbMinimumTimeClose & "#" & $g_hLblSymbolWaiting & "#" & $g_hLblWaitingInMinutes)
 	Else
 		$g_bCloseWhileTrainingEnable = False
 		_GUI_Value_STATE("DISABLE", $groupCloseWhileTraining)
-		_GUI_Value_STATE("DISABLE", $g_hLblCloseWaitingTroops & "#" & $g_hCmbMinimumTimeClose & "#" & $g_hLblSymbolWaiting & "#" & $g_hLblWaitingInMinutes & "#" & $chkTrainLogoutMaxTime & "#" & $txtTrainLogoutMaxTime & "#" & $lblTrainLogoutMaxTime)
-		_GUI_Value_STATE("UNCHECKED", $chkTrainLogoutMaxTime)
+		_GUI_Value_STATE("DISABLE", $g_hLblCloseWaitingTroops & "#" & $g_hCmbMinimumTimeClose & "#" & $g_hLblSymbolWaiting & "#" & $g_hLblWaitingInMinutes)
 	EndIf
 	If GUICtrlRead($g_hChkRandomClose) = $GUI_CHECKED Then
 		GUICtrlSetState($g_hChkCloseEmulator, BitOR($GUI_DISABLE, $GUI_UNCHECKED))
@@ -307,14 +286,6 @@ Func chkCloseWaitEnable()
 		EndIf
 	EndIf
 EndFunc   ;==>chkCloseWaitEnable
-
-Func chkTrainLogoutMaxTime()
-	If GUICtrlRead($chkTrainLogoutMaxTime) = $GUI_CHECKED Then
-		_GUI_Value_STATE("ENABLE", $txtTrainLogoutMaxTime & "#" & $lblTrainLogoutMaxTime)
-	Else
-		_GUI_Value_STATE("DISABLE", $txtTrainLogoutMaxTime & "#" & $lblTrainLogoutMaxTime)
-	EndIf
-EndFunc   ;==>chkTrainLogoutMaxTime
 
 Func chkCloseWaitTrain()
 	$g_bCloseWithoutShield = (GUICtrlRead($g_hChkCloseWithoutShield) = $GUI_CHECKED)

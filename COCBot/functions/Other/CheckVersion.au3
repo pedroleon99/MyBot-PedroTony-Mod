@@ -14,9 +14,13 @@
 ; ===============================================================================================================================
 #include-once
 
-;~ Global $g_sLastVersion = "" ;latest version from GIT
-;~ Global $g_sLastMessage = "" ;message for last version
-;~ Global $g_sOldVersionMessage = "" ;warning message for old bot
+Global $g_sLastVersion = "" ;latest version from GIT
+Global $g_sLastMessage = "" ;message for last version
+Global $g_sOldVersionMessage = "" ;warning message for old bot
+; Check Version
+Global $g_sLastModversion = "" ;latest version from GIT
+Global $g_sLastModmessage = "" ;message for last version
+Global $g_sOldModversmessage = "" ;warning message for old bot
 
 Func CheckVersion()
 	If $g_bCheckVersion Then

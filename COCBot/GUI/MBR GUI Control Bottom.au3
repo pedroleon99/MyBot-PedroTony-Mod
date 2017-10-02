@@ -30,7 +30,7 @@ Func Initiate()
 			SetLogCentered(" Search Mode Start ", Default, $COLOR_SUCCESS)
 		EndIf
 		SetLogCentered("  Current Profile: " & $g_sProfileCurrentName & " ", "-", $COLOR_INFO)
-		If $g_iDebugSetlog = 1 Or $g_iDebugOcr = 1 Or $g_iDebugRedArea = 1 Or $g_bDevMode = True Or $g_iDebugImageSave = 1 Or $g_iDebugBuildingPos = 1 Or $g_iDebugOCRdonate = 1 Or $g_iDebugAttackCSV = 1 Then
+		If $g_iDebugSetlog = 1 Or $g_iDebugOcr = 1 Or $g_iDebugRedArea = 1 Or $g_iDebugImageSave = 1 Or $g_iDebugBuildingPos = 1 Or $g_iDebugOCRdonate = 1 Or $g_iDebugAttackCSV = 1 Then
 			SetLogCentered(" Warning Debug Mode Enabled! ", "-", $COLOR_ERROR)
 			SetLog("      Setlog : " & $g_iDebugSetlog, $COLOR_ERROR, "Lucida Console", 8)
 			SetLog("         OCR : " & $g_iDebugOcr, $COLOR_ERROR, "Lucida Console", 8)
@@ -43,6 +43,7 @@ Func Initiate()
 		EndIf
 
 		$g_bFirstStart = True
+		$g_bInitiateSwitchAcc = True ; SwitchAcc - Demen_SA_#9001
 
 		If $g_bNotifyDeleteAllPushesOnStart = True Then _DeletePush()
 
@@ -71,8 +72,6 @@ Func Initiate()
 
 		ZoomOut()
 		If Not $g_bRunState Then Return
-
-		If $ichkSwitchAcc = 1 Then InitiateSwitchAcc(); SwitchAcc Demen
 
 		If Not $g_bSearchMode Then
 			BotDetectFirstTime()
@@ -165,7 +164,6 @@ Func btnStart()
 		$g_iBotAction = $eBotStart
 	EndIf
 	$g_iActualTrainSkip = 0
-	GUICtrlSetState($g_hModSupportConfig, $GUI_SHOW)
 EndFunc   ;==>btnStart
 
 Func btnStop()
@@ -176,7 +174,6 @@ Func btnStop()
 		$g_iBotAction = $eBotStop
 		ReduceBotMemory()
 	EndIf
-	GUICtrlSetState($g_hModSupportConfig, $GUI_SHOW)
 EndFunc   ;==>btnStop
 
 Func btnSearchMode()
@@ -193,20 +190,18 @@ EndFunc   ;==>btnSearchMode
 Func btnPause($RunNow = True)
 	;Send("{PAUSE}")
 	TogglePause()
-	GUICtrlSetState($g_hBtnDisableGUI, $GUI_HIDE)	; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen
-	GUICtrlSetState($g_hBtnEnableGUI, $GUI_SHOW)	; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen
-	GUICtrlSetState($g_hModSupportConfig, $GUI_HIDE)
+	GUICtrlSetState($g_hBtnDisableGUI, $GUI_HIDE)	; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen_EG_#9008
+	GUICtrlSetState($g_hBtnEnableGUI, $GUI_SHOW)	; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen_EG_#9008
 EndFunc   ;==>btnPause
 
 Func btnResume()
 	;Send("{PAUSE}")
 	TogglePause()
-	GUICtrlSetState($g_hBtnDisableGUI, $GUI_HIDE)	; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen
-	GUICtrlSetState($g_hBtnEnableGUI, $GUI_HIDE)	; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen
-	GUICtrlSetState($g_hModSupportConfig, $GUI_SHOW)
+	GUICtrlSetState($g_hBtnDisableGUI, $GUI_HIDE)	; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen_EG_#9008
+	GUICtrlSetState($g_hBtnEnableGUI, $GUI_HIDE)	; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen_EG_#9008
 EndFunc   ;==>btnResume
 
-Func btnEnableGUI() 	; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen
+Func btnEnableGUI() 	; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen_EG_#9008
 	GUICtrlSetState($g_hBtnEnableGUI, $GUI_HIDE)
 	GUICtrlSetState($g_hBtnDisableGUI, $GUI_SHOW)
 	GUICtrlSetState($g_hBtnResume, $GUI_DISABLE)
@@ -215,7 +210,7 @@ Func btnEnableGUI() 	; Manually enable/disable GUI while botting (as requested b
 	SetLog("Enabled bot controls as you wished", $COLOR_SUCCESS)
 EndFunc
 
-Func btnDisableGUI()	; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen
+Func btnDisableGUI()	; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen_EG_#9008
 	GUICtrlSetState($g_hBtnDisableGUI, $GUI_HIDE)
 	GUICtrlSetState($g_hBtnEnableGUI, $GUI_SHOW)
 	GUICtrlSetState($g_hBtnResume, $GUI_ENABLE)

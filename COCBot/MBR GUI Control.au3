@@ -47,9 +47,9 @@ Global $g_hFrmBot_WNDPROC_ptr = 0
 #include "GUI\MBR GUI Control Child Misc.au3"
 #include "GUI\MBR GUI Control Android.au3"
 #include "MBR GUI Action.au3"
-; Team AiO MOD++ (2017)
-#include "Team__AiO__MOD++\GUI\MOD GUI Control.au3"
-#include "Team__AiO__MOD++\GUI\MOD GUI Control - Forecast.au3"
+
+; Demen Mod - Demen_GE_#9000
+#include "MOD_Demen\GUI Control_Demen.au3"
 
 Func InitializeMainGUI()
    InitializeControlVariables()
@@ -429,12 +429,12 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 		Case $GUI_EVENT_CLOSE, $g_hLblBotClose
 			; Clean up resources
 			BotCloseRequest()
-		Case $g_hLblCreditsBckGrnd
+        Case $g_hLblCreditsBckGrnd
 			; Handle open URL clicks when label of link is over another background label
 			Local $CursorInfo = GUIGetCursorInfo($g_hFrmBot)
 			If IsArray($CursorInfo) = 1 Then
 				Switch $CursorInfo[4]
-					Case $g_hLblMyBotURL, $g_hLblForumURL
+                    Case $g_hLblMyBotURL, $g_hLblForumURL
 						OpenURL_Label($CursorInfo[4])
 				EndSwitch
 			EndIf
@@ -464,8 +464,6 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 			btnAttackNowLB()
 		Case $g_hBtnAttackNowTS
 			btnAttackNowTS()
-		Case $g_hModSupportConfig
-			ShellExecute($g_sModSupportUrl)
 		;Case $idMENU_DONATE_SUPPORT
 		;	ShellExecute("https://mybot.run/forums/index.php?/donate/make-donation/")
 		Case $g_hBtnNotifyDeleteMessages
@@ -558,6 +556,8 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 			readConfig()
 		Case $g_hBtnTestConfigApply
 			applyConfig()
+		Case $g_hBtnTestWeakBase
+			btnTestWeakBase()
 	EndSwitch
 
 		If $lParam = $g_hCmbGUILanguage Then
@@ -665,22 +665,6 @@ Func GUIControl_WM_NOTIFY($hWind, $iMsg, $wParam, $lParam)
 		Case $g_hTabMain
 			; Handle RichText controls
 			tabMain()
-			If GUICtrlRead($g_hTabMain, 1) = $g_hGUI_MOD And GUICtrlRead($g_hGUI_MOD_TAB, 1) = $g_hGUI_MOD_TAB_ITEM5 Then
-				Local $tTag  = DllStructCreate("hwnd;int;int;int;int;int;int;ptr;int;int;int;int;int;int;int;int;int;int;int;int", $lParam)
-				Local $hFrom = DllStructGetData($tTag, 1)
-				Local $iID   = DllStructGetData($tTag, 2)
-				Local $iCode = DllStructGetData($tTag, 3)
-				Local $iPos  = DllStructGetData($tTag, 4)
-
-				If $iCode = -551 Then
-					GUICtrlSetState($g_hGUI_MOD_TAB_ITEM5, $GUI_SHOW)
-					Sleep(100)
-					If TimerDiff($TimerForecast) > (1 * 10000) Then ; 1 Refresh Graphique toutes les 5 mn maxi, faut pas abuser
-						cmbSwLang()
-						$TimerForecast = TimerInit()
-					EndIf
-				EndIf
-			EndIf
 		Case $g_hGUI_VILLAGE_TAB
 			tabVillage()
 		Case $g_hGUI_DONATE_TAB
@@ -697,42 +681,6 @@ Func GUIControl_WM_NOTIFY($hWind, $iMsg, $wParam, $lParam)
 			tabTHSnipe()
 		Case $g_hGUI_BOT_TAB
 			tabBot()
-		Case $g_hGUI_MOD_TAB
-			If GUICtrlRead($g_hGUI_MOD_TAB, 1) = $g_hGUI_MOD_TAB_ITEM5 Then
-				Local $tTag  = DllStructCreate("hwnd;int;int;int;int;int;int;ptr;int;int;int;int;int;int;int;int;int;int;int;int", $lParam)
-				Local $hFrom = DllStructGetData($tTag, 1)
-				Local $iID   = DllStructGetData($tTag, 2)
-				Local $iCode = DllStructGetData($tTag, 3)
-				Local $iPos  = DllStructGetData($tTag, 4)
-
-				If $iCode = -551 Then ;tab selected
-					GUICtrlSetState($g_hGUI_MOD_TAB_ITEM5, $GUI_SHOW)
-					Sleep(100)
-					If TimerDiff($TimerForecast) > (1 * 10000) Then ; 1 Refresh Graphique toutes les 5 mn maxi, faut pas abuser
-						setForecast()
-					EndIf
-				EndIf
-			EndIf
-
-			tabMod()
-			tabMain()
-
-			If GUICtrlRead($g_hGUI_MOD_TAB, 1) = $g_hGUI_MOD_TAB_ITEM5 Then
-				Local $tTag  = DllStructCreate("hwnd;int;int;int;int;int;int;ptr;int;int;int;int;int;int;int;int;int;int;int;int", $lParam)
-				Local $hFrom = DllStructGetData($tTag, 1)
-				Local $iID   = DllStructGetData($tTag, 2)
-				Local $iCode = DllStructGetData($tTag, 3)
-				Local $iPos  = DllStructGetData($tTag, 4)
-
-				If $iCode = -551 Then ;tab selected
-					GUICtrlSetState($g_hGUI_MOD_TAB_ITEM5, $GUI_SHOW)
-					Sleep(100)
-					If TimerDiff($TimerForecast) > (1 * 10000) Then ; 1 Refresh Graphique toutes les 5 mn maxi, faut pas abuser
-						cmbSwLang()
-						$TimerForecast = TimerInit()
-					EndIf
-				EndIf
-			EndIf
 		Case Else
 			$bCheckEmbeddedShield = False
 	EndSwitch
@@ -1315,7 +1263,6 @@ Func SetRedrawBotWindow($bEnableRedraw, $bCheckRedrawBotWindow = Default, $bForc
 		; set dirty redraw flag
 		$g_bRedrawBotWindow[1] = True
 	EndIf
-	redrawForecast()
 	Return $bWasRedraw
 EndFunc   ;==>SetRedrawBotWindow
 
@@ -1422,19 +1369,16 @@ Func SetTime($bForceUpdate = False)
 		GUICtrlSetData($g_hLblResultRuntimeNow, StringFormat("%02i:%02i:%02i", $hour, $min, $sec))
 	EndIf
 
-; Showing troops time in ProfileStats - SwitchAcc - Demen
+; Showing troops time in MultiStats - SwitchAcc - Demen_SA_#9001
 	Local Static $DisplayLoop = 0
-	If $DisplayLoop >= 10 Then ; Conserve Clock Cycles on Updating times
+	If $DisplayLoop >= 3 Then ; Conserve Clock Cycles on Updating times
 		$DisplayLoop = 0
-		;Update Multi Stat Page _ SwitchAcc_Demen_Style
-		If $ichkSwitchAcc = 1 Then
-			If GUICtrlRead($g_hGUI_MOD_TAB, 1) = $g_hGUI_MOD_TAB_ITEM4 Then
-				For $i = 0 To $nTotalProfile - 1 ; Update time for all Accounts
-					If $aProfileType[$i] = 1 And _
-							$i <> $nCurProfile - 1 And _
-							$aTimerStart[$i] <> 0 Then
-						Local $TrainTimerEnd = TimerDiff($aTimerStart[$i]) / 60 / 1000 ; in minutes
-						Local $UpdateTrainTime = $aRemainTrainTime[$i] - $TrainTimerEnd ; in minutes
+		If $g_bChkSwitchAcc Then
+			If GUICtrlRead($g_hGUI_BOT_TAB, 1) = $g_hGUI_BOT_TAB_ITEM6 Then
+				For $i = 0 To $g_iTotalAcc;  Update time for all Accounts
+					; Troop Time (include spell and hero if needed)
+					If $g_abAccountNo[$i] And Not $g_abDonateOnly[$i] And $g_aiTimerStart[$i] <> 0 Then
+						Local $UpdateTrainTime = $g_aiRemainTrainTime[$i] - TimerDiff($g_aiTimerStart[$i]) / 60 / 1000 ; in minutes
 						Local $sReadyTime = ""
 						If Abs($UpdateTrainTime) >= 60 Then
 						   $sReadyTime &= Int($UpdateTrainTime/60) & "h " & Abs(Round(Mod($UpdateTrainTime,60),0)) & "m"
@@ -1442,20 +1386,23 @@ Func SetTime($bForceUpdate = False)
 						   $sReadyTime &= Int($UpdateTrainTime) & "m " & Abs(Round(Mod($UpdateTrainTime,1) * 60, 0)) & "s"
 						EndIf
 
-						If $UpdateTrainTime < 0 Then
-							GUICtrlSetBkColor($g_lblTroopsTime[$i], $COLOR_RED)
-							GUICtrlSetColor($g_lblTroopsTime[$i], $COLOR_WHITE)
+						If $i = $g_iCurAccount Then
+							GUICtrlSetBkColor($g_ahLblTroopsTime[$i], $COLOR_GREEN)
+							GUICtrlSetColor($g_ahLblTroopsTime[$i], $COLOR_WHITE)
+						ElseIf $UpdateTrainTime < 0 Then
+							GUICtrlSetBkColor($g_ahLblTroopsTime[$i], $COLOR_RED)
+							GUICtrlSetColor($g_ahLblTroopsTime[$i], $COLOR_WHITE)
 						Else
-							GUICtrlSetBkColor($g_lblTroopsTime[$i], $COLOR_YELLOW)
-							GUICtrlSetColor($g_lblTroopsTime[$i], $COLOR_BLACK)
+							GUICtrlSetBkColor($g_ahLblTroopsTime[$i], $COLOR_YELLOW)
+							GUICtrlSetColor($g_ahLblTroopsTime[$i], $COLOR_BLACK)
 						EndIf
-						GUICtrlSetData($g_lblTroopsTime[$i], $sReadyTime)
+						GUICtrlSetData($g_ahLblTroopsTime[$i], $sReadyTime)
 					EndIf
 
-					If $i <> $nCurProfile - 1 And $g_aLabTimerStart[$i] <> 0 Then	; update lab time of all accounts on multi stats
+					; Lab time
+					If $i <> $g_iCurAccount And $g_aLabTimerStart[$i] <> 0 Then
 						Local $sLabtime = ""
-						Local $TimerEnd = TimerDiff($g_aLabTimerStart[$i]) / 60 / 1000 ; in minutes
-						Local $UpdateLabTime = $g_aLabTimeAcc[$i] - $TimerEnd ; in minutes
+						Local $UpdateLabTime = $g_aLabTimeAcc[$i] - TimerDiff($g_aLabTimerStart[$i]) / 60 / 1000 ; in minutes
 						If $UpdateLabTime <= 0 Then
 							GUICtrlSetColor($g_ahLblLab[$i], $COLOR_GREEN)
 							GUICtrlSetColor($g_ahLblLabTime[$i], $COLOR_GREEN)
@@ -1474,7 +1421,7 @@ Func SetTime($bForceUpdate = False)
 		EndIf
 	EndIf
 	$DisplayLoop += 1
-; Showing troops time in ProfileStats - SwitchAcc - Demen
+; Showing troops time in MultiStats - SwitchAcc - Demen_SA_#9001
 
 EndFunc   ;==>SetTime
 
@@ -1486,7 +1433,6 @@ Func tabMain()
 				GUISetState(@SW_HIDE, $g_hGUI_ATTACK)
 				GUISetState(@SW_HIDE, $g_hGUI_BOT)
 				GUISetState(@SW_HIDE, $g_hGUI_ABOUT)
-				GUISetState(@SW_HIDE, $g_hGUI_MOD)
 				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_LOG)
 
 			Case $tabidx = 1 ; Village
@@ -1494,7 +1440,6 @@ Func tabMain()
 				GUISetState(@SW_HIDE, $g_hGUI_ATTACK)
 				GUISetState(@SW_HIDE, $g_hGUI_BOT)
 				GUISetState(@SW_HIDE, $g_hGUI_ABOUT)
-				GUISetState(@SW_HIDE, $g_hGUI_MOD)
 				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_VILLAGE)
 				tabVillage()
 
@@ -1503,7 +1448,6 @@ Func tabMain()
 				GUISetState(@SW_HIDE, $g_hGUI_VILLAGE)
 				GUISetState(@SW_HIDE, $g_hGUI_BOT)
 				GUISetState(@SW_HIDE, $g_hGUI_ABOUT)
-				GUISetState(@SW_HIDE, $g_hGUI_MOD)
 				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_ATTACK)
 				tabAttack()
 
@@ -1512,25 +1456,14 @@ Func tabMain()
 				GUISetState(@SW_HIDE, $g_hGUI_VILLAGE)
 				GUISetState(@SW_HIDE, $g_hGUI_ATTACK)
 				GUISetState(@SW_HIDE, $g_hGUI_ABOUT)
-				GUISetState(@SW_HIDE, $g_hGUI_MOD)
 				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_BOT)
 				tabBot()
 
-			Case $tabidx = 4 ; Mods
+			Case $tabidx = 4 ; About
 				GUISetState(@SW_HIDE, $g_hGUI_LOG)
 				GUISetState(@SW_HIDE, $g_hGUI_VILLAGE)
 				GUISetState(@SW_HIDE, $g_hGUI_ATTACK)
 				GUISetState(@SW_HIDE, $g_hGUI_BOT)
-				GUISetState(@SW_HIDE, $g_hGUI_ABOUT)
-				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_MOD)
-				tabMod()
-
-			Case $tabidx = 5 ; About
-				GUISetState(@SW_HIDE, $g_hGUI_LOG)
-				GUISetState(@SW_HIDE, $g_hGUI_VILLAGE)
-				GUISetState(@SW_HIDE, $g_hGUI_ATTACK)
-				GUISetState(@SW_HIDE, $g_hGUI_BOT)
-				GUISetState(@SW_HIDE, $g_hGUI_MOD)
 				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_ABOUT)
 
 			Case Else
@@ -1538,7 +1471,6 @@ Func tabMain()
 				GUISetState(@SW_HIDE, $g_hGUI_VILLAGE)
 				GUISetState(@SW_HIDE, $g_hGUI_ATTACK)
 				GUISetState(@SW_HIDE, $g_hGUI_BOT)
-				GUISetState(@SW_HIDE, $g_hGUI_MOD)
 		EndSelect
 
 EndFunc   ;==>tabMain
@@ -1742,31 +1674,31 @@ Func tabBot()
 		Select
 			Case $tabidx = 0 ; Options tab
 				GUISetState(@SW_HIDE, $g_hGUI_STATS)
+				GUISetState(@SW_HIDE, $g_hGUI_LOG_SA) ; Demen_SA_#9001
 				ControlShow("","",$g_hCmbGUILanguage)
 			Case $tabidx = 1 ; Debug tab
 				GUISetState(@SW_HIDE, $g_hGUI_STATS)
+				GUISetState(@SW_HIDE, $g_hGUI_LOG_SA) ; Demen_SA_#9001
 				ControlHide("","",$g_hCmbGUILanguage)
-;~			Case $tabidx = 2 ; Profiles tab
-;~				GUISetState(@SW_HIDE, $g_hGUI_STATS)
-;~				ControlHide("","",$g_hCmbGUILanguage)
-			Case $tabidx = 2 ; Android tab
+			Case $tabidx = 2 ; Profiles tab
 				GUISetState(@SW_HIDE, $g_hGUI_STATS)
+				GUISetState(@SW_HIDE, $g_hGUI_LOG_SA) ; Demen_SA_#9001
 				ControlHide("","",$g_hCmbGUILanguage)
-			Case $tabidx = 3 ; Stats tab
+			Case $tabidx = 3 ; Android tab
+				GUISetState(@SW_HIDE, $g_hGUI_STATS)
+				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_LOG_SA) ; Demen_SA_#9001
+				ControlHide("","",$g_hCmbGUILanguage)
+			Case $tabidx = 4 ; Stats tab
 				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_STATS)
+				GUISetState(@SW_HIDE, $g_hGUI_LOG_SA) ; Demen_SA_#9001
+				ControlHide("","",$g_hCmbGUILanguage)
+			Case $tabidx = 5 ; MultiStats tab - SwitchAcc Demen_SA_#9001
+				GUISetState(@SW_HIDE, $g_hGUI_STATS)
+				GUISetState(@SW_HIDE, $g_hGUI_LOG_SA)
+				If $g_bRunState = False Then UpdateMultiStats()
 				ControlHide("","",$g_hCmbGUILanguage)
 		EndSelect
 EndFunc   ;==>tabBot
-
-Func tabMod()
-	Local $tabidx = GUICtrlRead($g_hGUI_MOD_TAB)
-	Select
-		Case $tabidx = 0 ; Profile tab
-			GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_MOD_SWITCH)
-		Case Else
-			GUISetState(@SW_HIDE, $g_hGUI_MOD_SWITCH)
-	EndSelect
-EndFunc   ;==>tabMod
 
 Func tabDeadbase()
 	Local $tabidx = GUICtrlRead($g_hGUI_DEADBASE_TAB)
@@ -1916,7 +1848,7 @@ Func Bind_ImageList($nCtrl)
 	Switch $nCtrl
 		Case $g_hTabMain
 			; the icons for main tab
-			Local $aIconIndex[6] = [$eIcnHourGlass, $eIcnTH11, $eIcnAttack, $eIcnGUI, $eIcnMods, $eIcnInfo]
+			Local $aIconIndex[5] = [$eIcnHourGlass, $eIcnTH11, $eIcnAttack, $eIcnGUI, $eIcnInfo]
 
 		Case $g_hGUI_VILLAGE_TAB
 			; the icons for village tab
@@ -1935,7 +1867,7 @@ Func Bind_ImageList($nCtrl)
 
 		Case $g_hGUI_UPGRADE_TAB
 			; the icons for upgrade tab
-			Local $aIconIndex[5] = [$eIcnLaboratory, $eIcnHeroes, $eIcnMortar, $eIcnWall, $eIcnUpgrade]
+			Local $aIconIndex[4] = [$eIcnLaboratory, $eIcnHeroes, $eIcnMortar, $eIcnWall]
 
 		Case $g_hGUI_NOTIFY_TAB
 			; the icons for NOTIFY tab
@@ -1967,16 +1899,8 @@ Func Bind_ImageList($nCtrl)
 
 		Case $g_hGUI_BOT_TAB
 			; the icons for Bot tab
-			Local $aIconIndex[4] = [$eIcnOptions, $eIcnAndroid, $eIcnDebug, $eIcnGold]
+			Local $aIconIndex[5] = [$eIcnOptions, $eIcnAndroid, $eIcnProfile, $eIcnProfile, $eIcnGold]
 			; The Android Robot is a Google Trademark and follows Creative Common Attribution 3.0
-
-		Case $g_hGUI_MOD_TAB
-			; the icons for Mods tab
-			Local $aIconIndex[5] = [$eIcnSwitchOptions, $eIcnHumanization, $eIcnGoblinXP, $eIcnStats, $eIcnForecast]
-
-		Case $g_hGUI_MOD_SWITCH_TAB
-			; the icons for Profiles tab
-			Local $aIconIndex[2] = [$eIcnSwitchAcc, $eIcnSwitchProfiles]
 
 		Case $g_hGUI_STRATEGIES_TAB
 			; the icons for strategies tab

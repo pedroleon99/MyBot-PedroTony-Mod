@@ -46,13 +46,6 @@ Func btnDonateBlacklist()
 	EndIf
 EndFunc   ;==>btnDonateBlacklist
 
-; Clan Hop
-Func btnDonateOptions()
-	If GUICtrlGetState($g_hGrpDonateOptions) = BitOR($GUI_HIDE, $GUI_ENABLE) Then
-		_DonateBtn($g_hGrpDonateOptions, $g_hChkClanHop)
-	EndIf
-EndFunc
-
 Func chkDonateTroop()
     For $i = 0 To $eTroopCount-1 + $g_iCustomDonateConfigs
 	   If @GUI_CtrlId = $g_ahChkDonateTroop[$i] Then

@@ -55,7 +55,6 @@
 #include <Crypt.au3>
 
 Global Const $g_sLogoPath = @ScriptDir & "\Images\Logo.png"
-Global Const $g_sLogoPath2 = @ScriptDir & "\Images\Logo2.png"
 Global Const $g_sLogoUrlPath = @ScriptDir & "\Images\LogoURL.png"
 Global Const $g_sLogoUrlSmallPath = @ScriptDir & "\Images\LogoURLsmall.png"
 Global Const $g_iGAME_WIDTH = 860
@@ -72,6 +71,7 @@ Global $g_iBotLaunchTime = 0 ; Keeps track of time (in millseconds) from bot lau
 Global $g_iVILLAGE_OFFSET[3] = [0, 0, 1]
 
 #Region debugging
+#Tidy_Off
 ; <><><><><><><><><><><><><><><><><><>
 ; <><><><> debug flags <><><><>
 ; <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
@@ -154,6 +154,7 @@ Global $g_oDebugGDIHandles = ObjCreate("Scripting.Dictionary") ; stores GDI hand
 Global $g_oCOMErrorHandler = 0
 
 ; <><><><><><><><><><><><><><><><><><>
+#Tidy_On
 #EndRegion debugging
 
 Global Const $COLOR_ORANGE = 0xFF7700 ; Used for donate GUI buttons
@@ -190,6 +191,7 @@ Global Const $g_sWow6432Node = ($g_b64Bit ? "\Wow6432Node" : "")
 Global Const $g_sGoogle = "Google"
 
 #Region Android.au3
+#Tidy_Off
 ; <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 ; <><><><><><>  Android.au3 (and related) globals <><><><><><>
 Global $g_sAndroidGameDistributor = "Google" ; Default CoC Game Distributor, loaded from config.ini
@@ -215,6 +217,7 @@ Global $g_bAndroidEmbedded = False
 Global $g_aiAndroidEmbeddedCtrlTarget[10] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_avAndroidShieldStatus[5] = [Default, 0, 0, Default, Default] ; Current Android Shield status (0: True = Shield Up, False = Shield Down, Default only for init; 1: Color; 2: Transparency = 0-255; 3: Invisible Shield; 4: Detached Shield)
 
+Global $g_bPoliteCloseCoC = False ; True: PoliteCloseCoC() function will try to perform a polite close by going back and press exit button, False am force-stop to kill game
 Global Const $g_bAndroidBackgroundLaunchEnabled = False ; Headless mode not finished yet (2016-07-13, cosote)
 Global $g_bAndroidCheckTimeLagEnabled = True ; Checks every 60 Seconds or later in main loops (Bot Run, Idle and SearchVillage) is Android needs reboot due to time lag (see $g_iAndroidTimeLagThreshold)
 Global $g_iAndroidAdbAutoTerminate = 0 ; Steady ADB shell instance is automatically closed after this number of executed commands, 0 = disabled (test for BS to fix frozen screen situation!)
@@ -262,37 +265,43 @@ Global $__Droid4X_Window[3][3] = _ ; Alternative window sizes (array must be ord
 		["0.10.0", $g_iDEFAULT_WIDTH + 6, $g_iDEFAULT_HEIGHT + 53], _
 		["0.8.6", $g_iDEFAULT_WIDTH + 10, $g_iDEFAULT_HEIGHT + 50] _
 		]
-Global $__Nox_Config[2][2] = _ ; Alternative Nox Control ID (array must be ordered by version descending!)
+Global $__Nox_Config[1][2] = _ ; Alternative Nox Control ID (array must be ordered by version descending!)
 		[ _ ; Version|$g_sAppClassInstance
-		["3.8.1.3", "[CLASS:subWin; INSTANCE:1]|[CLASS:Qt5QWindowIcon; INSTANCE:5]"], _
-		["3.1.0", "[CLASS:Qt5QWindowIcon; INSTANCE:4]"] _
+		["3.3.0", "[CLASS:subWin; INSTANCE:1]|[TEXT:QWidgetClassWindow; CLASS:Qt5QWindowIcon]"] _ ; use multiple index as during undock it can change
 		]
-;   0            |1                  |2                       |3                                 |4               |5                     |6                      |7                     |8                      |9             |10                  |11                       |12                    |13                                  |14
-;   $g_sAndroidEmulator              |$g_sAndroidTitle        |$g_sAppClassInstance              |$g_sAppPaneName |$g_iAndroidClientWidth|$g_iAndroidClientHeight|$g_iAndroidWindowWidth|$g_iAndroidWindowHeight|$ClientOffsetY|$g_sAndroidAdbDevice|$g_iAndroidSupportFeature|$g_sAndroidShellPrompt|$g_sAndroidMouseDevice              |$g_bAndroidEmbed/$g_iAndroidEmbedMode
-;                |$g_sAndroidInstance|                        |                                  |                |                      |                       |                      |                       |              |                    |1 = Normal background mode                      |                                    |-1 = Not available
-;                |                   |                        |                                  |                |                      |                       |                      |                       |              |                    |2 = ADB screencap mode   |                      |                                    | 0 = Normal docking
-;                |                   |                        |                                  |                |                      |                       |                      |                       |              |                    |4 = ADB mouse click      |                      |                                    | 1 = Simulated docking
-;                |                   |                        |                                  |                |                      |                       |                      |                       |              |                    |8 = ADB input text       |                      |                                    |
-;                |                   |                        |                                  |                |                      |                       |                      |                       |              |                    |16 = ADB shell is steady |                      |                                    |
-;                |                   |                        |                                  |                |                      |                       |                      |                       |              |                    |32 = ADB click drag                             |                                    |
-;                |                   |                        |                                  |                |                      |                       |                      |                       |              |                    |64 = Make DPI Aware (if avaliable)              |                                    |
-Global $g_avAndroidAppConfig[8][15] = [ _ ;                   |                                  |                |                      |                       |                      |                       |              |                    |128 = ADB use input swipe and not script        |                                    |
-		["MEmu", "MEmu", "MEmu ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH + 51, $g_iDEFAULT_HEIGHT - 12, 0, "127.0.0.1:21503", 0 + 2 + 4 + 8 + 16 + 32, '# ', 'Microvirt Virtual Input', 0], _
-		["BlueStacks2", "Android", "BlueStacks ", "[CLASS:BlueStacksApp; INSTANCE:1]", "_ctl.Window", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, 0, "127.0.0.1:5555", 1 + 8 + 16 + 32 + 128, '$ ', 'BlueStacks Virtual Touch', 0], _
-		["BlueStacks", "Android", "BlueStacks App Player", "[CLASS:BlueStacksApp; INSTANCE:1]", "_ctl.Window", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, 0, "127.0.0.1:5555", 1 + 8 + 16 + 32 + 128, '$ ', 'BlueStacks Virtual Touch', 0], _
-		["KOPLAYER", "KOPLAYER", "KOPLAYER", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH + 64, $g_iDEFAULT_HEIGHT - 8, 0, "127.0.0.1:6555", 0 + 2 + 4 + 8 + 16 + 32, '# ', 'ttVM Virtual Input', 0], _
-		["LeapDroid", "vm1", "Leapd", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, 0, "emulator-5554", 1 + 8 + 16 + 32, '# ', 'qwerty2', 1], _
-		["iTools", "iToolsVM", "iTools ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH + 2, $g_iDEFAULT_HEIGHT - 13, 0, "127.0.0.1:54001", 1 + 8 + 16 + 32 + 64, '# ', 'iTools Virtual PassThrough Input', 0], _
-		["Droid4X", "droid4x", "Droid4X ", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH + 10, $g_iDEFAULT_HEIGHT + 50, 0, "127.0.0.1:26944", 0 + 2 + 4 + 8 + 16 + 32, '# ', 'droid4x Virtual Input', 0], _
-		["Nox", "nox", "No", "[CLASS:subWin; INSTANCE:1]", "", $g_iDEFAULT_WIDTH, $g_iDEFAULT_HEIGHT - 48, $g_iDEFAULT_WIDTH + 4, $g_iDEFAULT_HEIGHT - 10, 0, "127.0.0.1:62001", 0 + 2 + 4 + 8 + 16 + 32, '# ', '(nox Virtual Input|Android Input)', -1] _
-		]
+
+;   0             |1         |2                       |3                                 |4               |5                     |6                      |7                     |8                      |9             |10                  |11                           |12                    |13                                  |14                                   |15
+;   $g_sAndroidEmulator      |$g_sAndroidTitle        |$g_sAppClassInstance              |$g_sAppPaneName |$g_iAndroidClientWidth|$g_iAndroidClientHeight|$g_iAndroidWindowWidth|$g_iAndroidWindowHeight|$ClientOffsetY|$g_sAndroidAdbDevice|$g_iAndroidSupportFeature    |$g_sAndroidShellPrompt|$g_sAndroidMouseDevice              |$g_bAndroidEmbed/$g_iAndroidEmbedMode|$g_iAndroidBackgroundModeDefault
+;                 |$g_sAndroidInstance                |                                  |                |                      |                       |                      |                       |              |                    |1 = Normal background mode   |                      |                                    |-1 = Not available                   |1 = WinAPI Mode (requires DirectX)
+;                 |          |                        |                                  |                |                      |                       |                      |                       |              |                    |2 = ADB screencap mode       |                      |                                    | 0 = Normal docking                  |2 = ADB screencap Mode (not supported in BS1 and LeapDroid!)
+;                 |          |                        |                                  |                |                      |                       |                      |                       |              |                    |4 = ADB mouse click          |                      |                                    | 1 = Simulated docking               |
+;                 |          |                        |                                  |                |                      |                       |                      |                       |              |                    |8 = ADB input text           |                      |                                    |                                     |
+;                 |          |                        |                                  |                |                      |                       |                      |                       |              |                    |16 = ADB shell is steady     |                      |                                    |                                     |
+;                 |          |                        |                                  |                |                      |                       |                      |                       |              |                    |32 = ADB click drag          |                      |                                    |                                     |
+;                 |          |                        |                                  |                |                      |                       |                      |                       |              |                    |64 = Make DPI Aware (if avaliable)                  |                                    |                                     |
+;                 |          |                        |                                  |                |                      |                       |                      |                       |              |                    |128 = ADB use input swipe and not script            |                                    |                                     |
+Global $g_avAndroidAppConfig[8][16] = [ _ ;           |                                  |                |                      |                       |                      |                       |              |                    |256 = Update $g_sAppClassInstance with Window Handle|                                    |                                     |
+    ["MEmu",       "MEmu",    "MEmu ",                "[CLASS:subWin; INSTANCE:1]",       "",              $g_iDEFAULT_WIDTH,     $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 51,$g_iDEFAULT_HEIGHT - 12,0,             "127.0.0.1:21503",       2 + 4 + 8 + 16 + 32,      '# ',                  'Microvirt Virtual Input',           0,                                    2], _ ; MEmu
+	["BlueStacks2","Android", "BlueStacks ",          "[CLASS:BlueStacksApp; INSTANCE:1]","_ctl.Window",   $g_iDEFAULT_WIDTH,     $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH,     $g_iDEFAULT_HEIGHT - 48,0,             "127.0.0.1:5555",    1 + 2     + 8 + 16 + 32 + 128,'$ ',                  'BlueStacks Virtual Touch',          0,                                    1], _ ; BlueStacks2
+	["BlueStacks", "Android", "BlueStacks App Player","[CLASS:BlueStacksApp; INSTANCE:1]","_ctl.Window",   $g_iDEFAULT_WIDTH,     $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH,     $g_iDEFAULT_HEIGHT - 48,0,             "127.0.0.1:5555",    1         + 8 + 16 + 32 + 128,'$ ',                  'BlueStacks Virtual Touch',          0,                                    1], _ ; BlueStacks
+	["KOPLAYER",   "KOPLAYER","KOPLAYER",             "[CLASS:subWin; INSTANCE:1]",       "",              $g_iDEFAULT_WIDTH,     $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 64,$g_iDEFAULT_HEIGHT - 8, 0,             "127.0.0.1:6555",    1 + 2 + 4 + 8 + 16 + 32,      '# ',                  'ttVM Virtual Input',                0,                                    2], _ ; KOPLAYER
+	["LeapDroid",  "vm1",     "Leapd",                "[CLASS:subWin; INSTANCE:1]",       "",              $g_iDEFAULT_WIDTH,     $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH,     $g_iDEFAULT_HEIGHT - 48,0,             "emulator-5554",     1         + 8 + 16 + 32,      '# ',                  'qwerty2',                           1,                                    1], _ ; LeapDroid
+	["iTools",     "iToolsVM","iTools ",              "[CLASS:subWin; INSTANCE:1]",       "",              $g_iDEFAULT_WIDTH,     $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 2, $g_iDEFAULT_HEIGHT - 13,0,             "127.0.0.1:54001",   1 + 2     + 8 + 16 + 32 + 64, '# ',                  'iTools Virtual PassThrough Input',  0,                                    1], _ ; iTools
+	["Droid4X",    "droid4x", "Droid4X ",             "[CLASS:subWin; INSTANCE:1]",       "",              $g_iDEFAULT_WIDTH,     $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 10,$g_iDEFAULT_HEIGHT + 50,0,             "127.0.0.1:26944",       2 + 4 + 8 + 16 + 32,      '# ',                  'droid4x Virtual Input',             0,                                    2], _ ; Droid4X
+	["Nox",        "nox",     "No",                   "[CLASS:subWin; INSTANCE:1]",       "",              $g_iDEFAULT_WIDTH,     $g_iDEFAULT_HEIGHT - 48,$g_iDEFAULT_WIDTH + 4, $g_iDEFAULT_HEIGHT - 10,0,             "127.0.0.1:62001",   1 + 2 + 4 + 8 + 16 + 32 + 256,'# ',                  '(nox Virtual Input|Android Input)', 0,                                    2] _  ; Nox
+]
 
 ; Startup detection
 Global $g_bOnlyInstance = True
 Global $g_bFoundRunningAndroid = False
 Global $g_bFoundInstalledAndroid = False
 
+; Android Options and settings
 Global Const $g_iOpenAndroidActiveMaxTry = 3 ; Try recursively 3 times to open Android
+Global Const $g_iAndroidBackgroundModeDirectX = 1
+Global Const $g_iAndroidBackgroundModeOpenGL = 2
+Global $g_iAndroidBackgroundMode = 0 ; 0 = Default (using $g_iAndroidBackgroundModeDefault), 1 = WinAPI mode (faster, but requires Android DirectX), 2 = ADB screencap mode (slower, but alwasy works even if Monitor is off -> "True Brackground Mode")
+Global $g_iAndroidBackgroundModeDefault = 1 ; Uses 1 or 2 of $g_iAndroidBackgroundMode
 Global $g_iAndroidConfig = 0 ; Default selected Android Config of $g_avAndroidAppConfig array
 Global $g_sAndroidVersion ; Identified version of Android Emulator
 Global $g_sAndroidEmulator ; Emulator used (BS, BS2, Droid4X, MEmu or Nox)
@@ -321,6 +330,8 @@ Global $g_bAndroidEmbed ; Enable Android Docking
 Global $g_iAndroidEmbedMode ; Android Dock Mode: -1 = Not available, 0 = Normal docking, 1 = Simulated docking
 Global $g_bAndroidBackgroundLaunch ; Enabled Android Background launch using Windows Scheduled Task
 Global $g_bAndroidBackgroundLaunched ; True when Android was launched in headless mode without a window
+Global $g_iAndroidControlClickDelay = 10 ; 10 is Default (Milliseconds)
+Global $g_iAndroidControlClickDownDelay = 0 ; 10 is Default (Milliseconds)
 Global $g_iAndroidControlClickWindow = 0 ; 0 = Click the Android Control, 1 = Click the Android Window
 Global $g_iAndroidControlClickMode = 0 ; 0 = Use AutoIt ControlClick, 1 = Use _SendMessage
 
@@ -329,6 +340,7 @@ Global $g_bInitAndroidActive = False
 
 Global $g_sAndroidPath = "" ; Program folder to launch android emulator
 Global $g_sAndroidProgramPath = "" ; Program path and executable to launch android emulator
+Global $b_sAndroidProgramWerFaultExcluded = True ; Register Android Executable to be excluded globally for WerFault (Windows Error Reporting Service)
 Global $g_avAndroidProgramFileVersionInfo = 0 ; Array of _WinAPI_VerQueryValue FileVersionInfo
 Global $g_bAndroidHasSystemBar = False ; BS2 System Bar can be entirely disabled in Windows Registry
 Global $g_iAndroidClientWidth_Configured = 0 ; Android configured Screen Width
@@ -391,9 +403,11 @@ Global $__iTools_Path
 Global $__VBoxManage_Path ; Full path to executable VBoxManage.exe
 Global $__VBoxVMinfo ; Virtualbox vminfo config details of android instance
 Global $__VBoxGuestProperties ; Virtualbox guestproperties config details of android instance
+Global $__VBoxExtraData ; Virtualbox extra data details of android instance
 
 ; <><><><><><>  Android.au3 globals <><><><><><>
 ; <><><><><><><><><><><><><><><><><><><><><><><><>
+#Tidy_On
 #EndRegion Android.au3
 
 ; Tooltips
@@ -497,10 +511,7 @@ Global Enum $eIcnArcher = 1, $eIcnDonArcher, $eIcnBalloon, $eIcnDonBalloon, $eIc
 		$eWall04, $eWall05, $eWall06, $eWall07, $eWall08, $eWall09, $eWall10, $eWall11, $eIcnPBNotify, $eIcnCCTroops, _
 		$eIcnCCSpells, $eIcnSpellsGroup, $eBahasaIND, $eChinese_S, $eChinese_T, $eEnglish, $eFrench, $eGerman, $eItalian, $ePersian, _
 		$eRussian, $eSpanish, $eTurkish, $eMissingLangIcon, $eWall12, $ePortuguese, $eIcnDonPoisonSpell, $eIcnDonEarthQuakeSpell, $eIcnDonHasteSpell, $eIcnDonSkeletonSpell, $eVietnamese, $eKorean, $eAzerbaijani, _
-		$eArabic, $eIcnElixirCollectorL5, $eIcnClockTower, $eIcnBuilderHall, $eIcnGoldMineL5, $eIcnGemMine, _
-		$eIcnMods, $eIcnDebug, $eIcnUpgrade, $eIcnSwitchOptions, $eIcnSwitchAcc, $eIcnSwitchProfiles, $eIcnHumanization, $eIcnGoblinXP, $eIcnStats, $eIcnForecast, _ ; Icn For Mods Tab
-		$eIcnChat, $eIcnRepeat, $eIcnClan, $eIcnTarget, $eIcnSettings, _ ; Icn for Bot Humanization
-		$eIcnClanHop
+		$eArabic, $eIcnElixirCollectorL5, $eIcnClockTower, $eIcnBuilderHall, $eIcnGoldMineL5, $eIcnGemMine
 
 Global $eIcnDonBlank = $eIcnDonBlacklist
 Global $eIcnOptions = $eIcnDonBlacklist
@@ -547,6 +558,7 @@ Global Const $DROPLINE_FULL_EDGE_FIRST = 3
 Global Const $DROPLINE_DROPPOINTS_ONLY = 4
 
 #Region Standard Enums and Consts - Attacks, Troops, Spells, Leagues, Loot Types
+#Tidy_Off
 ;--------------------------------------------------------------------------
 ; Standard Enums and Consts - Attacks, Troops, Spells, Leagues, Loot Types
 ;--------------------------------------------------------------------------
@@ -584,25 +596,25 @@ Global Const $g_aiTroopTrainTime[$eTroopCount] = [ _
 		36, 90, 180, 600, 360, 600, 120]
 ; Zero element contains number of levels, elements 1 thru n contain cost of that level troop
 Global Const $g_aiTroopCostPerLevel[$eTroopCount][9] = [ _
-		[7, 25, 40, 60, 100, 150, 200, 250], _ 				 	; Barbarian
-		[7, 50, 80, 120, 200, 300, 400, 500], _ 			 	; Archer
-		[8, 250, 750, 1250, 1750, 2250, 3000, 3500, 4000], _	; Giant
-		[7, 25, 40, 60, 80, 100, 150, 200], _ 				 	; Goblin
-		[7, 1000, 1500, 2000, 2500, 3000, 3500, 4000], _ 	 	; WallBreaker
-		[7, 2000, 2500, 3000, 3500, 4000, 4500, 5000], _ 	 	; Balloon
-		[8, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000], _ 	; Wizard
-		[5, 5000, 6000, 8000, 10000, 15000], _					; Healer
-		[6, 25000, 29000, 33000, 37000, 42000, 46000], _ 		; Dragon
-		[6, 28000, 32000, 36000, 40000, 45000, 50000], _ 		; Pekka
-		[5, 15000, 16000, 17000, 18000, 19000], _ 			 	; BabyDragon
-		[5, 4200, 4800, 5200, 5600, 6000], _  					; Miner
-		[7, 6, 7, 8, 9, 10, 11, 12], _ 						 	; Minion
-		[7, 40, 45, 52, 58, 65, 90, 115], _					 	; HogRider
-		[5, 70, 100, 130, 160, 190], _ 						 	; Valkyrie
-		[6, 450, 525, 600, 675, 750, 825], _ 				 	; Golem
-		[3, 250, 350, 450], _ 								 	; Witch
-		[4, 390, 450, 510, 570], _  						 	; Lavahound
-		[3, 130, 150, 170]]										; Bowler
+		[7, 25, 40, 60, 100, 150, 200, 250], _ 				 ; Archer
+		[7, 50, 80, 120, 200, 300, 400, 500], _ 				 ;Barbarian
+		[8, 250, 750, 1250, 1750, 2250, 3000, 3500, 4000], _ ; Giant
+		[7, 25, 40, 60, 80, 100, 150, 200], _ 				 ; Goblin
+		[6, 1000, 1500, 2000, 2500, 3000, 3500], _ 			 ; WallBreaker
+		[7, 2000, 2500, 3000, 3500, 4000, 4500, 5000], _ 	 ; Balloon
+		[7, 1500, 2000, 2500, 3000, 3500, 4000, 4500], _ 	 ; Wizard
+		[4, 5000, 6000, 8000, 10000], _						 ;Healer
+		[6, 25000, 29000, 33000, 37000, 42000, 46000], _ 	 ; Dragon
+		[5, 28000, 32000, 36000, 40000, 45000], _ 			 ; Pekka
+		[5, 15000, 16000, 17000, 18000, 19000], _ 			 ; BabyDragon
+		[4, 4200, 4800, 5400, 6000], _  						 ; Miner
+		[7, 6, 7, 8, 9, 10, 11, 12], _ 						 ; Minion
+		[7, 40, 45, 52, 58, 65, 90, 115], _					 ; HogRider
+		[5, 70, 100, 130, 160, 190], _ 						 ;Valkyrie
+		[6, 450, 525, 600, 675, 750, 825], _ 				 ; Golem
+		[3, 250, 350, 450], _ 								 ; Witch
+		[4, 390, 450, 510, 570], _  							 ;Lavahound
+		[3, 130, 150, 170]] ; Bowler
 Global Const $g_aiTroopDonateXP[$eTroopCount] = [1, 1, 5, 1, 2, 5, 4, 14, 20, 25, 10, 5, 2, 5, 8, 30, 12, 30, 6]
 
 ; Spells
@@ -614,16 +626,16 @@ Global Const $g_aiSpellSpace[$eSpellCount] = [2, 2, 2, 2, 2, 4, 1, 1, 1, 1]
 Global Const $g_aiSpellTrainTime[$eSpellCount] = [360, 360, 360, 360, 360, 720, 180, 180, 180, 180]
 ; Zero element contains number of levels, elements 1 thru n contain cost of that level spell
 Global Const $g_aiSpellCostPerLevel[$eSpellCount][8] = [ _
-		[7, 15000, 16500, 18000, 20000, 22000, 24000, 26000], _	 ; LightningSpell
-		[7, 15000, 16500, 18000, 19000, 21000, 23000, 25000], _  ; HealSpell
-		[5, 23000, 25000, 27000, 30000, 33000], _     		 	 ; RageSpell
-		[3, 23000, 27000, 31000], _        					 	 ; JumpSpell
-		[6, 23000, 26000, 29000, 31000, 33000, 35000], _ 		 ; FreezeSpell
-		[5, 38000, 39000, 41000, 43000, 45000], _				 ; CloneSpell
-		[5, 95, 110, 125, 140, 155], _         				 	 ; PoisonSpell
-		[4, 125, 140, 160, 180], _    						 	 ; EarthquakeSpell
-		[4, 80, 85, 90, 95], _								 	 ; HasteSpell
-		[4, 110, 120, 130, 140]] 								 ; SkeletonSpell
+		[7, 15000, 16500, 18000, 20000, 22000, 24000, 26000], _ ;LightningSpell
+		[7, 15000, 16500, 18000, 19000, 21000, 23000, 25000], _ 	 ;HealSpell
+		[5, 23000, 25000, 27000, 30000, 33000], _     		 ;RageSpell
+		[3, 23000, 27000, 31000], _        					 ;JumpSpell
+		[6, 23000, 26000, 29000, 31000, 33000, 35000], _ ;FreezeSpell
+		[5, 38000, 39000, 41000, 43000, 45000], _					 ;CloneSpell
+		[5, 95, 110, 125, 140, 155], _         				 ;PoisonSpell
+		[4, 125, 140, 160, 180], _    						 ;EarthquakeSpell
+		[4, 80, 85, 60, 95], _								 ;HasteSpell
+		[4, 110, 120, 130, 140]] ;SkeletonSpell
 Global Const $g_aiSpellDonateXP[$eSpellCount] = [10, 10, 10, 10, 10, 0, 5, 5, 5, 5]
 
 ; Hero Bitmaped Values
@@ -709,10 +721,11 @@ EndFunc   ;==>GetTroopName
 ;--------------------------------------------------------------------------
 ; END: GetTroopName()
 ;--------------------------------------------------------------------------
-
+#Tidy_On
 #EndRegion Standard Enums and Consts - Attacks, Troops, Spells, Leagues, Loot Types
 
 #Region GUI Variables
+#Tidy_Off
 ;--------------------------------------------------------------------------
 ; Variables to hold current GUI setting values
 ;--------------------------------------------------------------------------
@@ -834,7 +847,7 @@ Global $g_bNotifyRemoteEnable = False, $g_sNotifyOrigin = "", $g_bNotifyDeleteAl
 Global $g_bNotifyAlertMatchFound = False, $g_bNotifyAlerLastRaidIMG = False, $g_bNotifyAlerLastRaidTXT = False, $g_bNotifyAlertCampFull = False, _
 		$g_bNotifyAlertUpgradeWalls = False, $g_bNotifyAlertOutOfSync = False, $g_bNotifyAlertTakeBreak = False, $g_bNotifyAlertBulderIdle = False, _
 		$g_bNotifyAlertVillageReport = False, $g_bNotifyAlertLastAttack = False, $g_bNotifyAlertAnotherDevice = False, $g_bNotifyAlertMaintenance = False, _
-		$g_bNotifyAlertBAN = False, $g_bNotifyAlertBOTUpdate = False
+		$g_bNotifyAlertBAN = False, $g_bNotifyAlertBOTUpdate = False, $g_bNotifyAlertSmartWaitTime = False
 ;Schedule
 Global $g_bNotifyScheduleHoursEnable = False, $g_bNotifyScheduleWeekDaysEnable = False
 Global $g_abNotifyScheduleHours[24] = [False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False]
@@ -842,7 +855,7 @@ Global $g_abNotifyScheduleWeekDays[7] = [False, False, False, False, False, Fals
 
 ; <><><><> Attack Plan / Train Army / Troops/Spells <><><><>
 Global $g_bQuickTrainEnable = False
-Global $g_bQuickTrainArmy[3] = [True, False, False] ; QuickTrainCombo (Checkbox)
+Global $g_iQuickTrainArmyNum = 1
 Global $g_aiArmyCompTroops[$eTroopCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_aiArmyCompSpells[$eSpellCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_aiTrainArmyTroopLevel[$eTroopCount] = [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -882,8 +895,8 @@ Global $g_aiBrewOrder[$eSpellCount] = [ _
 
 
 ; <><><><> Attack Plan / Train Army / Options <><><><>
-Global $g_bCloseWhileTrainingEnable = True, $g_bCloseWithoutShield = True, $g_bCloseEmulator = False, $g_bSuspendComputer = False, $g_bCloseRandom = False, _
-		$g_bCloseExactTime = True, $g_bCloseRandomTime = False, $g_iCloseRandomTimePercent = 10, $g_iCloseMinimumTime = 2
+Global $g_bCloseWhileTrainingEnable = True, $g_bCloseWithoutShield = False, $g_bCloseEmulator = False, $g_bSuspendComputer = False, $g_bCloseRandom = False, _
+		$g_bCloseExactTime = False, $g_bCloseRandomTime = True, $g_iCloseRandomTimePercent = 10, $g_iCloseMinimumTime = 2
 Global $g_iTrainClickDelay = 40
 Global $g_bTrainAddRandomDelayEnable = False, $g_iTrainAddRandomDelayMin = 5, $g_iTrainAddRandomDelayMax = 60
 
@@ -971,7 +984,7 @@ Global $g_bMilkFarmForceToleranceEnable = False, $g_iMilkFarmForceToleranceNorma
 Global $g_abCollectorLevelEnabled[13] = [-1, -1, -1, -1, -1, -1, True, True, True, True, True, True, True] ; elements 0 thru 5 are never referenced
 Global $g_aiCollectorLevelFill[13] = [-1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1] ; elements 0 thru 5 are never referenced
 Global $g_bCollectorFilterDisable = False
-Global $g_iCollectorMatchesMin = 4
+Global $g_iCollectorMatchesMin = 3
 Global $g_iCollectorToleranceOffset = 0
 
 ; <><><><> Attack Plan / Search & Attack / Activebase / Search <><><><>
@@ -1022,7 +1035,7 @@ Global $g_bSmartZapEnable = False, $g_bEarthQuakeZap = False, $g_bNoobZap = Fals
 		$g_bSmartZapFTW = False, $g_iSmartZapMinDE = 350, $g_iSmartZapExpectedDE = 320, $g_bDebugSmartZap = False
 
 ; <><><><> Attack Plan / Search & Attack / Options / End Battle <><><><>
-Global $g_bShareAttackEnable = 0, $g_iShareMinGold = 300000, $g_iShareMinElixir = 300000, $g_iShareMinDark = 0, $g_sShareMessage = StringReplace("Nice|Good|Thanks|Wowwww", "|", @CRLF), _
+Global $g_bShareAttackEnable = 0, $g_iShareMinGold = 300000, $g_iShareMinElixir = 300000, $g_iShareMinDark = 0, $g_sShareMessage = "Nice|Good|Thanks|Wowwww", _
 		$g_bTakeLootSnapShot = True, $g_bScreenshotLootInfo = False, $g_bShareAttackEnableNow = False
 
 ; <><><><> Attack Plan / Search & Attack / Options / Trophy Settings <><><><>
@@ -1049,6 +1062,7 @@ Global $g_bScreenshotPNGFormat = False, $g_bScreenshotHideName = True
 Global $g_iAnotherDeviceWaitTime = 120
 Global $g_bForceSinglePBLogoff = 0, $g_iSinglePBForcedLogoffTime = 18, $g_iSinglePBForcedEarlyExitTime = 15
 Global $g_bAutoResumeEnable = 0, $g_iAutoResumeTime = 5
+Global $g_bDisableNotifications = False
 Global $g_bForceClanCastleDetection = 0
 
 ; <><><><> Bot / Android <><><><>
@@ -1066,6 +1080,7 @@ Global $g_bForceClanCastleDetection = 0
 ;--------------------------------------------------------------------------
 ; END: Variables to hold current GUI setting values
 ;--------------------------------------------------------------------------
+#Tidy_On
 #EndRegion GUI Variables
 
 ; Android & MBR window
@@ -1137,7 +1152,7 @@ Global $g_iArmyCapacity = 0 ; Calculated percentage of troops currently in camp 
 Global $g_iTotalTrainSpaceSpell = 0
 Global $g_iSpellFactorySize = 0 ; Size of spell factory
 Global $g_iCurrentCCSpell = 0, $g_iTotalCCSpell = 0
-Global $g_bFullArmySpells = False  ; true when $g_iTotalTrainSpaceSpell = $iTotalSpellSpace in getArmySpellCount
+Global $g_bFullArmySpells = False ; true when $g_iTotalTrainSpaceSpell = $iTotalSpellSpace in getArmySpellCount
 Global $g_CurrentCampUtilization = 0, $g_iTotalCampSpace = 0
 
 ; Upgrading - Lab
@@ -1186,11 +1201,11 @@ Global $g_iImglocTHLevel = 0
 Global $g_aiTownHallDetails[4] = [-1, -1, -1, -1] ; [LocX, LocY, BldgLvl, Quantity]
 
 ; Attack
-;~ Global Const $g_aaiTopLeftDropPoints[5][2] = [[83, 306], [174, 238], [240, 188], [303, 142], [390, 76]]
-;~ Global Const $g_aaiTopRightDropPoints[5][2] = [[466, 66], [556, 134], [622, 184], [684, 231], [775, 300]]
-;~ Global Const $g_aaiBottomLeftDropPoints[5][2] = [[81, 363], [174, 434], [235, 481], [299, 530], [390, 600]]
-;~ Global Const $g_aaiBottomRightDropPoints[5][2] = [[466, 590], [554, 523], [615, 477], [678, 430], [765, 364]]
-;~ Global Const $g_aaiEdgeDropPoints[4] = [$g_aaiBottomRightDropPoints, $g_aaiTopLeftDropPoints, $g_aaiBottomLeftDropPoints, $g_aaiTopRightDropPoints]
+Global Const $g_aaiTopLeftDropPoints[5][2] = [[66, 299], [174, 210], [240, 169], [303, 127], [390, 55]]
+Global Const $g_aaiTopRightDropPoints[5][2] = [[466, 60], [556, 120], [622, 170], [684, 220], [775, 285]]
+Global Const $g_aaiBottomLeftDropPoints[5][2] = [[81, 390], [174, 475], [235, 521], [299, 570], [390, 610]]
+Global Const $g_aaiBottomRightDropPoints[5][2] = [[466, 600], [554, 555], [615, 510], [678, 460], [765, 394]]
+Global Const $g_aaiEdgeDropPoints[4] = [$g_aaiBottomRightDropPoints, $g_aaiTopLeftDropPoints, $g_aaiBottomLeftDropPoints, $g_aaiTopRightDropPoints]
 Global Const $g_aiUseAllTroops[33] = [$eBarb, $eArch, $eGiant, $eGobl, $eWall, $eBall, $eWiza, $eHeal, $eDrag, $ePekk, $eBabyD, $eMine, $eMini, $eHogs, $eValk, $eGole, $eWitc, $eLava, $eBowl, $eKing, $eQueen, $eWarden, $eCastle, $eLSpell, $eHSpell, $eRSpell, $eJSpell, $eFSpell, $eCSpell, $ePSpell, $eESpell, $eHaSpell]
 Global Const $g_aiUseBarracks[26] = [$eBarb, $eArch, $eGiant, $eGobl, $eWall, $eBall, $eWiza, $eHeal, $eDrag, $ePekk, $eBabyD, $eMine, $eKing, $eQueen, $eWarden, $eCastle, $eLSpell, $eHSpell, $eRSpell, $eJSpell, $eFSpell, $eCSpell, $ePSpell, $eESpell, $eHaSpell, $eSkSpell]
 Global Const $g_aiUseBarbs[15] = [$eBarb, $eKing, $eQueen, $eWarden, $eCastle, $eLSpell, $eHSpell, $eRSpell, $eJSpell, $eFSpell, $eCSpell, $ePSpell, $eESpell, $eHaSpell, $eSkSpell]
@@ -1305,7 +1320,6 @@ Global $g_aiTimeTrain[3] = [0, 0, 0] ; [Troop remaining time], [Spells remaining
 Global Enum $ArmyTAB, $TrainTroopsTAB, $BrewSpellsTAB, $QuickTrainTAB
 Global $g_bCheckSpells = False
 Global $g_bCheckClanCastleTroops = False
-Global Const $g_iQuickTrainButtonRetryDelay = 1000
 ; Array to hold Laboratory Troop information [LocX of upper left corner of image, LocY of upper left corner of image, PageLocation, Troop "name", Icon # in DLL file]
 Global $g_avLabTroops[30][5]
 
@@ -1468,7 +1482,7 @@ Func _FilloBldgLevels()
 	$g_oBldgLevels.add($eBldgDarkS, $aBldgDarkStorage)
 	Local Const $aBldgEagle[11] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2]
 	$g_oBldgLevels.add($eBldgEagle, $aBldgEagle)
-	Local Const $aBldgInferno[11] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4]
+	Local Const $aBldgInferno[11] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 5]
 	$g_oBldgLevels.add($eBldgInferno, $aBldgInferno)
 	Local Const $aBldgMortar[11] = [0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 10]
 	$g_oBldgLevels.add($eBldgMortar, $aBldgMortar)
@@ -1513,8 +1527,8 @@ _FilloBldgMaxQty()
 
 Global $g_oBldgImages = ObjCreate("Scripting.Dictionary") ; stores strings with location of images used to find buildings during attacks
 ; Building image key string value = bldg type enum & "_" & $g_iDetectedImageType (no snow, with snow)
-$g_oBldgImages.add($eBldgTownHall & "_" & "0","imglocth-bundle")
-$g_oBldgImages.add($eBldgTownHall & "_" & "1","snow-imglocth-bundle")
+$g_oBldgImages.add($eBldgTownHall & "_" & "0", "imglocth-bundle")
+$g_oBldgImages.add($eBldgTownHall & "_" & "1", "snow-imglocth-bundle")
 $g_oBldgImages.add($eBldgGoldM & "_" & "0", @ScriptDir & "\imgxml\Storages\Mines")
 $g_oBldgImages.add($eBldgGoldM & "_" & "1", @ScriptDir & "\imgxml\Storages\Mines_Snow")
 $g_oBldgImages.add($eBldgElixirC & "_" & "0", @ScriptDir & "\imgxml\Storages\Collectors")
@@ -1530,7 +1544,6 @@ $g_oBldgImages.add($eBldgWizTower & "_" & "1", @ScriptDir & "\imgxml\Buildings\W
 $g_oBldgImages.add($eBldgMortar & "_" & "0", @ScriptDir & "\imgxml\Buildings\Mortars")
 $g_oBldgImages.add($eBldgAirDefense & "_" & "0", @ScriptDir & "\imgxml\Buildings\ADefense")
 
-; Team AiO MOD++ (2017)
-#include "Team__AiO__MOD++\Globals_Team__AiO__MOD++.au3"
-
 ; EOF
+; Demen MOD - Demen_GE_#9000
+#include "MOD_Demen\Globals_Demen.au3"

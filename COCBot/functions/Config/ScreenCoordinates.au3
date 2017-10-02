@@ -150,6 +150,11 @@ Global Const $aImageTypeN2[4] = [205, 180, 0x86A533, 30] ; Grass on Forest Edge 
 Global Const $aImageTypeS1[4] = [237, 161, 0xFEFDFD, 30] ; Snow on Forest Edge 'Lane' 860x780
 Global Const $aImageTypeS2[4] = [205, 180, 0xFEFEFE, 30] ; Snow on Forest Edge 'Lane' 860x780
 
+;ReplayShare
+Global Const $aAttackLogPage[4] = [775, 125, 0xEB1115, 40] ;red on X Button of Attack Log Page
+Global Const $aAttackLogAttackTab[4] = [437, 114, 0xF0F4F0, 30] ; White on Attack Log Tab  (Tab Name)
+Global Const $aBlueShareReplayButton[4] = [500, 156 + $g_iMidOffsetY, 0x70D4E8, 30] ; Blue Share Replay Button
+Global Const $aGrayShareReplayButton[4] = [500, 156 + $g_iMidOffsetY, 0xBBBBBB, 30] ; Gray Share Replay Button
 
 Global Const $ProfileRep01[4] = [600, 260, 0x71769F, 20] ; If colorcheck then village have 0 attacks and 0 defenses
 
@@ -158,36 +163,36 @@ Global $aAttackButtonRND[4] = [20, 610 + $g_iMidOffsetY, 100, 670 + $g_iMidOffse
 Global $aFindMatchButtonRND[4] = [200, 510 + $g_iMidOffsetY, 300, 530 + $g_iMidOffsetY] ; Find Multiplayer Match Button, Both Shield or without shield Screen 860x732
 Global $NextBtnRND[4] = [710, 530 + $g_iMidOffsetY, 830, 570 + $g_iMidOffsetY] ;  Next Button
 
-Global $aTrainBarb[4]  = [-1, -1, -1, -1]
-Global $aTrainArch[4]  = [-1, -1, -1, -1]
-Global $aTrainGiant[4] = [-1, -1, -1, -1]
-Global $aTrainGobl[4]  = [-1, -1, -1, -1]
-Global $aTrainWall[4]  = [-1, -1, -1, -1]
-Global $aTrainBall[4]  = [-1, -1, -1, -1]
-Global $aTrainWiza[4]  = [-1, -1, -1, -1]
-Global $aTrainHeal[4]  = [-1, -1, -1, -1]
-Global $aTrainDrag[4]  = [-1, -1, -1, -1]
-Global $aTrainPekk[4]  = [-1, -1, -1, -1]
-Global $aTrainBabyD[4] = [-1, -1, -1, -1]
-Global $aTrainMine[4]  = [-1, -1, -1, -1]
-Global $aTrainMini[4] = [-1, -1, -1, -1]
-Global $aTrainHogs[4] = [-1, -1, -1, -1]
-Global $aTrainValk[4] = [-1, -1, -1, -1]
-Global $aTrainGole[4] = [-1, -1, -1, -1]
-Global $aTrainWitc[4] = [-1, -1, -1, -1]
-Global $aTrainLava[4] = [-1, -1, -1, -1]
-Global $aTrainBowl[4] = [-1, -1, -1, -1]
-Global $aTrainLSpell[4] = [-1, -1, -1, -1]
-Global $aTrainHSpell[4] = [-1, -1, -1, -1]
-Global $aTrainRSpell[4] = [-1, -1, -1, -1]
-Global $aTrainJSpell[4] = [-1, -1, -1, -1]
-Global $aTrainFSpell[4] = [-1, -1, -1, -1]
-Global $aTrainCSpell[4] = [-1, -1, -1, -1]
-Global $aTrainPSpell[4] = [-1, -1, -1, -1]
-Global $aTrainESpell[4] = [-1, -1, -1, -1]
-Global $aTrainHaSpell[4] = [-1, -1, -1, -1]
-Global $aTrainSkSpell[4] = [-1, -1, -1, -1]
+;~ Global $aTrainBarb[4]  = [-1, -1, -1, -1]
+;~ Global $aTrainArch[4]  = [-1, -1, -1, -1]
+;~ Global $aTrainGiant[4] = [-1, -1, -1, -1]
+;~ Global $aTrainGobl[4]  = [-1, -1, -1, -1]
+;~ Global $aTrainWall[4]  = [-1, -1, -1, -1]
+;~ Global $aTrainBall[4]  = [-1, -1, -1, -1]
+;~ Global $aTrainWiza[4]  = [-1, -1, -1, -1]
+;~ Global $aTrainHeal[4]  = [-1, -1, -1, -1]
+;~ Global $aTrainDrag[4]  = [-1, -1, -1, -1]
+;~ Global $aTrainPekk[4]  = [-1, -1, -1, -1]
+;~ Global $aTrainBabyD[4] = [-1, -1, -1, -1]
+;~ Global $aTrainMine[4]  = [-1, -1, -1, -1]
+;~ Global $aTrainMini[4] = [-1, -1, -1, -1]
+;~ Global $aTrainHogs[4] = [-1, -1, -1, -1]
+;~ Global $aTrainValk[4] = [-1, -1, -1, -1]
+;~ Global $aTrainGole[4] = [-1, -1, -1, -1]
+;~ Global $aTrainWitc[4] = [-1, -1, -1, -1]
+;~ Global $aTrainLava[4] = [-1, -1, -1, -1]
+;~ Global $aTrainBowl[4] = [-1, -1, -1, -1]
+;~ Global $aTrainLSpell[4] = [-1, -1, -1, -1]
+;~ Global $aTrainHSpell[4] = [-1, -1, -1, -1]
+;~ Global $aTrainRSpell[4] = [-1, -1, -1, -1]
+;~ Global $aTrainJSpell[4] = [-1, -1, -1, -1]
+;~ Global $aTrainFSpell[4] = [-1, -1, -1, -1]
+;~ Global $aTrainCSpell[4] = [-1, -1, -1, -1]
+;~ Global $aTrainPSpell[4] = [-1, -1, -1, -1]
+;~ Global $aTrainESpell[4] = [-1, -1, -1, -1]
+;~ Global $aTrainHaSpell[4] = [-1, -1, -1, -1]
+;~ Global $aTrainSkSpell[4] = [-1, -1, -1, -1]
 
-Global $aTrainArmy[$eArmyCount] = [$aTrainBarb, $aTrainArch, $aTrainGiant, $aTrainGobl, $aTrainWall, $aTrainBall, $aTrainWiza, $aTrainHeal, $aTrainDrag, $aTrainPekk, $aTrainBabyD, $aTrainMine, _
-								   $aTrainMini, $aTrainHogs, $aTrainValk, $aTrainGole, $aTrainWitc, $aTrainLava, $aTrainBowl, 0, 0, 0, 0, $aTrainLSpell, $aTrainHSpell, $aTrainRSpell, $aTrainJSpell, $aTrainFSpell, $aTrainCSpell, _
-								   $aTrainPSpell, $aTrainESpell, $aTrainHaSpell, $aTrainSkSpell]
+;~ Global $aTrainArmy[$eArmyCount] = [$aTrainBarb, $aTrainArch, $aTrainGiant, $aTrainGobl, $aTrainWall, $aTrainBall, $aTrainWiza, $aTrainHeal, $aTrainDrag, $aTrainPekk, $aTrainBabyD, $aTrainMine, _
+;~ 								   $aTrainMini, $aTrainHogs, $aTrainValk, $aTrainGole, $aTrainWitc, $aTrainLava, $aTrainBowl, 0, 0, 0, 0, $aTrainLSpell, $aTrainHSpell, $aTrainRSpell, $aTrainJSpell, $aTrainFSpell, $aTrainCSpell, _
+;~ 								   $aTrainPSpell, $aTrainESpell, $aTrainHaSpell, $aTrainSkSpell]

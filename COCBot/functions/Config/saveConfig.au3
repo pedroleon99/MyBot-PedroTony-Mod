@@ -200,7 +200,7 @@ Func SaveRegularConfig()
 	SaveConfig_600_35()
 	; <><><> Attack Plan / Train Army / Troops/Spells <><><>
 	; Quick train
- 	SaveConfig_600_52_1()
+;~ 	SaveConfig_600_52_1()	; QuickTrainCombo - Demen_QT_#9006
 	; troop/spell levels and counts
 	SaveConfig_600_52_2()
 	; <><><> Attack Plan / Train Army / Train Order <><><>
@@ -211,12 +211,6 @@ Func SaveRegularConfig()
 	SaveConfig_641_1()
 	; <><><><> Bot / Debug <><><><>
 	SaveConfig_Debug()
-
-	;  <><><> Team AiO MOD++ (2017) <><><>
-	SaveConfig_MOD()
-	SaveConfig_SwitchAcc()
-	SaveConfig_Forecast()
-
 	; <><><><> Attack Plan / Strategies <><><><>
 	; <<< nothing here >>>
 
@@ -225,6 +219,9 @@ Func SaveRegularConfig()
 
 	; <><><><> Bot / Stats <><><><>
 	; <<< nothing here >>>
+
+	; Demen Mod - Demen_GE_#9000
+	SaveConfig_Mod()
 
 	;SetDebugLog("saveConfig: Wrote " & $g_iIniLineCount & " ini lines.")
 	_Ini_Save($g_sProfileConfigPath)
@@ -239,6 +236,7 @@ Func SaveConfig_Android()
 	_Ini_Add("android", "user.distributor", $g_sUserGameDistributor)
 	_Ini_Add("android", "user.package", $g_sUserGamePackage)
 	_Ini_Add("android", "user.class", $g_sUserGameClass)
+	_Ini_Add("android", "backgroundmode", $g_iAndroidBackgroundMode)
 	_Ini_Add("android", "check.time.lag.enabled", ($g_bAndroidCheckTimeLagEnabled ? "1" : "0"))
 	_Ini_Add("android", "adb.screencap.timeout.min", $g_iAndroidAdbScreencapTimeoutMin)
 	_Ini_Add("android", "adb.screencap.timeout.max", $g_iAndroidAdbScreencapTimeoutMax)
@@ -483,6 +481,7 @@ Func SaveConfig_600_18()
 	_Ini_Add("notify", "AlertPBMaintenance", $g_bNotifyAlertMaintenance ? 1 : 0)
 	_Ini_Add("notify", "AlertPBBAN", $g_bNotifyAlertBAN ? 1 : 0)
 	_Ini_Add("notify", "AlertPBUpdate", $g_bNotifyAlertBOTUpdate ? 1 : 0)
+	_Ini_Add("notify", "AlertSmartWaitTime", $g_bNotifyAlertSmartWaitTime ? 1 : 0)
 EndFunc   ;==>SaveConfig_600_18
 
 Func SaveConfig_600_19()
@@ -879,7 +878,7 @@ Func SaveConfig_600_30()
 	_Ini_Add("shareattack", "minGold", $g_iShareMinGold)
 	_Ini_Add("shareattack", "minElixir", $g_iShareMinElixir)
 	_Ini_Add("shareattack", "minDark", $g_iShareMinDark)
-	_Ini_Add("shareattack", "Message", StringReplace($g_sShareMessage, @CRLF, "|"))
+	_Ini_Add("shareattack", "Message", $g_sShareMessage)
 	_Ini_Add("attack", "TakeLootSnapShot", $g_bTakeLootSnapShot ? 1 : 0)
 	_Ini_Add("attack", "ScreenshotLootInfo", $g_bScreenshotLootInfo ? 1 : 0)
 EndFunc   ;==>SaveConfig_600_30
@@ -990,17 +989,18 @@ Func SaveConfig_600_35()
 	_Ini_Add("other", "ValuePBTimeForcedExit", $g_iSinglePBForcedEarlyExitTime)
 	_Ini_Add("other", "ChkAutoResume", $g_bAutoResumeEnable ? 1 : 0)
 	_Ini_Add("other", "AutoResumeTime", $g_iAutoResumeTime)
+	_Ini_Add("other", "ChkDisableNotifications", $g_bDisableNotifications)
 	_Ini_Add("other", "ChkFixClanCastle", $g_bForceClanCastleDetection ? 1 : 0)
 EndFunc   ;==>SaveConfig_600_35
 
+#CS	; QuickTrainCombo - Demen_QT_#9006
 Func SaveConfig_600_52_1()
 	; <><><> Attack Plan / Train Army / Troops/Spells <><><>
 	ApplyConfig_600_52_1("Save")
 	_Ini_Add("other", "ChkUseQTrain", $g_bQuickTrainEnable ? 1 : 0)
-	_Ini_Add("troop", "QuickTrainArmy1", $g_bQuickTrainArmy[0] ? 1 : 0)
-	_Ini_Add("troop", "QuickTrainArmy2", $g_bQuickTrainArmy[1] ? 1 : 0)
-	_Ini_Add("troop", "QuickTrainArmy3", $g_bQuickTrainArmy[2] ? 1 : 0)
+	_Ini_Add("troop", "QuickTrainArmyNum", $g_iQuickTrainArmyNum)
 EndFunc   ;==>SaveConfig_600_52_1
+#CE
 
 Func SaveConfig_600_52_2()
 	; troop/spell levels and counts

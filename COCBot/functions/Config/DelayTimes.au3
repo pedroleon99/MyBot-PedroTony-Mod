@@ -295,6 +295,7 @@ Global Const $DELAYTRAIN4 = 200
 Global Const $DELAYTRAIN6 = 20 ; click
 Global Const $DELAYTRAIN8 = 5000 ; wait for a while to desapear the 'received castle troops' msg
 Global Const $DELAYLVUP = 150 ; delay in repeatly increasing levels on the train troops screen when button is held down
+Global Const $g_iQuickTrainButtonRetryDelay = 1000
 
 ;IsTrainPage
 Global Const $DELAYISTRAINPAGE1 = 100
@@ -375,14 +376,7 @@ Global $DELAYSMARTZAP4 = 4000
 
 ;SwitchBetweenBases
 Global $DELAYSWITCHBASES1 = 1000
-Global $DELAYSWITCHBASES2 = 200
 
 ;ClockTower
-Global $DELAYCLOCKTOWER1 = 200
+Global $DELAYCLOCKTOWER1 = 1000
 Global $DELAYCLOCKTOWER2 = 100
-
-;SuperXP / GoblinXP
-Global Const $DELAYDROPSuperXP1= 500
-Global Const $DELAYDROPSuperXP2 = 1000
-Global Const $DELAYDROPSuperXP3 = 250
-Global Const $DELAYPREPARESearchSuperXP = 500

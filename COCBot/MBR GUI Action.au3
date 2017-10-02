@@ -110,7 +110,6 @@ Func BotStart($bAutostartDelay = 0)
 		EndIf
 		If Not $g_bRunState Then Return
 		If $hWndActive = $g_hAndroidWindow And ($g_bAndroidBackgroundLaunched = True Or AndroidControlAvailable())  Then ; Really?
-			AutoHide() ; Auto Hide - NguyenAnhHD
 			Initiate() ; Initiate and run bot
 		Else
 			SetLog("Cannot use " & $g_sAndroidEmulator & ", please check log", $COLOR_ERROR)
@@ -154,8 +153,8 @@ Func BotStop()
 	If $g_iTownHallLevel > 2 Then GUICtrlSetState($g_hBtnSearchMode, $GUI_ENABLE)
 	GUICtrlSetState($g_hBtnSearchMode, $GUI_SHOW)
 	;GUICtrlSetState($g_hBtnMakeScreenshot, $GUI_ENABLE)
-	GUICtrlSetState($g_hBtnEnableGUI, $GUI_HIDE) ; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen
-	GUICtrlSetState($g_hBtnDisableGUI, $GUI_HIDE) ; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen
+	GUICtrlSetState($g_hBtnEnableGUI, $GUI_HIDE) ; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen_EG_#9008
+	GUICtrlSetState($g_hBtnDisableGUI, $GUI_HIDE) ; Manually enable/disable GUI while botting (as requested by YScorpion) - Demen_EG_#9008
 
 	; hide attack buttons if show
 	GUICtrlSetState($g_hBtnAttackNowDB, $GUI_HIDE)

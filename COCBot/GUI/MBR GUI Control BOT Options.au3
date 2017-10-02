@@ -68,7 +68,7 @@ Func cmbLanguage()
 	$g_sLanguage = $aLanguageFile[$g_sLanguageIndex][0] ; the filename = 0, the display name = 1
 	MsgBox("", "", GetTranslatedFileIni("MBR Popups", "Func_cmbLanguage", "Restart Bot to load program with new language:") & " " & $aLanguageFile[$g_sLanguageIndex][1] & " (" & $g_sLanguage & ")")
 	IniWriteS($g_sProfileConfigPath, "other", "language", $g_sLanguage) ; save language before restarting
-	ShellExecute(@ScriptFullPath, $g_sProfileCurrentName & " " & $g_sAndroidEmulator & " " & $g_sAndroidInstance & " /r")
+	RestartBot(False, False)
 EndFunc   ;==>cmbLanguage
 
 Func chkBotCustomTitleBarClick()
@@ -81,6 +81,10 @@ Func chkBotAutoSlideClick()
 	Local $bChecked = GUICtrlRead($g_hChkBotAutoSlideClick) = $GUI_CHECKED
 	$g_iBotDesignFlags = BitOR(BitAND($g_iBotDesignFlags, BitNOT(2)), (($bChecked) ? 2 : 0))
 EndFunc   ;==>chkBotAutoSlideClick
+
+Func chkDisableNotifications()
+	$g_bDisableNotifications = (GUICtrlRead($g_hChkDisableNotifications) = $GUI_CHECKED)
+EndFunc   ;==>chkDisableNotifications
 
 Func chkUseRandomClick()
 	$g_bUseRandomClick = (GUICtrlRead($g_hChkUseRandomClick) = $GUI_CHECKED)
@@ -617,7 +621,7 @@ Func btnTestGetLocationBuilding()
 	ResetTHsearch()
 	SetLog("Testing FindTownhall()", $COLOR_INFO)
 	SetLog("FindTownhall() = " & FindTownhall(True), $COLOR_INFO)
-;	SetLog("$g_sImglocRedline = " & $g_sImglocRedline, $COLOR_INFO)
+	;	SetLog("$g_sImglocRedline = " & $g_sImglocRedline, $COLOR_INFO)
 
 	_LogObjList($g_oBldgAttackInfo) ; log dictionary contents
 
@@ -895,3 +899,11 @@ Func btnTestOcrMemory()
 
 EndFunc   ;==>btnTestOcrMemory
 
+Func btnTestWeakBase()
+	Local $currentRunState = $g_bRunState
+	$g_bRunState = True
+	BeginImageTest()
+	IsWeakBase()
+	EndImageTest()
+	$g_bRunState = $currentRunState
+EndFunc   ;==>btnTestWeakBase
