@@ -26,6 +26,18 @@ Func BoostBarracks()
 		EndIf
 	EndIf
 
+	If GUICtrlRead($chkForecastBoost) = $GUI_CHECKED Then
+		If $currentForecast > Number($iTxtForecastBoost, 3) Then
+			Local $hour = StringSplit(_NowTime(4), ":", $STR_NOCOUNT)
+			If $g_abBoostBarracksHours[$hour[0]] = False Then
+				SetLog("No planned boosting for this hour.", $COLOR_RED)
+				Return ; exit func if no planned Boost Barracks checkmarks
+			EndIf
+		Else
+			Return
+		EndIf
+	EndIf
+
 	If OpenArmyWindow() = True Then
 		Local $CheckArmyWindow = ISArmyWindow()
 		OpenTrainTabNumber(1, "BoostBarracks")
@@ -35,9 +47,13 @@ Func BoostBarracks()
 		If $ClickResult = True Then
 			Local $GemResult = IsGemWindowOpen(True)
 			If $GemResult = True Then
-				If $g_iCmbBoostBarracks >= 1 Then $g_iCmbBoostBarracks -= 1
-				Setlog(" Total remain cycles to boost Barracks:" & $g_iCmbBoostBarracks, $COLOR_GREEN)
-				GUICtrlSetData($g_hCmbBoostBarracks, $g_iCmbBoostBarracks)
+				If $g_iCmbBoostBarracks >= 1 And $g_iCmbBoostBarracks <= 24 Then
+					$g_iCmbBoostBarracks -= 1
+					Setlog(" Total remain cycles to boost Barracks:" & $g_iCmbBoostBarracks, $COLOR_GREEN)
+					GUICtrlSetData($g_hCmbBoostBarracks, $g_iCmbBoostBarracks)
+				ElseIf $g_iCmbBoostBarracks = 25 Then
+					Setlog(" Total remain cycles to boost Barracks: Unlimited", $COLOR_GREEN)
+				EndIf
 			EndIf
 		EndIf
 
@@ -54,6 +70,8 @@ Func BoostSpellFactory()
 	If $g_iCmbBoostSpellFactory >= 1 Then
 		SetLog("Boosting Spell Factory...", $COLOR_BLUE)
 
+		If $iChkForecastBoost = 1 And $currentForecast <= Number($iTxtForecastBoost, 3) Then Return
+
 		If OpenArmyWindow() = True Then
 			Local $CheckArmyWindow = ISArmyWindow()
 			OpenTrainTabNumber(2, "BoostSpellFactory")
@@ -63,9 +81,13 @@ Func BoostSpellFactory()
 			If $ClickResult = True Then
 				Local $GemResult = IsGemWindowOpen(True)
 				If $GemResult = True Then
-					If $g_iCmbBoostSpellFactory >= 1 Then $g_iCmbBoostSpellFactory -= 1
-					Setlog(" Total remain cycles to boost Spells:" & $g_iCmbBoostSpellFactory, $COLOR_GREEN)
-					GUICtrlSetData($g_hCmbBoostSpellFactory, $g_iCmbBoostSpellFactory)
+					If $g_iCmbBoostSpellFactory >= 1 And $g_iCmbBoostSpellFactory <= 24 Then
+						$g_iCmbBoostSpellFactory -= 1
+						Setlog(" Total remain cycles to boost Spells:" & $g_iCmbBoostSpellFactory, $COLOR_GREEN)
+						GUICtrlSetData($g_hCmbBoostSpellFactory, $g_iCmbBoostSpellFactory)
+					ElseIf $g_iCmbBoostSpellFactory = 25 Then
+						Setlog(" Total remain cycles to boost Spells: Unlimited", $COLOR_GREEN)
+					EndIf
 				EndIf
 			EndIf
 
@@ -103,8 +125,8 @@ Func IsGemWindowOpen($AcceptGem = False)
 	_Sleep($DELAYISGEMOPEN1)
 	If _ColorCheck(_GetPixelColor(590, 235 + $g_iMidOffsetY, True), Hex(0xD80408, 6), 20) Then
 		If _ColorCheck(_GetPixelColor(375, 383 + $g_iMidOffsetY, True), Hex(0x222322, 6), 20) Then
-			If $g_iDebugSetlog = 1 Or $g_bDebugBarrackBoost Then Setlog("DETECTED, GEM Window Is OPEN", $COLOR_DEBUG) ;Debug
-			If $AcceptGem = True Then
+			If $g_bDebugSetlog Or $g_bDebugBarrackBoost Then Setlog("DETECTED, GEM Window Is OPEN", $COLOR_DEBUG) ;Debug
+			If $AcceptGem Then
 				Click(435, 445)
 				_Sleep($DELAYBOOSTBARRACKS2)
 				SetLog('Boost was Successful.', $COLOR_GREEN)

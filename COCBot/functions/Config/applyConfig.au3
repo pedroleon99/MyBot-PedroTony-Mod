@@ -14,6 +14,7 @@
 ; ===============================================================================================================================
 
 Func applyConfig($bRedrawAtExit = True, $TypeReadSave = "Read") ;Applies the data from config to the controls in GUI
+
 	Static $iApplyConfigCount = 0
 	$iApplyConfigCount += 1
 	SetDebugLog("applyConfig(), call number " & $iApplyConfigCount)
@@ -29,9 +30,21 @@ Func applyConfig($bRedrawAtExit = True, $TypeReadSave = "Read") ;Applies the dat
 		If $g_iFrmBotDockedPosX > -30000 And $g_iFrmBotDockedPosY > -30000 And $g_bFrmBotMinimized = False Then WinMove($g_hFrmBot, "", $g_iFrmBotDockedPosX, $g_iFrmBotDockedPosY)
 	EndIf
 
+	If $g_iGuiMode <> 1 Then
+		If $g_iGuiMode = 2 Then ; mini mode controls
+			Switch $TypeReadSave
+				Case "Read"
+					GUICtrlSetState($g_hChkBackgroundMode, $g_bChkBackgroundMode = True ? $GUI_CHECKED : $GUI_UNCHECKED)
+				Case "Save"
+					$g_bChkBackgroundMode = (GUICtrlRead($g_hChkBackgroundMode) = $GUI_CHECKED)
+			EndSwitch
+		EndIf
+		UpdateBotTitle()
+		Return
+	EndIf
+
 	; Move with redraw disabled causes ghost window in VMWare, so move first then disable redraw
 	Local $bWasRdraw = SetRedrawBotWindow(False, Default, Default, Default, "applyConfig")
-
 	; <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 
 	; <><><><> Bot / Profile (global settings) <><><><>
@@ -56,6 +69,8 @@ Func applyConfig($bRedrawAtExit = True, $TypeReadSave = "Read") ;Applies the dat
 	ApplyConfig_600_15($TypeReadSave)
 	; <><><><> Village / Upgrade - Buildings <><><><>
 	ApplyConfig_600_16($TypeReadSave)
+	; <><><><> Village / Upgrade - Auto Upgrade <><><><>
+	ApplyConfig_auto($TypeReadSave)
 	; <><><><> Village / Upgrade - Walls <><><><>
 	ApplyConfig_600_17($TypeReadSave)
 	; <><><><> Village / Notify <><><><>
@@ -98,7 +113,7 @@ Func applyConfig($bRedrawAtExit = True, $TypeReadSave = "Read") ;Applies the dat
 	ApplyConfig_600_35($TypeReadSave)
 	; <><><> Attack Plan / Train Army / Troops/Spells <><><>
 	; Quick train
-;~ 	ApplyConfig_600_52_1($TypeReadSave)	; QuickTrainCombo - Demen_QT_#9006
+ 	ApplyConfig_600_52_1($TypeReadSave)
 	; troop/spell levels and counts
 	ApplyConfig_600_52_2($TypeReadSave)
 	; <><><> Attack Plan / Train Army / Train Order <><><>
@@ -107,6 +122,10 @@ Func applyConfig($bRedrawAtExit = True, $TypeReadSave = "Read") ;Applies the dat
 	ApplyConfig_600_56($TypeReadSave)
 	; <><><> Attack Plan / Train Army / Options <><><>
 	ApplyConfig_641_1($TypeReadSave)
+
+	;  <><><> Team AiO MOD++ (2017) <><><>
+	ApplyConfig_MOD($TypeReadSave)
+	ApplyConfig_Forecast($TypeReadSave)
 
 	; <><><><> Attack Plan / Strategies <><><><>
 	; <<< nothing here >>>
@@ -125,8 +144,7 @@ Func applyConfig($bRedrawAtExit = True, $TypeReadSave = "Read") ;Applies the dat
 	; <<< nothing here >>>
 
 	; <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-	; Demen Mod - Demen_GE_#9000
-	ApplyConfig_Mod($TypeReadSave)
+
 
 	ApplyConfig_Debug($TypeReadSave)
 
@@ -157,11 +175,13 @@ Func ApplyConfig_Android($TypeReadSave)
 			UpdateBotTitle()
 			_GUICtrlComboBox_SetCurSel($g_hCmbAndroidBackgroundMode, $g_iAndroidBackgroundMode)
 			GUICtrlSetState($g_hChkAndroidAdbClickDragScript, $g_bAndroidAdbClickDragScript ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetData($g_hTxtAndroidRebootHours, $g_iAndroidRebootHours)
 			_GUICtrlComboBox_SetCurSel($g_hCmbSuspendAndroid, AndroidSuspendFlagsToIndex($g_iAndroidSuspendModeFlags))
 		Case "Save"
 			cmbCOCDistributors()
 			cmbAndroidBackgroundMode()
 			$g_bAndroidAdbClickDragScript = (GUICtrlRead($g_hChkAndroidAdbClickDragScript) = $GUI_CHECKED ? True : False)
+			$g_iAndroidRebootHours = Int(GUICtrlRead($g_hTxtAndroidRebootHours)) ; Hours are entered
 			cmbSuspendAndroid()
 	EndSwitch
 EndFunc   ;==>ApplyConfig_Android
@@ -170,19 +190,19 @@ Func ApplyConfig_Debug($TypeReadSave)
 	; <><><><> Bot / Debug <><><><>
 	Switch $TypeReadSave
 		Case "Read"
-			GUICtrlSetState($g_hChkDebugClick, $g_iDebugClick = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugSetlog, $g_iDebugSetlog = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugDisableZoomout, $g_iDebugDisableZoomout = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugDisableVillageCentering, $g_iDebugDisableVillageCentering = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugDeadbaseImage, $g_iDebugDeadBaseImage = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugOCR, $g_iDebugOcr = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugImageSave, $g_iDebugImageSave = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkdebugBuildingPos, $g_iDebugBuildingPos = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkdebugTrain, $g_iDebugSetlogTrain = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugOCRDonate, $g_iDebugOCRdonate = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkdebugAttackCSV, $g_iDebugAttackCSV = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkMakeIMGCSV, $g_iDebugMakeIMGCSV = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDebugSmartZap, $g_bDebugSmartZap = True ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugClick, $g_bDebugClick ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugSetlog, $g_bDebugSetlog ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugDisableZoomout, $g_bDebugDisableZoomout ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugDisableVillageCentering, $g_bDebugDisableVillageCentering ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugDeadbaseImage, $g_bDebugDeadBaseImage ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugOCR, $g_bDebugOcr ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugImageSave, $g_bDebugImageSave ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkdebugBuildingPos, $g_bDebugBuildingPos ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkdebugTrain, $g_bDebugSetlogTrain ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugOCRDonate, $g_bDebugOCRdonate ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkdebugAttackCSV, $g_bDebugAttackCSV ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkMakeIMGCSV, $g_bDebugMakeIMGCSV ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkDebugSmartZap, $g_bDebugSmartZap ? $GUI_CHECKED : $GUI_UNCHECKED)
 			If $g_bDevMode = True Then
 				GUICtrlSetState($g_hChkDebugSetlog, $GUI_ENABLE)
 				GUICtrlSetState($g_hChkDebugOCR, $GUI_ENABLE)
@@ -194,20 +214,20 @@ Func ApplyConfig_Debug($TypeReadSave)
 				GUICtrlSetState($g_hChkDebugSmartZap, $GUI_ENABLE)
 			EndIf
 		Case "Save"
-			$g_iDebugClick = GUICtrlRead($g_hChkDebugClick) = $GUI_CHECKED ? 1 : 0
-			If $g_bDevMode = True Then
-				$g_iDebugSetlog = GUICtrlRead($g_hChkDebugSetlog) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugDisableZoomout = GUICtrlRead($g_hChkDebugDisableZoomout) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugDisableVillageCentering = GUICtrlRead($g_hChkDebugDisableVillageCentering) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugDeadBaseImage = GUICtrlRead($g_hChkDebugDeadbaseImage) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugOcr = GUICtrlRead($g_hChkDebugOCR) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugImageSave = GUICtrlRead($g_hChkDebugImageSave) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugBuildingPos = GUICtrlRead($g_hChkdebugBuildingPos) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugSetlogTrain = GUICtrlRead($g_hChkdebugTrain) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugOCRdonate = GUICtrlRead($g_hChkDebugOCRDonate) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugAttackCSV = GUICtrlRead($g_hChkdebugAttackCSV) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugMakeIMGCSV = GUICtrlRead($g_hChkMakeIMGCSV) = $GUI_CHECKED ? 1 : 0
-				$g_bDebugSmartZap = (GUICtrlRead($g_hChkDebugSmartZap) = $GUI_CHECKED ? True : False)
+			$g_bDebugClick = (GUICtrlRead($g_hChkDebugClick) = $GUI_CHECKED)
+			If $g_bDevMode Then
+				$g_bDebugSetlog = (GUICtrlRead($g_hChkDebugSetlog) = $GUI_CHECKED)
+				$g_bDebugDisableZoomout = (GUICtrlRead($g_hChkDebugDisableZoomout) = $GUI_CHECKED)
+				$g_bDebugDisableVillageCentering = (GUICtrlRead($g_hChkDebugDisableVillageCentering) = $GUI_CHECKED)
+				$g_bDebugDeadBaseImage = (GUICtrlRead($g_hChkDebugDeadbaseImage) = $GUI_CHECKED)
+				$g_bDebugOcr = (GUICtrlRead($g_hChkDebugOCR) = $GUI_CHECKED)
+				$g_bDebugImageSave = (GUICtrlRead($g_hChkDebugImageSave) = $GUI_CHECKED)
+				$g_bDebugBuildingPos = (GUICtrlRead($g_hChkdebugBuildingPos) = $GUI_CHECKED)
+				$g_bDebugSetlogTrain = (GUICtrlRead($g_hChkdebugTrain) = $GUI_CHECKED)
+				$g_bDebugOCRdonate = (GUICtrlRead($g_hChkDebugOCRDonate) = $GUI_CHECKED)
+				$g_bDebugAttackCSV = (GUICtrlRead($g_hChkdebugAttackCSV) = $GUI_CHECKED)
+				$g_bDebugMakeIMGCSV = (GUICtrlRead($g_hChkMakeIMGCSV) = $GUI_CHECKED)
+				$g_bDebugSmartZap = (GUICtrlRead($g_hChkDebugSmartZap) = $GUI_CHECKED)
 			EndIf
 	EndSwitch
 EndFunc   ;==>ApplyConfig_Debug
@@ -257,6 +277,18 @@ Func ApplyConfig_600_6($TypeReadSave)
 			GUICtrlSetState($g_hChkStartClockTowerBoost, $g_bChkStartClockTowerBoost ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_hChkCTBoostBlderBz, $g_bChkCTBoostBlderBz ? $GUI_CHECKED : $GUI_UNCHECKED)
 			chkStartClockTowerBoost()
+			GUICtrlSetState($g_chkBBSuggestedUpgrades, $g_ichkBBSuggestedUpgrades = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_chkBBSuggestedUpgradesIgnoreGold, $g_ichkBBSuggestedUpgradesIgnoreGold = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_chkBBSuggestedUpgradesIgnoreElixir, $g_ichkBBSuggestedUpgradesIgnoreElixir = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_chkBBSuggestedUpgradesIgnoreHall, $g_ichkBBSuggestedUpgradesIgnoreHall = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
+
+			GUICtrlSetState($g_chkPlacingNewBuildings, $g_ichkPlacingNewBuildings = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
+
+			chkActivateBBSuggestedUpgrades()
+			chkActivateBBSuggestedUpgradesGold()
+			chkActivateBBSuggestedUpgradesElixir()
+			chkPlacingNewBuildings()
+
 		Case "Save"
 			$g_bChkBotStop = (GUICtrlRead($g_hChkBotStop) = $GUI_CHECKED)
 			$g_iCmbBotCommand = _GUICtrlComboBox_GetCurSel($g_hCmbBotCommand)
@@ -278,6 +310,12 @@ Func ApplyConfig_600_6($TypeReadSave)
 			$g_bChkCollectBuilderBase = (GUICtrlRead($g_hChkCollectBuilderBase) = $GUI_CHECKED)
 			$g_bChkStartClockTowerBoost = (GUICtrlRead($g_hChkStartClockTowerBoost) = $GUI_CHECKED)
 			$g_bChkCTBoostBlderBz = (GUICtrlRead($g_hChkCTBoostBlderBz) = $GUI_CHECKED)
+			$g_ichkBBSuggestedUpgrades = (GUICtrlRead($g_chkBBSuggestedUpgrades) = $GUI_CHECKED) ? 1 : 0
+			$g_ichkBBSuggestedUpgradesIgnoreGold = (GUICtrlRead($g_chkBBSuggestedUpgradesIgnoreGold) = $GUI_CHECKED) ? 1 : 0
+			$g_ichkBBSuggestedUpgradesIgnoreElixir = (GUICtrlRead($g_chkBBSuggestedUpgradesIgnoreElixir) = $GUI_CHECKED) ? 1 : 0
+			$g_ichkBBSuggestedUpgradesIgnoreHall = (GUICtrlRead($g_chkBBSuggestedUpgradesIgnoreHall) = $GUI_CHECKED) ? 1 : 0
+
+			$g_ichkPlacingNewBuildings = (GUICtrlRead($g_chkPlacingNewBuildings) = $GUI_CHECKED) ? 1 : 0
 	EndSwitch
 EndFunc   ;==>ApplyConfig_600_6
 
@@ -385,6 +423,19 @@ Func ApplyConfig_600_12($TypeReadSave)
 			Next
 			cmbDonateCustomB()
 
+			; Additional Custom Donate - Team AiO MOD++ (#-28)
+			For $i = 0 To 2
+				_GUICtrlComboBox_SetCurSel($g_ahCmbDonateCustomC[$i], $g_aiDonateCustomTrpNumC[$i][0])
+				GUICtrlSetData($g_ahTxtDonateCustomC[$i], $g_aiDonateCustomTrpNumC[$i][1])
+			Next
+			cmbDonateCustomC()
+
+			For $i = 0 To 2
+				_GUICtrlComboBox_SetCurSel($g_ahCmbDonateCustomD[$i], $g_aiDonateCustomTrpNumD[$i][0])
+				GUICtrlSetData($g_ahTxtDonateCustomD[$i], $g_aiDonateCustomTrpNumD[$i][1])
+			Next
+			cmbDonateCustomD()
+
 			GUICtrlSetState($g_hChkExtraAlphabets, $g_bChkExtraAlphabets ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_hChkExtraChinese, $g_bChkExtraChinese ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_hChkExtraKorean, $g_bChkExtraKorean ? $GUI_CHECKED : $GUI_UNCHECKED)
@@ -415,6 +466,12 @@ Func ApplyConfig_600_12($TypeReadSave)
 				$g_aiDonateCustomTrpNumA[$i][1] = GUICtrlRead($g_ahTxtDonateCustomA[$i])
 				$g_aiDonateCustomTrpNumB[$i][0] = _GUICtrlComboBox_GetCurSel($g_ahCmbDonateCustomB[$i])
 				$g_aiDonateCustomTrpNumB[$i][1] = GUICtrlRead($g_ahTxtDonateCustomB[$i])
+
+				; Additional Custom Donate - Team AiO MOD++ (#-28)
+				$g_aiDonateCustomTrpNumC[$i][0] = _GUICtrlComboBox_GetCurSel($g_ahCmbDonateCustomC[$i])
+				$g_aiDonateCustomTrpNumC[$i][1] = GUICtrlRead($g_ahTxtDonateCustomC[$i])
+				$g_aiDonateCustomTrpNumD[$i][0] = _GUICtrlComboBox_GetCurSel($g_ahCmbDonateCustomD[$i])
+				$g_aiDonateCustomTrpNumD[$i][1] = GUICtrlRead($g_ahTxtDonateCustomD[$i])
 			Next
 
 			$g_bChkExtraAlphabets = (GUICtrlRead($g_hChkExtraAlphabets) = $GUI_CHECKED)
@@ -539,6 +596,35 @@ Func ApplyConfig_600_16($TypeReadSave)
 			$g_iUpgradeMinDark = Number(GUICtrlRead($g_hTxtUpgrMinDark))
 	EndSwitch
 EndFunc   ;==>ApplyConfig_600_16
+
+Func ApplyConfig_auto($TypeReadSave)
+; Auto Upgrade
+    Switch $TypeReadSave
+	    Case "Read"
+			GUICtrlSetState($g_chkAutoUpgrade, $g_ichkAutoUpgrade = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
+			For $i = 0 To 12
+				GUICtrlSetState($g_chkUpgradesToIgnore[$i], $g_ichkUpgradesToIgnore[$i] = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
+			Next
+			For $i = 0 To 2
+				GUICtrlSetState($g_chkResourcesToIgnore[$i], $g_ichkResourcesToIgnore[$i] = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
+			Next
+			GUICtrlSetData($g_SmartMinGold, $g_iSmartMinGold)
+			GUICtrlSetData($g_SmartMinElixir, $g_iSmartMinElixir)
+			GUICtrlSetData($g_SmartMinDark, $g_iSmartMinDark)
+			chkAutoUpgrade()
+		Case "Save"
+			$g_ichkAutoUpgrade = GUICtrlRead($g_chkAutoUpgrade) = $GUI_CHECKED ? 1 : 0
+			For $i = 0 To 12
+				$g_ichkUpgradesToIgnore[$i] = GUICtrlRead($g_chkUpgradesToIgnore[$i]) = $GUI_CHECKED ? 1 : 0
+			Next
+			For $i = 0 To 2
+				$g_ichkResourcesToIgnore[$i] = GUICtrlRead($g_chkResourcesToIgnore[$i]) = $GUI_CHECKED ? 1 : 0
+			Next
+			$g_iSmartMinGold = GUICtrlRead($g_SmartMinGold)
+			$g_iSmartMinElixir = GUICtrlRead($g_SmartMinElixir)
+			$g_iSmartMinDark = GUICtrlRead($g_SmartMinDark)
+    EndSwitch
+EndFunc   ;==>ApplyConfig_auto
 
 Func ApplyConfig_600_17($TypeReadSave)
 	; <><><><> Village / Upgrade - Walls <><><><>
@@ -685,11 +771,11 @@ Func ApplyConfig_600_22($TypeReadSave)
 				GUICtrlSetState($g_hChkBoostBarracksHours[$i], $g_abBoostBarracksHours[$i] ? $GUI_CHECKED : $GUI_UNCHECKED)
 			Next
 		Case "Save"
-			$g_iCmbBoostBarracks = GUICtrlRead($g_hCmbBoostBarracks)
-			$g_iCmbBoostSpellFactory = GUICtrlRead($g_hCmbBoostSpellFactory)
-			$g_iCmbBoostBarbarianKing = GUICtrlRead($g_hCmbBoostBarbarianKing)
-			$g_iCmbBoostArcherQueen = GUICtrlRead($g_hCmbBoostArcherQueen)
-			$g_iCmbBoostWarden = GUICtrlRead($g_hCmbBoostWarden)
+			$g_iCmbBoostBarracks = _GUICtrlComboBox_GetCurSel($g_hCmbBoostBarracks)
+			$g_iCmbBoostSpellFactory = _GUICtrlComboBox_GetCurSel($g_hCmbBoostSpellFactory)
+			$g_iCmbBoostBarbarianKing = _GUICtrlComboBox_GetCurSel($g_hCmbBoostBarbarianKing)
+			$g_iCmbBoostArcherQueen = _GUICtrlComboBox_GetCurSel($g_hCmbBoostArcherQueen)
+			$g_iCmbBoostWarden = _GUICtrlComboBox_GetCurSel($g_hCmbBoostWarden)
 			For $i = 0 To 23
 				$g_abBoostBarracksHours[$i] = (GUICtrlRead($g_hChkBoostBarracksHours[$i]) = $GUI_CHECKED)
 			Next
@@ -1185,7 +1271,6 @@ Func ApplyConfig_600_29_DB_Standard($TypeReadSave)
 			GUICtrlSetState($g_hChkAttackNearGoldMineDB, $g_abAttackStdSmartNearCollectors[$DB][0] ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_hChkAttackNearElixirCollectorDB, $g_abAttackStdSmartNearCollectors[$DB][1] ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_hChkAttackNearDarkElixirDrillDB, $g_abAttackStdSmartNearCollectors[$DB][2] ? $GUI_CHECKED : $GUI_UNCHECKED)
-			cmbStandardDropSidesDB()	; FourFinger Classic - Demen_FF_#9007
 		Case "Save"
 			$g_aiAttackStdDropOrder[$DB] = _GUICtrlComboBox_GetCurSel($g_hCmbStandardDropOrderDB)
 			$g_aiAttackStdDropSides[$DB] = _GUICtrlComboBox_GetCurSel($g_hCmbStandardDropSidesDB)
@@ -1299,9 +1384,9 @@ Func ApplyConfig_600_29_DB_Milking($TypeReadSave)
 				GUICtrlSetState($g_hChkMilkingDebugIMG, $GUI_SHOW)
 				GUICtrlSetState($g_hChkMilkingDebugVillage, $GUI_SHOW)
 				GUICtrlSetState($g_hChkMilkingDebugFullSearch, $GUI_SHOW)
-				GUICtrlSetState($g_hChkMilkingDebugIMG, $g_iDebugResourcesOffset = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-				GUICtrlSetState($g_hChkMilkingDebugVillage, $g_iDebugMilkingIMGmake = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-				GUICtrlSetState($g_hChkMilkingDebugFullSearch, $g_iDebugContinueSearchElixir = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
+				GUICtrlSetState($g_hChkMilkingDebugIMG, $g_bDebugResourcesOffset ? $GUI_CHECKED : $GUI_UNCHECKED)
+				GUICtrlSetState($g_hChkMilkingDebugVillage, $g_bDebugMilkingIMGmake ? $GUI_CHECKED : $GUI_UNCHECKED)
+				GUICtrlSetState($g_hChkMilkingDebugFullSearch, $g_bDebugContinueSearchElixir ? $GUI_CHECKED : $GUI_UNCHECKED)
 			EndIf
 		Case "Save"
 			$g_iMilkAttackType = _GUICtrlComboBox_GetCurSel($g_hCmbMilkAttackType)
@@ -1348,10 +1433,10 @@ Func ApplyConfig_600_29_DB_Milking($TypeReadSave)
 			$g_iMilkFarmForceToleranceNormal = GUICtrlRead($g_hTxtMilkFarmForceToleranceNormal)
 			$g_iMilkFarmForceToleranceBoosted = GUICtrlRead($g_hTxtMilkFarmForceToleranceBoosted)
 			$g_iMilkFarmForceToleranceDestroyed = GUICtrlRead($g_hTxtMilkFarmForceToleranceDestroyed)
-			If $g_bDevMode = True Then
-				$g_iDebugResourcesOffset = GUICtrlRead($g_hChkMilkingDebugIMG) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugMilkingIMGmake = GUICtrlRead($g_hChkMilkingDebugVillage) = $GUI_CHECKED ? 1 : 0
-				$g_iDebugContinueSearchElixir = GUICtrlRead($g_hChkMilkingDebugFullSearch) = $GUI_CHECKED ? 1 : 0
+			If $g_bDevMode Then
+				$g_bDebugResourcesOffset = (GUICtrlRead($g_hChkMilkingDebugIMG) = $GUI_CHECKED)
+				$g_bDebugMilkingIMGmake = (GUICtrlRead($g_hChkMilkingDebugVillage) = $GUI_CHECKED)
+				$g_bDebugContinueSearchElixir = (GUICtrlRead($g_hChkMilkingDebugFullSearch) = $GUI_CHECKED)
 			EndIf
 	EndSwitch
 EndFunc   ;==>ApplyConfig_600_29_DB_Milking
@@ -1431,7 +1516,6 @@ Func ApplyConfig_600_29_LB_Standard($TypeReadSave)
 			GUICtrlSetState($g_hChkAttackNearGoldMineAB, $g_abAttackStdSmartNearCollectors[$LB][0] ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_hChkAttackNearElixirCollectorAB, $g_abAttackStdSmartNearCollectors[$LB][1] ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_hChkAttackNearDarkElixirDrillAB, $g_abAttackStdSmartNearCollectors[$LB][2] ? $GUI_CHECKED : $GUI_UNCHECKED)
-			cmbStandardDropSidesAB()	; FourFinger Classic - Demen_FF_#9007
 		Case "Save"
 			$g_aiAttackStdDropOrder[$LB] = _GUICtrlComboBox_GetCurSel($g_hCmbStandardDropOrderAB)
 			$g_aiAttackStdDropSides[$LB] = _GUICtrlComboBox_GetCurSel($g_hCmbStandardDropSidesAB)
@@ -1733,8 +1817,8 @@ Func ApplyConfig_600_35($TypeReadSave)
 			GUICtrlSetData($g_hTxtPBTimeForcedExit, $g_iSinglePBForcedEarlyExitTime)
 			chkSinglePBTForced()
 			GUICtrlSetState($g_hChkAutoResume, $g_bAutoResumeEnable ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hChkDisableNotifications, $g_bDisableNotifications ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetData($g_hTxtAutoResumeTime, $g_iAutoResumeTime)
+			GUICtrlSetState($g_hChkDisableNotifications, $g_bDisableNotifications ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_hChkFixClanCastle, $g_bForceClanCastleDetection ? $GUI_CHECKED : $GUI_UNCHECKED)
 		Case "Save"
 			$g_bDisableSplash = (GUICtrlRead($g_hChkDisableSplash) = $GUI_CHECKED)
@@ -1771,28 +1855,22 @@ Func ApplyConfig_600_35($TypeReadSave)
 	EndSwitch
 EndFunc   ;==>ApplyConfig_600_35
 
-#CS		;  QuickTrainCombo - Demen_QT_#9006
 Func ApplyConfig_600_52_1($TypeReadSave)
 	; <><><> Attack Plan / Train Army / Troops/Spells <><><>
 	; Quick train
 	Switch $TypeReadSave
 		Case "Read"
 			GUICtrlSetState($g_hChkUseQuickTrain, $g_bQuickTrainEnable ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hRdoArmy1, $g_iQuickTrainArmyNum = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hRdoArmy2, $g_iQuickTrainArmyNum = 2 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetState($g_hRdoArmy3, $g_iQuickTrainArmyNum = 3 ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_ahChkArmy[0], $g_bQuickTrainArmy[0] ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_ahChkArmy[1], $g_bQuickTrainArmy[1] ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_ahChkArmy[2], $g_bQuickTrainArmy[2] ? $GUI_CHECKED : $GUI_UNCHECKED)
 		Case "Save"
 			$g_bQuickTrainEnable = (GUICtrlRead($g_hChkUseQuickTrain) = $GUI_CHECKED)
-			If GUICtrlRead($g_hRdoArmy1) = $GUI_CHECKED Then
-				$g_iQuickTrainArmyNum = 1
-			ElseIf GUICtrlRead($g_hRdoArmy2) = $GUI_CHECKED Then
-				$g_iQuickTrainArmyNum = 2
-			ElseIf GUICtrlRead($g_hRdoArmy3) = $GUI_CHECKED Then
-				$g_iQuickTrainArmyNum = 3
-			EndIf
+			$g_bQuickTrainArmy[0] = (GUICtrlRead($g_ahChkArmy[0]) = $GUI_CHECKED)
+			$g_bQuickTrainArmy[1] = (GUICtrlRead($g_ahChkArmy[1]) = $GUI_CHECKED)
+			$g_bQuickTrainArmy[2] = (GUICtrlRead($g_ahChkArmy[2]) = $GUI_CHECKED)
 	EndSwitch
 EndFunc   ;==>ApplyConfig_600_52_1
-#CE
 
 Func ApplyConfig_600_52_2($TypeReadSave)
 	; troop/spell levels and counts
@@ -1949,6 +2027,9 @@ Func ApplyConfig_641_1($TypeReadSave)
 				GUICtrlSetState($g_hCmbMinimumTimeClose, $GUI_ENABLE)
 				GUICtrlSetState($g_hLblSymbolWaiting, $GUI_ENABLE)
 				GUICtrlSetState($g_hLblWaitingInMinutes, $GUI_ENABLE)
+				; Max logout time - Team AiO MOD++ (#-21)
+				GUICtrlSetState($g_hChkTrainLogoutMaxTime, $GUI_ENABLE)
+				chkTrainLogoutMaxTime()
 			Else
 				GUICtrlSetState($g_hChkCloseWhileTraining, $GUI_UNCHECKED)
 				_GUI_Value_STATE("DISABLE", $groupCloseWhileTraining)
@@ -1956,6 +2037,8 @@ Func ApplyConfig_641_1($TypeReadSave)
 				GUICtrlSetState($g_hCmbMinimumTimeClose, $GUI_DISABLE)
 				GUICtrlSetState($g_hLblSymbolWaiting, $GUI_DISABLE)
 				GUICtrlSetState($g_hLblWaitingInMinutes, $GUI_DISABLE)
+				; Max logout time - Team AiO MOD++ (#-21)
+				GUICtrlSetState($g_hChkTrainLogoutMaxTime, $GUI_DISABLE)
 			EndIf
 			GUICtrlSetState($g_hChkCloseWithoutShield, $g_bCloseWithoutShield ? $GUI_CHECKED : $GUI_UNCHECKED)
 			GUICtrlSetState($g_hChkCloseEmulator, $g_bCloseEmulator ? $GUI_CHECKED : $GUI_UNCHECKED)

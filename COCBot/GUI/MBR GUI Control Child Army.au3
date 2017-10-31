@@ -16,9 +16,9 @@
 
 Func chkUseQTrain()
 	If GUICtrlRead($g_hChkUseQuickTrain) = $GUI_CHECKED Then
-		_GUI_Value_STATE("ENABLE", $g_ahChkArmy[0] & "#" & $g_ahChkArmy[1] & "#" & $g_ahChkArmy[2])		; QuickTrainCombo (checkbox) - Demen_QT_#9006
-		chkQuickTrainCombo()																			; QuickTrainCombo (checkbox) - Demen_QT_#9006
-		If GUICtrlRead($g_hchkSmartTrain) = $GUI_CHECKED Then 											; Precise troops of SmartTrain - Demen_ST_#9002
+		_GUI_Value_STATE("ENABLE", $g_ahChkArmy[0] & "#" & $g_ahChkArmy[1] & "#" & $g_ahChkArmy[2])		; QuickTrain Combo - Team AiO MOD++ (#-11)
+		chkQuickTrainCombo()																			; QuickTrain Combo - Team AiO MOD++ (#-11)
+		If GUICtrlRead($g_hchkSmartTrain) = $GUI_CHECKED Then 											; Smart Train - Team AiO MOD++ (#-13)
 			GUICtrlSetState($g_hchkPreciseTroops, $GUI_UNCHECKED)
 			GUICtrlSetState($g_hchkPreciseTroops, $GUI_DISABLE)
 		EndIf
@@ -31,15 +31,34 @@ Func chkUseQTrain()
 		GUICtrlSetData($g_hLblElixirCostSpell, "0")
 		GUICtrlSetData($g_hLblDarkCostSpell, "0")
 	Else
-		_GUI_Value_STATE("DISABLE", $g_ahChkArmy[0] & "#" & $g_ahChkArmy[1] & "#" & $g_ahChkArmy[2])	; QuickTrainCombo (checkbox) - Demen_QT_#9006
+		_GUI_Value_STATE("DISABLE", $g_ahChkArmy[0] & "#" & $g_ahChkArmy[1] & "#" & $g_ahChkArmy[2])	; QuickTrain Combo - Team AiO MOD++ (#-11)
 		chkQuickTrainCombo()
-		chkSmartTrain()																				; Precise troops of SmartTrain - Demen_ST_#9002
+		chkSmartTrain()																					; Smart Train - Team AiO MOD++ (#-13)
 		_GUI_Value_STATE("ENABLE", $grpTrainTroops)
 		_GUI_Value_STATE("ENABLE", $grpCookSpell)
 		lblTotalCountTroop1()
 		TotalSpellCountClick()
 	EndIf
 EndFunc   ;==>chkUseQTrain
+
+; QuickTrain Combo - Team AiO MOD++ (#-11)
+Func chkQuickTrainCombo()
+	If GUICtrlRead($g_ahChkArmy[0]) = $GUI_UNCHECKED And GUICtrlRead($g_ahChkArmy[1]) = $GUI_UNCHECKED And GUICtrlRead($g_ahChkArmy[2]) = $GUI_UNCHECKED Then
+		GUICtrlSetState($g_ahChkArmy[0], $GUI_CHECKED)
+		ToolTip("QuickTrainCombo: " & @CRLF & "At least 1 Army Check is required! Default Army1.")
+		Sleep(2000)
+		ToolTip('')
+	EndIf
+
+	If GUICtrlRead($g_ahChkArmy[2]) = $GUI_CHECKED And GUICtrlRead($g_hChkUseQuickTrain) = $GUI_CHECKED Then
+		_GUI_Value_STATE("HIDE", $g_hLblRemoveArmy & "#" & $g_hBtnRemoveArmy)
+		_GUI_Value_STATE("SHOW", $g_hChkMultiClick)
+	Else
+		_GUI_Value_STATE("HIDE", $g_hChkMultiClick)
+		_GUI_Value_STATE("SHOW", $g_hLblRemoveArmy & "#" & $g_hBtnRemoveArmy)
+	EndIf
+
+EndFunc   ;==>chkQuickTrainCombo
 
 Func SetComboTroopComp()
 	Local $bWasRedraw = SetRedrawBotWindow(False, Default, Default, Default, "SetComboTroopComp")
@@ -270,11 +289,15 @@ Func chkCloseWaitEnable()
 	If GUICtrlRead($g_hChkCloseWhileTraining) = $GUI_CHECKED Then
 		$g_bCloseWhileTrainingEnable = True
 		_GUI_Value_STATE("ENABLE", $groupCloseWhileTraining)
-		_GUI_Value_STATE("ENABLE", $g_hLblCloseWaitingTroops & "#" & $g_hCmbMinimumTimeClose & "#" & $g_hLblSymbolWaiting & "#" & $g_hLblWaitingInMinutes)
+		; Max logout time - Team AiO MOD++ (#-21)
+		_GUI_Value_STATE("ENABLE", $g_hLblCloseWaitingTroops & "#" & $g_hCmbMinimumTimeClose & "#" & $g_hLblSymbolWaiting & "#" & $g_hLblWaitingInMinutes & "#" & $g_hChkTrainLogoutMaxTime)
+		chkTrainLogoutMaxTime()
 	Else
 		$g_bCloseWhileTrainingEnable = False
 		_GUI_Value_STATE("DISABLE", $groupCloseWhileTraining)
-		_GUI_Value_STATE("DISABLE", $g_hLblCloseWaitingTroops & "#" & $g_hCmbMinimumTimeClose & "#" & $g_hLblSymbolWaiting & "#" & $g_hLblWaitingInMinutes)
+		; Max logout time - Team AiO MOD++ (#-21)
+		_GUI_Value_STATE("DISABLE", $g_hLblCloseWaitingTroops & "#" & $g_hCmbMinimumTimeClose & "#" & $g_hLblSymbolWaiting & "#" & $g_hLblWaitingInMinutes & "#" & $g_hChkTrainLogoutMaxTime & "#" & $g_hTxtTrainLogoutMaxTime & "#" & $g_hLblTrainLogoutMaxTime)
+		_GUI_Value_STATE("UNCHECKED", $g_hChkTrainLogoutMaxTime)
 	EndIf
 	If GUICtrlRead($g_hChkRandomClose) = $GUI_CHECKED Then
 		GUICtrlSetState($g_hChkCloseEmulator, BitOR($GUI_DISABLE, $GUI_UNCHECKED))
@@ -286,6 +309,15 @@ Func chkCloseWaitEnable()
 		EndIf
 	EndIf
 EndFunc   ;==>chkCloseWaitEnable
+
+; Max logout time - Team AiO MOD++ (#-21)
+Func chkTrainLogoutMaxTime()
+	If GUICtrlRead($g_hChkTrainLogoutMaxTime) = $GUI_CHECKED Then
+		_GUI_Value_STATE("ENABLE", $g_hTxtTrainLogoutMaxTime & "#" & $g_hLblTrainLogoutMaxTime)
+	Else
+		_GUI_Value_STATE("DISABLE", $g_hTxtTrainLogoutMaxTime & "#" & $g_hLblTrainLogoutMaxTime)
+	EndIf
+EndFunc   ;==>chkTrainLogoutMaxTime
 
 Func chkCloseWaitTrain()
 	$g_bCloseWithoutShield = (GUICtrlRead($g_hChkCloseWithoutShield) = $GUI_CHECKED)
@@ -358,7 +390,7 @@ Func chkTroopOrder($bSetLog = True)
 			GUICtrlSetState($g_ahCmbTroopOrder[$i], $GUI_DISABLE) ; disable combo boxes
 		Next
 		SetDefaultTroopGroup($bSetLog) ; Reset troopgroup values to default
-		If ($bSetLog Or $g_iDebugSetlogTrain = 1) And $g_bCustomTrainOrderEnable Then
+		If ($bSetLog Or $g_bDebugSetlogTrain) And $g_bCustomTrainOrderEnable Then
 			Local $sNewTrainList = ""
 			For $i = 0 To $eTroopCount - 1
 				$sNewTrainList &= $g_asTroopShortNames[$g_aiTrainOrder[$i]] & ", "
@@ -651,7 +683,7 @@ Func BtnTroopOrderSet()
 EndFunc   ;==>BtnTroopOrderSet
 
 Func ChangeSpellsBrewOrder()
-	If $g_iDebugSetlog = 1 Or $g_iDebugSetlogTrain = 1 Then Setlog("Begin Func ChangeSpellsBrewOrder()", $COLOR_DEBUG) ;Debug
+	If $g_bDebugSetlog Or $g_bDebugSetlogTrain Then Setlog("Begin Func ChangeSpellsBrewOrder()", $COLOR_DEBUG) ;Debug
 
 	Local $NewTroopOrder[$eSpellCount]
 	Local $iUpdateCount = 0
@@ -690,7 +722,7 @@ EndFunc   ;==>ChangeSpellsBrewOrder
 
 Func ChangeTroopTrainOrder()
 
-	If $g_iDebugSetlog = 1 Or $g_iDebugSetlogTrain = 1 Then Setlog("Begin Func ChangeTroopTrainOrder()", $COLOR_DEBUG) ;Debug
+	If $g_bDebugSetlog Or $g_bDebugSetlogTrain Then Setlog("Begin Func ChangeTroopTrainOrder()", $COLOR_DEBUG) ;Debug
 
 	Local $NewTroopOrder[$eTroopCount]
 	Local $iUpdateCount = 0
@@ -731,7 +763,7 @@ Func SetDefaultTroopGroup($bSetLog = True)
 		$g_aiTrainOrder[$i] = $i
 	Next
 
-	If ($bSetLog Or $g_iDebugSetlogTrain = 1) And $g_bCustomTrainOrderEnable Then Setlog("Default troop training order set", $COLOR_SUCCESS)
+	If ($bSetLog Or $g_bDebugSetlogTrain) And $g_bCustomTrainOrderEnable Then Setlog("Default troop training order set", $COLOR_SUCCESS)
 EndFunc   ;==>SetDefaultTroopGroup
 
 Func SetDefaultSpellsGroup($bSetLog = True)
@@ -739,28 +771,28 @@ Func SetDefaultSpellsGroup($bSetLog = True)
 		$g_aiBrewOrder[$i] = $i
 	Next
 
-	If ($bSetLog Or $g_iDebugSetlogTrain = 1) And $g_bCustomTrainOrderEnable Then Setlog("Default Spells Brew order set", $COLOR_SUCCESS)
+	If ($bSetLog Or $g_bDebugSetlogTrain) And $g_bCustomTrainOrderEnable Then Setlog("Default Spells Brew order set", $COLOR_SUCCESS)
 EndFunc   ;==>SetDefaultSpellsGroup
 
 Func IsUseCustomSpellsOrder()
 	For $i = 0 To UBound($g_aiCmbCustomBrewOrder) - 1 ; Check if custom train order has been used, to select log message
 		If $g_aiCmbCustomBrewOrder[$i] = -1 Then
-			If $g_iDebugSetlogTrain = 1 And $g_bCustomBrewOrderEnable Then Setlog("Custom Spell order not used...", $COLOR_DEBUG) ;Debug
+			If $g_bDebugSetlogTrain And $g_bCustomBrewOrderEnable Then Setlog("Custom Spell order not used...", $COLOR_DEBUG) ;Debug
 			Return False
 		EndIf
 	Next
-	If $g_iDebugSetlogTrain = 1 And $g_bCustomBrewOrderEnable Then Setlog("Custom Spell order used...", $COLOR_DEBUG) ;Debug
+	If $g_bDebugSetlogTrain And $g_bCustomBrewOrderEnable Then Setlog("Custom Spell order used...", $COLOR_DEBUG) ;Debug
 	Return True
 EndFunc   ;==>IsUseCustomSpellsOrder
 
 Func IsUseCustomTroopOrder()
 	For $i = 0 To UBound($g_aiCmbCustomTrainOrder) - 1 ; Check if custom train order has been used, to select log message
 		If $g_aiCmbCustomTrainOrder[$i] = -1 Then
-			If $g_iDebugSetlogTrain = 1 And $g_bCustomTrainOrderEnable Then Setlog("Custom train order not used...", $COLOR_DEBUG) ;Debug
+			If $g_bDebugSetlogTrain And $g_bCustomTrainOrderEnable Then Setlog("Custom train order not used...", $COLOR_DEBUG) ;Debug
 			Return False
 		EndIf
 	Next
-	If $g_iDebugSetlogTrain = 1 And $g_bCustomTrainOrderEnable Then Setlog("Custom train order used...", $COLOR_DEBUG) ;Debug
+	If $g_bDebugSetlogTrain And $g_bCustomTrainOrderEnable Then Setlog("Custom train order used...", $COLOR_DEBUG) ;Debug
 	Return True
 EndFunc   ;==>IsUseCustomTroopOrder
 

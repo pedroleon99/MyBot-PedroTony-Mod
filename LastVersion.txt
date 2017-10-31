@@ -1,5 +1,5 @@
 
 [mod]
-version    = "v3.7"
+version    = "v3.8"
 messagenew = "Fully working with May update\nNew GUI and lots of new features\nFor more information, go to \nhttps://mybot.run\n\n Always free and open source."
 messageold = "A new version of MyBot Pedro&Tony MOD (v3.5) is available!\nPlease download the latest from:\nhttps://mybot.run"

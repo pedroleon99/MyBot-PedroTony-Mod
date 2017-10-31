@@ -23,7 +23,7 @@ Func AttackReport()
 	While _CheckPixel($aEndFightSceneAvl, True) = False ; check for light gold pixle in the Gold ribbon in End of Attack Scene before reading values
 		$iCount += 1
 		If _Sleep($DELAYATTACKREPORT1) Then Return
-		If $g_iDebugSetlog = 1 Then Setlog("Waiting Attack Report Ready, " & ($iCount / 2) & " Seconds.", $COLOR_DEBUG)
+		If $g_bDebugSetlog Then Setlog("Waiting Attack Report Ready, " & ($iCount / 2) & " Seconds.", $COLOR_DEBUG)
 		If $iCount > 30 Then ExitLoop ; wait 30*500ms = 15 seconds max for the window to render
 	WEnd
 	If $iCount > 30 Then Setlog("End of Attack scene slow to appear, attack values my not be correct", $COLOR_INFO)
@@ -32,7 +32,7 @@ Func AttackReport()
 	While getResourcesLoot(333, 289 + $g_iMidOffsetY) = "" ; check for gold value to be non-zero before reading other values as a secondary timer to make sure all values are available
 		$iCount += 1
 		If _Sleep($DELAYATTACKREPORT1) Then Return
-		If $g_iDebugSetlog = 1 Then Setlog("Waiting Attack Report Ready, " & ($iCount / 2) & " Seconds.", $COLOR_DEBUG)
+		If $g_bDebugSetlog Then Setlog("Waiting Attack Report Ready, " & ($iCount / 2) & " Seconds.", $COLOR_DEBUG)
 		If $iCount > 20 Then ExitLoop ; wait 20*500ms = 10 seconds max before we have call the OCR read an error
 	WEnd
 	If $iCount > 20 Then Setlog("End of Attack scene read gold error, attack values my not be correct", $COLOR_INFO)
@@ -170,8 +170,9 @@ Func AttackReport()
 	SetLog("Stars earned: " & $starsearned)
 
 	Local $AtkLogTxt
-	If $g_bChkSwitchAcc Then	; SwitchAcc - Demen_SA_#9001
-		$AtkLogTxt = String($g_iCurAccount + 1) & " |" & _NowTime(4) & "|"
+	; Switch Accounts - Team AiO MOD++ (#-12)
+	If $g_bChkSwitchAcc Then
+		$AtkLogTxt = String($g_iCurAccount + 1) & "|" & _NowTime(4) & "|"
 	Else
 		$AtkLogTxt = "" & _NowTime(4) & "|"
 	EndIf
@@ -197,7 +198,7 @@ Func AttackReport()
 	EndIf
 
 	; rename or delete zombie
-	If $g_iDebugDeadBaseImage = 1 Then
+	If $g_bDebugDeadBaseImage Then
 		setZombie($g_iStatsLastAttack[$eLootElixir])
 	EndIf
 
@@ -232,9 +233,10 @@ Func AttackReport()
 	EndIf
 	$g_aiAttackedVillageCount[$g_iMatchMode] += 1
 
-	If $g_bChkSwitchAcc = 1 Then 	; SwitchAcc - Demen_SA_#9001
+	; Switch Accounts - Team AiO MOD++ (#-12)
+	If $g_bChkSwitchAcc Then
 		$g_aiGoldTotalAcc[$g_iCurAccount] += $g_iStatsLastAttack[$eLootGold] + $g_iStatsBonusLast[$eLootGold]
-		$g_aiElixirTotalAcc[$g_iCurAccount] +=$g_iStatsLastAttack[$eLootElixir] + $g_iStatsBonusLast[$eLootElixir]
+		$g_aiElixirTotalAcc[$g_iCurAccount] += $g_iStatsLastAttack[$eLootElixir] + $g_iStatsBonusLast[$eLootElixir]
 		If $g_iStatsStartedWith[$eLootDarkElixir] <> "" Then
 			$g_aiDarkTotalAcc[$g_iCurAccount] += $g_iStatsLastAttack[$eLootDarkElixir] + $g_iStatsBonusLast[$eLootDarkElixir]
 		EndIf
