@@ -29,7 +29,7 @@ Func AttackReport()
 	If $iCount > 30 Then Setlog("End of Attack scene slow to appear, attack values my not be correct", $COLOR_INFO)
 
 	$iCount = 0 ; reset loop counter
-	While getResourcesLoot(333, 289 + $g_iMidOffsetY) = "" ; check for gold value to be non-zero before reading other values as a secondary timer to make sure all values are available
+	While getResourcesLoot(290, 289 + $g_iMidOffsetY) = "" ; check for gold value to be non-zero before reading other values as a secondary timer to make sure all values are available
 		$iCount += 1
 		If _Sleep($DELAYATTACKREPORT1) Then Return
 		If $g_bDebugSetlog Then Setlog("Waiting Attack Report Ready, " & ($iCount / 2) & " Seconds.", $COLOR_DEBUG)
@@ -38,9 +38,9 @@ Func AttackReport()
 	If $iCount > 20 Then Setlog("End of Attack scene read gold error, attack values my not be correct", $COLOR_INFO)
 
 	If _ColorCheck(_GetPixelColor($aAtkRprtDECheck[0], $aAtkRprtDECheck[1], True), Hex($aAtkRprtDECheck[2], 6), $aAtkRprtDECheck[3]) Then ; if the color of the DE drop detected
-		$g_iStatsLastAttack[$eLootGold] = getResourcesLoot(333, 289 + $g_iMidOffsetY)
+		$g_iStatsLastAttack[$eLootGold] = getResourcesLoot(290, 289 + $g_iMidOffsetY)
 		If _Sleep($DELAYATTACKREPORT2) Then Return
-		$g_iStatsLastAttack[$eLootElixir] = getResourcesLoot(333, 328 + $g_iMidOffsetY)
+		$g_iStatsLastAttack[$eLootElixir] = getResourcesLoot(290, 328 + $g_iMidOffsetY)
 		If _Sleep($DELAYATTACKREPORT2) Then Return
 		$g_iStatsLastAttack[$eLootDarkElixir] = getResourcesLootDE(365, 365 + $g_iMidOffsetY)
 		If _Sleep($DELAYATTACKREPORT2) Then Return
@@ -50,9 +50,9 @@ Func AttackReport()
 		EndIf
 		SetLog("Loot: [G]: " & _NumberFormat($g_iStatsLastAttack[$eLootGold]) & " [E]: " & _NumberFormat($g_iStatsLastAttack[$eLootElixir]) & " [DE]: " & _NumberFormat($g_iStatsLastAttack[$eLootDarkElixir]) & " [T]: " & $g_iStatsLastAttack[$eLootTrophy], $COLOR_SUCCESS)
 	Else
-		$g_iStatsLastAttack[$eLootGold] = getResourcesLoot(333, 289 + $g_iMidOffsetY)
+		$g_iStatsLastAttack[$eLootGold] = getResourcesLoot(290, 289 + $g_iMidOffsetY)
 		If _Sleep($DELAYATTACKREPORT2) Then Return
-		$g_iStatsLastAttack[$eLootElixir] = getResourcesLoot(333, 328 + $g_iMidOffsetY)
+		$g_iStatsLastAttack[$eLootElixir] = getResourcesLoot(290, 328 + $g_iMidOffsetY)
 		If _Sleep($DELAYATTACKREPORT2) Then Return
 		$g_iStatsLastAttack[$eLootTrophy] = getResourcesLootT(403, 365 + $g_iMidOffsetY)
 		If _ColorCheck(_GetPixelColor($aAtkRprtTrophyCheck[0], $aAtkRprtTrophyCheck[1], True), Hex($aAtkRprtTrophyCheck[2], 6), $aAtkRprtTrophyCheck[3]) Then
@@ -83,8 +83,8 @@ Func AttackReport()
 					$iCalcMaxBonus = $g_iStatsBonusLast[$eLootGold]
 					SetLog("Bonus [G]: " & _NumberFormat($g_iStatsBonusLast[$eLootGold]) & " [E]: " & _NumberFormat($g_iStatsBonusLast[$eLootElixir]) & " [DE]: " & _NumberFormat($g_iStatsBonusLast[$eLootDarkElixir]), $COLOR_SUCCESS)
 				Else
-					$iCalcMaxBonus = Number($g_iStatsBonusLast[$eLootGold] / ($iBonusLast / 100))
-					$iCalcMaxBonusDark = Number($g_iStatsBonusLast[$eLootDarkElixir] / ($iBonusLast / 100))
+					$iCalcMaxBonus = Ceiling($g_iStatsBonusLast[$eLootGold] / ($iBonusLast / 100))
+					$iCalcMaxBonusDark = Ceiling($g_iStatsBonusLast[$eLootDarkElixir] / ($iBonusLast / 100))
 
 					SetLog("Bonus [G]: " & _NumberFormat($g_iStatsBonusLast[$eLootGold]) & " out of " & _NumberFormat($iCalcMaxBonus) & " [E]: " & _NumberFormat($g_iStatsBonusLast[$eLootElixir]) & " out of " & _NumberFormat($iCalcMaxBonus) & " [DE]: " & _NumberFormat($g_iStatsBonusLast[$eLootDarkElixir]) & " out of " & _NumberFormat($iCalcMaxBonusDark), $COLOR_SUCCESS)
 				EndIf
@@ -163,36 +163,99 @@ Func AttackReport()
 	EndIf
 
 	; check stars earned
-	Local $starsearned = 0
+	;xbenk ~ atklog ~ set as global
+	$starsearned = 0
 	If _ColorCheck(_GetPixelColor($aWonOneStarAtkRprt[0], $aWonOneStarAtkRprt[1], True), Hex($aWonOneStarAtkRprt[2], 6), $aWonOneStarAtkRprt[3]) Then $starsearned += 1
 	If _ColorCheck(_GetPixelColor($aWonTwoStarAtkRprt[0], $aWonTwoStarAtkRprt[1], True), Hex($aWonTwoStarAtkRprt[2], 6), $aWonTwoStarAtkRprt[3]) Then $starsearned += 1
 	If _ColorCheck(_GetPixelColor($aWonThreeStarAtkRprt[0], $aWonThreeStarAtkRprt[1], True), Hex($aWonThreeStarAtkRprt[2], 6), $aWonThreeStarAtkRprt[3]) Then $starsearned += 1
 	SetLog("Stars earned: " & $starsearned)
 
+	;xbenk ~ notify
+	If $starsearned >= 1 Then
+		$eWinlose = "VICTORY"
+	Else
+		$eWinlose = "DEFEAT"
+	EndIf
+	SetLog("RESULT: " & $eWinlose)
+
+	;xbenk ~ atklog ~ content
 	Local $AtkLogTxt
 	; Switch Accounts - Team AiO MOD++ (#-12)
 	If $g_bChkSwitchAcc Then
-		$AtkLogTxt = String($g_iCurAccount + 1) & "|" & _NowTime(4) & "|"
+		$AtkLogTxt = "#" & String($g_iCurAccount + 1) & "|" & _NowTime(4) & "|"
 	Else
-		$AtkLogTxt = "" & _NowTime(4) & "|"
+		$AtkLogTxt = "|" & _NowTime(4) & "|"
 	EndIf
-	$AtkLogTxt &= StringFormat("%5d", $g_aiCurrentLoot[$eLootTrophy]) & "|"
-	$AtkLogTxt &= StringFormat("%6d", $g_iSearchCount) & "|"
-	$AtkLogTxt &= StringFormat("%7d", $g_iStatsLastAttack[$eLootGold]) & "|"
-	$AtkLogTxt &= StringFormat("%7d", $g_iStatsLastAttack[$eLootElixir]) & "|"
-	$AtkLogTxt &= StringFormat("%7d", $g_iStatsLastAttack[$eLootDarkElixir]) & "|"
+
+	$AtkLogTxt &= StringFormat("%4d", $g_aiCurrentLoot[$eLootTrophy]) & "|"
+	$AtkLogTxt &= StringFormat("%3d", $g_iSearchCount) & "|"
+	Local $l_iTotalSearchTime = 0
+	If $g_iTotalSearchTime > 60 Then
+		$l_iTotalSearchTime = $g_iTotalSearchTime/60
+		$AtkLogTxt &= StringFormat("%4d", StringFormat("%.1f",$l_iTotalSearchTime)) & "h|"
+	Else
+		$AtkLogTxt &= StringFormat("%4d", StringFormat("%.1f",$g_iTotalSearchTime)) & "m|"
+	EndIf
+
+	$AtkLogTxt &= StringFormat("%2d", $eTHLevel) & "|"
+	$AtkLogTxt &= StringFormat("%2d", $g_iSearchTrophy) & "|"
+	If ($eLootPerc = 100) Then
+		$AtkLogTxt &= StringFormat("%3d", $eLootPerc) & "|"
+	Else
+		$AtkLogTxt &= StringFormat("%2d", $eLootPerc) & "%|"
+	EndIf
 	$AtkLogTxt &= StringFormat("%3d", $g_iStatsLastAttack[$eLootTrophy]) & "|"
 	$AtkLogTxt &= StringFormat("%1d", $starsearned) & "|"
-	$AtkLogTxt &= StringFormat("%6d", $g_iStatsBonusLast[$eLootGold]) & "|"
-	$AtkLogTxt &= StringFormat("%6d", $g_iStatsBonusLast[$eLootElixir]) & "|"
+	$AtkLogTxt &= StringFormat("%3d", ($g_iStatsLastAttack[$eLootGold]/1000)) & "K|"
+	$AtkLogTxt &= StringFormat("%3d", ($g_iStatsLastAttack[$eLootElixir]/1000)) & "K|"
+	$AtkLogTxt &= StringFormat("%4d", $g_iStatsLastAttack[$eLootDarkElixir]) & "|"
+
+	$AtkLogTxt &= StringFormat("%3d", ($g_iStatsBonusLast[$eLootGold]/1000)) & "K|"
+	$AtkLogTxt &= StringFormat("%3d", ($g_iStatsBonusLast[$eLootElixir]/1000)) & "K|"
 	$AtkLogTxt &= StringFormat("%4d", $g_iStatsBonusLast[$eLootDarkElixir]) & "|"
 	$AtkLogTxt &= $g_asLeagueDetailsShort & "|"
+	If $g_bChkSwitchAcc Then
+		$AtkLogTxt &= $g_sProfileCurrentName
+	EndIf
 
 	Local $AtkLogTxtExtend
 	$AtkLogTxtExtend = "|"
 	$AtkLogTxtExtend &= $g_CurrentCampUtilization & "/" & $g_iTotalCampSpace & "|"
+	;xbenk ~ atklog ~ colouring
 	If Int($g_iStatsLastAttack[$eLootTrophy]) >= 0 Then
-		SetAtkLog($AtkLogTxt, $AtkLogTxtExtend, $COLOR_BLACK)
+		If $g_bChkSwitchAcc Then
+			Local $lcolor
+			Switch $g_iCurAccount
+				Case 0
+					$lcolor = $COLOR_INFO ;blue
+				Case 1
+					$lcolor = $COLOR_DEBUG1 ;dark purple
+				Case 2
+					$lcolor = $COLOR_SUCCESS1 ;dark green
+				Case 3
+					$lcolor = $COLOR_ORANGE
+				Case 4
+					$lcolor = $COLOR_DEBUG2 ;lite purple
+				Case 5
+					$lcolor = $COLOR_SUCCESS ;dark green
+				Case 6
+					$lcolor = $COLOR_DEBUGS
+				Case 7
+					$lcolor = $COLOR_DEBUG ;light green
+			EndSwitch
+			SetAtkLog($AtkLogTxt, $AtkLogTxtExtend, $lcolor)
+		Else
+			; pedroleon99 Pedro&Tony MOD
+			If ($starsearned = 0) Then
+				SetAtkLog($AtkLogTxt, $AtkLogTxtExtend, $COLOR_ERROR)
+			ElseIf ($starsearned = 1) Then
+				SetAtkLog($AtkLogTxt, $AtkLogTxtExtend, $COLOR_ORANGE)
+			ElseIf ($starsearned = 2) Then
+				SetAtkLog($AtkLogTxt, $AtkLogTxtExtend, $COLOR_INFO)
+			ElseIf ($starsearned = 3) Then
+				SetAtkLog($AtkLogTxt, $AtkLogTxtExtend, $COLOR_SUCCESS1)
+			EndIf
+		EndIf
 	Else
 		SetAtkLog($AtkLogTxt, $AtkLogTxtExtend, $COLOR_ERROR)
 	EndIf

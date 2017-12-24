@@ -95,9 +95,8 @@ Func GetTrainPos(Const $iIndex)
 	; Get the Image path to search
 	If $iIndex >= $eBarb And $iIndex <= $eBowl Then
 		If $a_AllPositions[$iIndex][0] = -1 Then
-			Local $sDirectory = @ScriptDir & "\imgxml\Train\Train_Train\"
 			Local $sFilter = String($g_asTroopShortNames[$iIndex]) & "*"
-			Local $asImageToUse = _FileListToArray($sDirectory, $sFilter, $FLTA_FILES, True)
+			Local $asImageToUse = _FileListToArray($g_sImgTrainTroops, $sFilter, $FLTA_FILES, True)
 			If $g_bDebugSetlogTrain Then SetLog("$asImageToUse Troops: " & $asImageToUse[1])
 			Local $temp = GetVariable($asImageToUse[1], $iIndex)
 			For $i = 0 To 3
@@ -113,9 +112,8 @@ Func GetTrainPos(Const $iIndex)
 
 	If $iIndex >= $eLSpell And $iIndex <= $eSkSpell Then
 		If $a_AllPositions[$iIndex][0] = -1 Then
-			Local $sDirectory = @ScriptDir & "\imgxml\Train\Spell_Train\"
 			Local $sFilter = String($g_asSpellShortNames[$iIndex - $eLSpell]) & "*"
-			Local $asImageToUse = _FileListToArray($sDirectory, $sFilter, $FLTA_FILES, True)
+			Local $asImageToUse = _FileListToArray($g_sImgTrainSpells, $sFilter, $FLTA_FILES, True)
 			If $g_bDebugSetlogTrain Then SetLog("$asImageToUse Spell: " & $asImageToUse[1])
 			Local $temp = GetVariable($asImageToUse[1], $iIndex)
 			For $i = 0 To 3
@@ -185,7 +183,7 @@ Func GetVariable(Const $ImageToUse, Const $iIndex)
 	; Capture the screen for comparison
 	_CaptureRegion2(25, 375, 840, 548)
 
-	Local $res = DllCall($g_hLibImgLoc, "str", "FindTile", "handle", $g_hHBitmap2, "str", $ImageToUse, "str", "FV", "int", 1)
+	Local $res = DllCallMyBot("FindTile", "handle", $g_hHBitmap2, "str", $ImageToUse, "str", "FV", "int", 1)
 
 	If @error Then _logErrorDLLCall($g_sLibImgLocPath, @error)
 	If IsArray($res) Then

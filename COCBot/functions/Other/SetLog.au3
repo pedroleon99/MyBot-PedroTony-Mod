@@ -50,7 +50,7 @@ Func _SetLog($sLogMessage, $Color = Default, $Font = Default, $FontSize = Defaul
 	Local $log = $LogPrefix & $debugTime & $sLogMessage
 	If $bConsoleWrite = True And $sLogMessage <> "" Then
 		Local $sLevel = GetLogLevel($Color)
-		ConsoleWrite($sLevel & $log & @CRLF) ; Always write any log to console
+		_ConsoleWrite($sLevel & $log & @CRLF) ; Always write any log to console
 	EndIf
 	If $g_hLogFile = 0 And $g_sProfileLogsPath Then
 		CreateLogFile()
@@ -142,7 +142,7 @@ Func SetDebugLog($sLogMessage, $sColor = $COLOR_DEBUG, $bSilentSetLog = False, $
 	If $g_bDebugSetlog And $bSilentSetLog = False Then
 		_SetLog($sLogMessage, $sColor, $Font, $FontSize, $statusbar, Default, True, $sLogPrefix)
 	Else
-		If $sLogMessage <> "" Then ConsoleWrite(GetLogLevel($sColor) & $sLog & @CRLF) ; Always write any log to console
+		If $sLogMessage <> "" Then _ConsoleWrite(GetLogLevel($sColor) & $sLog & @CRLF) ; Always write any log to console
 		If $g_hLogFile = 0 And $g_sProfileLogsPath Then CreateLogFile()
 		If $g_hLogFile Then
 			__FileWriteLog($g_hLogFile, $sLog)
@@ -161,13 +161,14 @@ Func SetGuiLog($sLogMessage, $Color = Default, $bGuiLog = Default)
 EndFunc   ;==>SetGuiLog
 
 Func FlushGuiLog(ByRef $hTxtLog, ByRef $oTxtLog, $bUpdateStatus = False, $sLogMutexName = "txtLog")
+	$g_bFlushGuiLogActive = True
 	;SetDebugLog("FlushGuiLog: Entered")
 
 	Local $wasLock = AndroidShieldLock(True) ; lock Android Shield as shield changes state when focus changes
 	;Local $txtLogMutex = AcquireMutex($sLogMutexName) ; synchronize access
 
 	If $hTxtLog Then
-		Local $activeBot = _WinAPI_GetActiveWindow() = $g_hFrmBot ; different scroll to bottom when bot not active to fix strange bot activation flickering
+		Local $activeBot = _WinAPI_GetForegroundWindow() = $g_hFrmBot ; different scroll to bottom when bot not active to fix strange bot activation flickering
 		Local $hCtrl = _WinAPI_GetFocus() ; RichEdit tampers with focus so remember and restore
 		_SendMessage($hTxtLog, $WM_SETREDRAW, False, 0) ; disable redraw so logging has no visiual effect
 		_WinAPI_EnableWindow($hTxtLog, False) ; disable RichEdit
@@ -227,6 +228,7 @@ Func FlushGuiLog(ByRef $hTxtLog, ByRef $oTxtLog, $bUpdateStatus = False, $sLogMu
 
 	;ReleaseMutex($txtLogMutex) ; end of synchronized block
 	AndroidShieldLock($wasLock) ; unlock Android Shield
+	$g_bFlushGuiLogActive = False
 	Return $iLogs
 EndFunc   ;==>FlushGuiLog
 
@@ -285,14 +287,16 @@ EndFunc   ;==>SetAtkLog
 
 Func AtkLogHead()
 	; Switch Accounts - Team AiO MOD++ (#-12)
-	Local $Text = "", $Text2 = ""
+	Local $Text = "", $Text1 = "", $Text2 = ""
 	If $g_bChkSwitchAcc Then
-		$Text = "Sw"
-		$Text2 = "Ac"
+		$Text = "Ac"
+		$Text1 = "Sw"
+		$Text2 = "|Account"
 	EndIf
 	SetAtkLog(_PadStringCenter(" " & GetTranslatedFileIni("MBR Func_AtkLogHead", "AtkLogHead_Text_01", "ATTACK LOG") & " ", 71, "="), "", $COLOR_BLACK, "MS Shell Dlg", 8.5)
-	SetAtkLog($Text & GetTranslatedFileIni("MBR Func_AtkLogHead", "AtkLogHead_Text_02", '|                  --------  LOOT --------       ----- BONUS ------'), "")
-	SetAtkLog($Text2 & GetTranslatedFileIni("MBR Func_AtkLogHead", "AtkLogHead_Text_03", '|TIME|TROP.|SEARCH|   GOLD| ELIXIR|DARK EL|TR.|S|  GOLD|ELIXIR|  DE|L.'), "")
+	SetAtkLog(GetTranslatedFileIni("MBR Func_AtkLogHead", "AtkLogHead_Text_02", $Text1 & '|               ------- RESULT ------ ---- LOOT ---- ---- BONUS ----'), "")
+	SetAtkLog($Text & GetTranslatedFileIni("MBR Func_AtkLogHead", "AtkLogHead_Text_03", '|TIME |TROP|SRC|CLOUD|TH|TR|[%]|TR.|S|GOLD|ELIX|  DE|GOLD|ELIX|  DE|L.' & $Text2), "")
+	;---------------------------------------------------------------
 EndFunc   ;==>AtkLogHead
 
 Func __FileWriteLog($handle, $text)

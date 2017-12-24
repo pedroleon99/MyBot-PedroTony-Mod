@@ -19,10 +19,6 @@
 #include "functions\Config\readConfig.au3"
 #include "functions\Config\applyConfig.au3"
 
-; Drop Order Troops - Team AiO MOD++ (#-06)
-#include "functions\Troops Dropping Order\DropOrderTroops GUI.au3"
-#include "functions\Troops Dropping Order\DropOrderTroops.au3"
-
 ; Check Collector Outside - Team AiO MOD++ (#-08)
 #include "functions\Mod's\AreCollectorsOutside.au3"
 
@@ -50,6 +46,9 @@
 #include "functions\Bot Humanization\ClanActions.au3"
 #include "functions\Bot Humanization\ClanWarActions.au3"
 
+; Forecast - Team AiO MOD++ (#-17)
+#include "functions\Mod's\Forecast.au3"
+
 ; Goblin XP - Team AiO MOD++ (#-19)
 #include "functions\GoblinXP\GoblinXP.au3"
 #include "functions\GoblinXP\multiSearch.au3"
@@ -62,8 +61,8 @@
 #include "functions\Mod's\ExtendedAttackBarCheck.au3"
 
 ; Chatbot - Team AiO MOD++ (#-23)
-;~ #include "functions\Chatbot\Chatbot.au3"
-;~ #include "functions\Chatbot\Multy Lang.au3"
+#include "functions\Chatbot\Chatbot.au3"
+#include "functions\Chatbot\Multy Lang.au3"
 
 ; CheckCC Troops - Team AiO MOD++ (#-24)
 #include "functions\Mod's\CheckCC.au3"
@@ -76,3 +75,16 @@
 
 ; Farm Schedule - Team AiO MOD++ (#-27)
 #include "functions\Mod's\FarmSchedule.au3"
+
+; Multi Finger - Pedro&Tony MOD
+#include "functions\Multi Fingers\Vectors\fourFingerStandard.au3"
+#include "functions\Multi Fingers\Vectors\fourFingerSpiralLeft.au3"
+#include "functions\Multi Fingers\Vectors\fourFingerSpiralRight.au3"
+#include "functions\Multi Fingers\Vectors\eightFingerPinWheelLeft.au3"
+#include "functions\Multi Fingers\Vectors\eightFingerPinWheelRight.au3"
+#include "functions\Multi Fingers\Vectors\eightFingerBlossom.au3"
+#include "functions\Multi Fingers\Vectors\eightFingerImplosion.au3"
+#include "functions\Multi Fingers\fourFinger.au3"
+#include "functions\Multi Fingers\eightFinger.au3"
+#include "functions\Multi Fingers\multiFinger.au3"
+#include "functions\Multi Fingers\unitInfo.au3"

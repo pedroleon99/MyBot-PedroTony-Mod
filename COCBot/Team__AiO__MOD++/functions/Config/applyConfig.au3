@@ -35,27 +35,6 @@ Func ApplyConfig_MOD($TypeReadSave)
 			GUICtrlSetData($g_hTxtWaveFactor, $g_iTxtWaveFactor)
 			chkWaveFactor()
 
-			; Drop Order Troops - Team AiO MOD++ (#-06)
-			GUICtrlSetState($g_hChkCustomTrainDropOrderEnable, $g_bCustomTrainDropOrderEnable = True ? $GUI_CHECKED : $GUI_UNCHECKED)
-			For $p = 0 To UBound($icmbDropTroops) - 1
-				_GUICtrlComboBox_SetCurSel($cmbDropTroops[$p], $icmbDropTroops[$p])
-				_GUICtrlSetImage($g_ahImgTroopDropOrder[$p], $g_sLibIconPath, $g_aiTroopOrderDropIcon[$icmbDropTroops[$p] + 1])
-			Next
-			; process error
-			If $g_bCustomTrainDropOrderEnable = True Then ; only update troop train order if enabled
-				If ChangeTroopDropOrder() = False Then ; process error
-					;SetDefaultTroopGroup()
-					GUICtrlSetState($g_hChkCustomTrainDropOrderEnable, $GUI_UNCHECKED)
-					$g_bCustomTrainDropOrderEnable = False
-					GUICtrlSetState($g_hBtnTroopOrderSet2, $GUI_DISABLE) ; disable button
-					GUICtrlSetState($g_hBtnRemoveTroops2, $GUI_DISABLE)
-					For $i = 0 To UBound($cmbDropTroops) - 1
-						GUICtrlSetState($cmbDropTroops[$i], $GUI_DISABLE) ; disable combo boxes
-					Next
-				EndIf
-			EndIf
-			chkTroopDropOrder()
-
 			; Auto Dock, Hide Emulator & Bot - Team AiO MOD++ (#-07)
 			GUICtrlSetState($g_hChkEnableAuto, $g_bEnableAuto = True ? $GUI_CHECKED : $GUI_UNCHECKED)
 			chkEnableAuto()
@@ -136,6 +115,24 @@ Func ApplyConfig_MOD($TypeReadSave)
 			cmbStandardReplay()
 			cmbWarReplay()
 
+			; Forecast - Team AiO MOD++ (#-17)
+			GUICtrlSetState($g_hChkForecastBoost, $g_bChkForecastBoost ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetData($g_hTxtForecastBoost, $g_iTxtForecastBoost)
+			chkForecastBoost()
+			GUICtrlSetState($g_hChkForecastPause, $g_bChkForecastPause ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetData($g_hTxtForecastPause, $g_iTxtForecastPause)
+			chkForecastPause()
+
+			GUICtrlSetState($g_hChkForecastHopingSwitchMax, $g_bChkForecastHopingSwitchMax ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_hChkForecastHopingSwitchMin, $g_bChkForecastHopingSwitchMin ? $GUI_CHECKED : $GUI_UNCHECKED)
+			_GUICtrlComboBox_SetCurSel($g_hCmbForecastHopingSwitchMax, $g_iCmbForecastHopingSwitchMax)
+			_GUICtrlComboBox_SetCurSel($g_hCmbForecastHopingSwitchMin, $g_iCmbForecastHopingSwitchMin)
+			GUICtrlSetData($g_hTxtForecastHopingSwitchMax, $g_iTxtForecastHopingSwitchMax)
+			GUICtrlSetData($g_hTxtForecastHopingSwitchMin, $g_iTxtForecastHopingSwitchMin)
+			chkForecastHopingSwitch()
+
+			_GUICtrlComboBox_SetCurSel($g_hCmbSwLang, $g_iCmbSwLang)
+
 			; Request CC Troops at first - Team AiO MOD++ (#-18)
 			GUICtrlSetState($chkReqCCFirst, $g_bReqCCFirst = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
 
@@ -156,6 +153,8 @@ Func ApplyConfig_MOD($TypeReadSave)
 
 			; ClanHop - Team AiO MOD++ (#-20)
 			GUICtrlSetState($g_hChkClanHop, $g_bChkClanHop ? $GUI_CHECKED : $GUI_UNCHECKED)
+			GUICtrlSetState($g_ahTxtCheckingtrain, $g_bChkClanHop ? $GUI_ENABLE : $GUI_DISABLE)
+			GUICtrlSetData($g_ahTxtCheckingtrain, $g_iTxtCheckingtraine)
 
 			; Max logout time - Team AiO MOD++ (#-21)
 			GUICtrlSetState($g_hChkTrainLogoutMaxTime, $g_bTrainLogoutMaxTime = True ? $GUI_CHECKED : $GUI_UNCHECKED)
@@ -227,6 +226,9 @@ Func ApplyConfig_MOD($TypeReadSave)
 			GUICtrlSetData($g_hTxtStopOnBatt, $g_iStopOnBatt)
 			chkStopOnBatt()
 
+			; Robot Transparency - Pedro&Tony MOD
+			GUICtrlSetData($SldTransLevel, $iSldTransLevel)
+
 		Case "Save"
 
 			; Unit/Wave Factor - Team AiO MOD++ (#-05)
@@ -239,11 +241,8 @@ Func ApplyConfig_MOD($TypeReadSave)
 			$g_iChkWaveFactor = GUICtrlRead($g_hChkWaveFactor) = $GUI_CHECKED ? 1 : 0
 			$g_iTxtWaveFactor = GUICtrlRead($g_hTxtWaveFactor)
 
-			; Drop Order Troops - Team AiO MOD++ (#-06)
-			$g_bCustomTrainDropOrderEnable = GUICtrlRead($g_hChkCustomTrainDropOrderEnable) = $GUI_CHECKED ? True : False
-			For $p = 0 To UBound($icmbDropTroops) - 1
-				$icmbDropTroops[$p] = _GUICtrlComboBox_GetCurSel($cmbDropTroops[$p])
-			Next
+			; pedroleon99 Pedro&Tony MOD
+			$iSldTransLevel = GUICtrlRead($SldTransLevel)
 
 			; Auto Dock, Hide Emulator & Bot - Team AiO MOD++ (#-07)
 			$g_bEnableAuto = (GUICtrlRead($g_hChkEnableAuto) = $GUI_CHECKED)
@@ -298,6 +297,21 @@ Func ApplyConfig_MOD($TypeReadSave)
 			$g_icmbMaxActionsNumber = _GUICtrlComboBox_GetCurSel($g_icmbMaxActionsNumber)
 			$g_ichallengeMessage = GUICtrlRead($g_challengeMessage)
 
+			; Forecast - Team AiO MOD++ (#-17)
+			$g_bChkForecastBoost = (GUICtrlRead($g_hChkForecastBoost) = $GUI_CHECKED)
+			$g_iTxtForecastBoost = GUICtrlRead($g_hTxtForecastBoost)
+			$g_bChkForecastPause = (GUICtrlRead($g_hChkForecastPause) = $GUI_CHECKED)
+			$g_iTxtForecastPause = GUICtrlRead($g_hTxtForecastPause)
+
+			$g_bChkForecastHopingSwitchMax = (GUICtrlRead($g_hChkForecastHopingSwitchMax) = $GUI_CHECKED)
+			$g_bChkForecastHopingSwitchMin = (GUICtrlRead($g_hChkForecastHopingSwitchMin) = $GUI_CHECKED)
+			$g_iCmbForecastHopingSwitchMax = _GUICtrlComboBox_GetCurSel($g_hCmbForecastHopingSwitchMax)
+			$g_iCmbForecastHopingSwitchMin = _GUICtrlComboBox_GetCurSel($g_hCmbForecastHopingSwitchMin)
+			$g_iTxtForecastHopingSwitchMax = GUICtrlRead($g_hTxtForecastHopingSwitchMax)
+			$g_iTxtForecastHopingSwitchMin = GUICtrlRead($g_hTxtForecastHopingSwitchMin)
+
+			$g_iCmbSwLang = _GUICtrlComboBox_GetCurSel($g_hCmbSwLang)
+
 			; Request CC Troops at first - Team AiO MOD++ (#-18)
 			$g_bReqCCFirst = GUICtrlRead($chkReqCCFirst) = $GUI_CHECKED ? 1 : 0
 
@@ -312,6 +326,7 @@ Func ApplyConfig_MOD($TypeReadSave)
 
 			; ClanHop - Team AiO MOD++ (#-20)
 			$g_bChkClanHop = (GUICtrlRead($g_hChkClanHop) = $GUI_CHECKED)
+			$g_iTxtCheckingtraine = Int(GUICtrlRead($g_ahTxtCheckingtrain))
 
 			; Max logout time - Team AiO MOD++ (#-21)
 			$g_bTrainLogoutMaxTime = GUICtrlRead($g_hChkTrainLogoutMaxTime) = $GUI_CHECKED ? True : False
@@ -405,38 +420,3 @@ Func ApplyConfig_SwitchAcc($TypeReadSave)
 			$g_iTrainTimeToSkip = _GUICtrlComboBox_GetCurSel($g_hCmbTrainTimeToSkip)
 	EndSwitch
 EndFunc   ;==>ApplyConfig_SwitchAcc
-
-; Forecast - Team AiO MOD++ (#-17)
-Func ApplyConfig_Forecast($TypeReadSave)
-	Switch $TypeReadSave
-		Case "Read"
-			GUICtrlSetState($chkForecastBoost, $iChkForecastBoost = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetData($txtForecastBoost, $iTxtForecastBoost)
-			chkForecastBoost()
-			GUICtrlSetState($chkForecastPause, $iChkForecastPause = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			GUICtrlSetData($txtForecastPause, $iTxtForecastPause)
-			chkForecastPause()
-			GUICtrlSetState($chkForecastHopingSwitchMax, $ichkForecastHopingSwitchMax = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			_GUICtrlComboBox_SetCurSel($cmbForecastHopingSwitchMax, $icmbForecastHopingSwitchMax)
-			GUICtrlSetData($txtForecastHopingSwitchMax, $itxtForecastHopingSwitchMax)
-			chkForecastHopingSwitchMax()
-			GUICtrlSetState($chkForecastHopingSwitchMin, $ichkForecastHopingSwitchMin = 1 ? $GUI_CHECKED : $GUI_UNCHECKED)
-			_GUICtrlComboBox_SetCurSel($cmbForecastHopingSwitchMin, $icmbForecastHopingSwitchMin)
-			GUICtrlSetData($txtForecastHopingSwitchMin, $itxtForecastHopingSwitchMin)
-			chkForecastHopingSwitchMin()
-			_GUICtrlComboBox_SetCurSel($cmbSwLang, $icmbSwLang)
-
-		Case "Save"
-			$iChkForecastBoost = (GUICtrlRead($chkForecastBoost) = $GUI_UNCHECKED)
-			$iTxtForecastBoost = GUICtrlRead($txtForecastBoost)
-			$iChkForecastPause = (GUICtrlRead($chkForecastPause) = $GUI_UNCHECKED)
-			$iTxtForecastPause = GUICtrlRead($txtForecastPause)
-			$ichkForecastHopingSwitchMax = (GUICtrlRead($chkForecastHopingSwitchMax) = $GUI_UNCHECKED)
-			$icmbForecastHopingSwitchMax = _GUICtrlComboBox_GetCurSel($cmbForecastHopingSwitchMax)
-			$itxtForecastHopingSwitchMax = GUICtrlRead($txtForecastHopingSwitchMax)
-			$ichkForecastHopingSwitchMin = (GUICtrlRead($chkForecastHopingSwitchMin) = $GUI_UNCHECKED)
-			$icmbForecastHopingSwitchMin = _GUICtrlComboBox_GetCurSel($cmbForecastHopingSwitchMin)
-			$itxtForecastHopingSwitchMin = GUICtrlRead($txtForecastHopingSwitchMin)
-			$icmbSwLang = _GUICtrlComboBox_GetCurSel($cmbSwLang)
-	EndSwitch
-EndFunc   ;==>ApplyConfig_Forecast

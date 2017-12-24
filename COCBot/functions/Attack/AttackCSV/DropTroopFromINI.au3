@@ -80,21 +80,22 @@ Func DropTroopFromINI($vectors, $indexStart, $indexEnd, $indexArray, $qtaMin, $q
 
 	;search slot where is the troop...
 	Local $troopPosition = -1
+	Local $troopCount = -1
 	For $i = 0 To UBound($g_avAttackTroops) - 1
-		If $g_avAttackTroops[$i][0] = $iTroopIndex Then
+		If $g_avAttackTroops[$i][0] = $iTroopIndex And $g_avAttackTroops[$i][1] >= $troopCount Then
 			$troopPosition = $i
-			ExitLoop
+			$troopCount = $g_avAttackTroops[$i][1]
 		EndIf
 	Next
 
 	; ExtendedAttackBar - Team AiO MOD++ (#-22)
 	debugAttackCSV("Troop position / Total slots: " & $troopPosition & " / " & $g_iTotalAttackSlot)
 	If $troopPosition >= 0 And $troopPosition < $g_iTotalAttackSlot - 10 Then ; can only be selected when in 1st page of troopbar
-		If $g_bDraggedAttackBar Then DragAttackBar($g_iTotalAttackSlot, True) ; return drag
+		If $g_bDraggedAttackBar And $SWIPE = "" Then DragAttackBar($g_iTotalAttackSlot, True) ; return drag
 	ElseIf $troopPosition > 10 Then ; can only be selected when in 2nd page of troopbar
-		If $g_bDraggedAttackBar = False Then DragAttackBar($g_iTotalAttackSlot, False) ; drag forward
+		If Not $g_bDraggedAttackBar And $SWIPE = "" Then DragAttackBar($g_iTotalAttackSlot, False) ; drag forward
 	EndIf
-	If $g_bDraggedAttackBar Then
+	If $g_bDraggedAttackBar And $SWIPE = "" Then
 		$troopPosition -= $g_iTotalAttackSlot - 10
 		debugAttackCSV("New troop position: " & $troopPosition)
 	EndIf

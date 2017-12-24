@@ -174,8 +174,9 @@ Global Const $DELAYVILLAGESEARCH3 = 500
 Global Const $DELAYVILLAGESEARCH5 = 2000
 
 ;BoostBarracks
-Global Const $DELAYBOOSTBARRACKS2 = 2000
-Global Const $DELAYBOOSTBARRACKS5 = 200
+Global Const $DELAYBOOSTBARRACKS1 = 1000
+Global Const $DELAYBOOSTBARRACKS2 = 600
+Global Const $DELAYBOOSTBARRACKS3 = 200
 
 ;BoostSpellFactory
 Global Const $DELAYBOOSTSPELLFACTORY3 = 500
@@ -291,6 +292,7 @@ Global Const $DELAYMAKEREQUEST1 = 500
 Global Const $DELAYMAKEREQUEST2 = 1500
 
 ;Train
+Global Const $DELAYTRAIN1 = 1000
 Global Const $DELAYTRAIN4 = 200
 Global Const $DELAYTRAIN6 = 20 ; click
 Global Const $DELAYTRAIN8 = 5000 ; wait for a while to desapear the 'received castle troops' msg
@@ -387,3 +389,13 @@ Global Const $DELAYDROPSuperXP1= 500
 Global Const $DELAYDROPSuperXP2 = 1000
 Global Const $DELAYDROPSuperXP3 = 250
 Global Const $DELAYPREPARESearchSuperXP = 500
+
+;Train
+Global Const $iDelayTrain1 = 100
+Global Const $iDelayTrain2 = 500
+Global Const $iDelayTrain3 = 1000
+Global Const $iDelayTrain4 = 200
+Global Const $iDelayTrain5 = 250 ; click
+Global Const $iDelayTrain6 = 20 ; click
+Global Const $iDelayTrain7 = 5 ; Spells Creation
+Global Const $iDelayTrain8 = 5000 ; wait for a while to desapear the 'received castle troops' msg

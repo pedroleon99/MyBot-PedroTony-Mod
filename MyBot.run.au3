@@ -13,7 +13,6 @@
 ; AutoIt pragmas
 #NoTrayIcon
 #RequireAdmin
-#AutoIt3Wrapper_UseUpx=y
 #AutoIt3Wrapper_UseX64=7n
 ;#AutoIt3Wrapper_Res_HiDpi=Y ; HiDpi will be set during run-time!
 #AutoIt3Wrapper_Run_Au3Stripper=y
@@ -29,9 +28,7 @@
 ; Enforce variable declarations
 Opt("MustDeclareVars", 1)
 
-; Check Version - Team AiO MOD++ (#-03)
-Global $g_sModversion = "v3.8" ;<== Just Change This to Version Number
-Global $g_sModSupportUrl = "https://mybot.run/forums/index.php?/topic/31096-mods-mbr-v722-official-aio-mod-v171-update-1207/" ;<== Our Website Link Support Or Link Download
+; Check Version - Pedro&Tony MOD
 Global $g_sModDownloadUrl = "https://github.com/pedroleon99/MyBot-PedroTony-Mod/releases" ;<== Our Website Link Download
 
 Global $g_sBotTitle = "" ;~ Don't assign any title here, use Func UpdateBotTitle()
@@ -42,6 +39,7 @@ Global $g_hFrmBot = 0 ; The main GUI window
 #include "COCBot\functions\Config\DelayTimes.au3"
 #include "COCBot\GUI\MBR GUI Design Splash.au3"
 #include "COCBot\functions\Config\ScreenCoordinates.au3"
+#include "COCBot\functions\Config\ImageDirectories.au3"
 #include "COCBot\functions\Other\ExtMsgBox.au3"
 #include "COCBot\functions\Other\MBRFunc.au3"
 #include "COCBot\functions\Android\Android.au3"
@@ -71,11 +69,14 @@ InitializeBot()
 MainLoop()
 
 Func UpdateBotTitle()
-	Local $sTitle = "My Bot " & $g_sBotVersion & " - " & " Pedro&Tony MOD" & " " & $g_sModversion & " - "
+	Local $sTitle = "My Bot " & $g_sBotVersion & " - " & $g_sMODName & " " & $g_sModversion & " -"
+	Local $sConsoleTitle ; Console title has also Android Emulator Name
 	If $g_sBotTitle = "" Then
 		$g_sBotTitle = $sTitle
+		$sConsoleTitle = $sTitle
 	Else
 		$g_sBotTitle = $sTitle & " (" & ($g_sAndroidInstance <> "" ? $g_sAndroidInstance : $g_sAndroidEmulator) & ")" ;Do not change this. If you do, multiple instances will not work.
+		$sConsoleTitle = $sTitle & " " & $g_sAndroidEmulator & " (" & ($g_sAndroidInstance <> "" ? $g_sAndroidInstance : $g_sAndroidEmulator) & ")"
 	EndIf
 	If $g_hFrmBot <> 0 Then
 		; Update Bot Window Title also
@@ -83,7 +84,7 @@ Func UpdateBotTitle()
 		GUICtrlSetData($g_hLblBotTitle, $g_sBotTitle)
 	EndIf
 	; Update Console Window (if it exists)
-	DllCall("kernel32.dll", "bool", "SetConsoleTitle", "str", "Console " & $g_sBotTitle)
+	DllCall("kernel32.dll", "bool", "SetConsoleTitle", "str", "Console " & $sConsoleTitle)
 	; Update try icon title
 	TraySetToolTip($g_sBotTitle)
 
@@ -95,11 +96,6 @@ Func InitializeBot()
 	ProcessCommandLine()
 
 	SetupProfileFolder() ; Setup profile folders
-
-	If $g_iBotLaunchOption_Help Then
-		ShowCommandLineHelp()
-		Exit
-	EndIf
 
 	SetLogCentered(" BOT LOG ") ; Initial text for log
 
@@ -116,6 +112,20 @@ Func InitializeBot()
 	SetDebugLog("@OSServicePack: " & @OSServicePack)
 	SetDebugLog("Primary Display: " & @DesktopWidth & " x " & @DesktopHeight & " - " & @DesktopDepth & "bit")
 
+	DetectLanguage()
+	If $g_iBotLaunchOption_Help Then
+		ShowCommandLineHelp()
+		Exit
+	EndIf
+
+	InitAndroidConfig()
+
+	; early load of config
+	Local $bConfigRead = FileExists($g_sProfileConfigPath)
+	If $bConfigRead Or FileExists($g_sProfileBuildingPath) Then
+		readConfig()
+	EndIf
+
 	Local $sAndroidInfo = ""
 	; Disabled process priority tampering as not best practice
 	;Local $iBotProcessPriority = _ProcessGetPriority(@AutoItPID)
@@ -125,7 +135,6 @@ Func InitializeBot()
 	__GDIPlus_Startup() ; Start GDI+ Engine (incl. a new thread)
 
 	InitAndroidConfig()
-
 	If FileExists(@ScriptDir & "\EnableMBRDebug.txt") Then ; Set developer mode
 		$g_bDevMode = True
 		Local $aText = FileReadToArray(@ScriptDir & "\EnableMBRDebug.txt") ; check if special debug flags set inside EnableMBRDebug.txt file
@@ -137,13 +146,6 @@ Func InitializeBot()
 				EndIf
 			Next
 		EndIf
-	EndIf
-
-	; early load of config
-	Local $bConfigRead = False
-	If FileExists($g_sProfileConfigPath) Or FileExists($g_sProfileBuildingPath) Then
-		readConfig()
-		$bConfigRead = True
 	EndIf
 
 	CreateMainGUI() ; Just create the main window
@@ -214,12 +216,18 @@ Func ProcessCommandLine()
 					$g_iBotLaunchOption_Dock = 2
 				Case "/nobotslot", "/nbs", "-nobotslot", "-nbs"
 					$g_bBotLaunchOption_NoBotSlot = True
-				Case "/debug", "/debugmode", "/dev", "-debug", "-debugmode", "-dev"
+				Case "/debug", "/debugmode", "/dev", "/dm", "-debug", "-debugmode", "-dev", "-dm"
 					$g_bDevMode = True
 				Case "/minigui", "/mg", "-minigui", "-mg"
 					$g_iGuiMode = 2
 				Case "/nogui", "/ng", "-nogui", "-ng"
 					$g_iGuiMode = 0
+				Case "/hideandroid", "/ha", "-hideandroid", "-ha"
+					$g_bBotLaunchOption_HideAndroid = True
+				Case "/console", "/c", "-console", "-c"
+					$g_iBotLaunchOption_Console = True
+					_WinAPI_AllocConsole()
+					_WinAPI_SetConsoleIcon($g_sLibIconPath, $eIcnGUI)
 				Case "/?", "/h", "/help", "-?", "-h", "-help"
 					; show command line help and exit
 					$g_iBotLaunchOption_Help = True
@@ -335,7 +343,7 @@ Func SetupProfileFolder()
 	SetDebugLog("SetupProfileFolder: " & $g_sProfilePath & "\" & $g_sProfileCurrentName)
 	$g_sProfileConfigPath = $g_sProfilePath & "\" & $g_sProfileCurrentName & "\config.ini"
 	; Chatbot - Team AiO MOD++ (#-23)
-;~	$chatIni = $g_sProfilePath & "\" & $g_sProfileCurrentName &  "\chat.ini"
+	$chatIni = $g_sProfilePath & "\" & $g_sProfileCurrentName &  "\chat.ini"
 	$g_sProfileBuildingStatsPath = $g_sProfilePath & "\" & $g_sProfileCurrentName & "\stats_buildings.ini"
 	$g_sProfileBuildingPath = $g_sProfilePath & "\" & $g_sProfileCurrentName & "\building.ini"
 	$g_sProfileLogsPath = $g_sProfilePath & "\" & $g_sProfileCurrentName & "\Logs\"
@@ -380,7 +388,7 @@ Func InitializeMBR(ByRef $sAI, $bConfigRead)
 
 	; multilanguage
 	If Not FileExists(@ScriptDir & "\Languages") Then DirCreate(@ScriptDir & "\Languages")
-	DetectLanguage()
+	;DetectLanguage()
 	_ReadFullIni()
 	; must be called after language is detected
 	TranslateTroopNames()
@@ -567,7 +575,7 @@ Func FinalInitialization(Const $sAI)
 		Local $timer = __TimerInit()
 		While $g_iGuiPID = @AutoItPID And __TimerDiff($timer) < 60000
 			; wait for GUI Process updating $g_iGuiPID
-			_Sleep(50)
+			Sleep(50) ; must be Sleep as no run state!
 		WEnd
 		If $g_iGuiPID = @AutoItPID Then
 			SetDebugLog("GUI Process not received, close bot")
@@ -577,17 +585,25 @@ Func FinalInitialization(Const $sAI)
 		EndIf
 	EndIf
 
+	SetLog(" ", $COLOR_SUCCESS)
+	SetLog("___________ " & $g_sMODName & "___________", $COLOR_MONEYGREEN, "Impact", 14)
+	SetLog("                                   » " & "Warning" & " «", $COLOR_TEAL, "Segoe UI Semibold", 12)
+	SetLog("          » " & "Please Set The Bot Language To ENGLISH" & " «", $COLOR_TEAL, "Segoe UI Semibold", 10)
+	SetLog("            » " & "Make a Fresh Configuration, Don't Use Old Profile" & " «", $COLOR_TEAL, "Segoe UI Semibold", 9)
+	SetLog("-----------------------------------------------------------------------", $COLOR_MONEYGREEN)
+	SetLog("        » " & "Developer: Pedro (pedroleon99)" & " «", $COLOR_TEAL, "Segoe Print", 8)
+	SetLog("         » " & "Thanks To Tony" & " «", $COLOR_TEAL, "Segoe Print", 9)
+	SetLog("-----------------------------------------------------------------------", $COLOR_MONEYGREEN)
+	SetLog("                       » " & "Based On: MyBot " & $g_sBotVersion & " «", $COLOR_TEAL, "Segoe UI Semibold", 10)
+	SetLog("                           » " & $g_sMODName & " " & $g_sModversion & " «", $COLOR_TEAL, "Segoe UI Semibold", 10)
+	SetLog("-----------------------------------------------------------------------", $COLOR_MONEYGREEN)
+	SetLog(" ", $COLOR_MEDGRAY)
+
 	; destroy splash screen here (so we witness the 100% ;)
 	DestroySplashScreen()
 
 	; InitializeVariables();initialize variables used in extrawindows
 	CheckVersion() ; check latest version on mybot.run site
-#cs
-	SetLogCentered(" " & GetTranslatedFileIni("MBR GUI Design - Loading", "Warning_language", "Warning: Language for the Clash of Clans!") & " ", "-", $COLOR_INFO)
-	SetLog("» »" & GetTranslatedFileIni("MBR GUI Design - Loading", "Warning_language_Info_01", "Please set 'ENGLISH' language for CoC.......!!"), $COLOR_INFO)
-	SetLog("» » » » » » » » »" & GetTranslatedFileIni("MBR GUI Design - Loading", "Warning_language_Info_02", "...........if you want to use Bot MBR!!!!"), $COLOR_INFO)
-	SetLogCentered(" " & GetTranslatedFileIni("MBR GUI Design - Loading", "Warning_language_Info_03", "Regards!") & " ", "-", $COLOR_INFO)
-#ce
 	SetDebugLog("Maximum of " & $g_iGlobalActiveBotsAllowed & " bots running at same time configured")
 	SetDebugLog("MyBot.run launch time " & Round($g_iBotLaunchTime) & " ms.")
 
@@ -627,12 +643,14 @@ Func MainLoop()
 		If $g_bRestarted = True Then $iDelay = 0
 		$iStartDelay = $iDelay * 1000
 		$g_iBotAction = $eBotStart
+		; check if android should be hidden
+		If $g_bBotLaunchOption_HideAndroid Then $g_bIsHidden = True
 	EndIf
 
 	While 1
 		_Sleep($DELAYSLEEP, True, False)
 
-		If $g_bRunState = False And ($g_bNotifyPBEnable = True Or $g_bNotifyTGEnable = True) And $g_bNotifyRemoteEnable = True Then
+		If Not $g_bRunState And ($g_bNotifyPBEnable Or $g_bNotifyTGEnable) And $g_bNotifyRemoteEnable Then
 			NotifyRemoteControlProcBtnStart()
 		EndIf
 
@@ -669,6 +687,12 @@ Func runBot() ;Bot that runs everything in order
 		Setlog("Rematching Account [" & $g_iNextAccount + 1 & "] with Profile [" & GUICtrlRead($g_ahCmbProfile[$g_iNextAccount]) & "]")
 		SwitchCoCAcc($g_iNextAccount)
 	EndIf
+	If $g_iGlobalChat Or $g_iClanChat Then
+		ChatbotMessage()
+	EndIf
+	If $g_ichkUseBotHumanization = 1 Then
+		BotHumanization()
+	EndIf
 
 	Local $iWaitTime
 
@@ -693,6 +717,8 @@ Func runBot() ;Bot that runs everything in order
 		checkMainScreen()
 		If $g_bRestart = True Then ContinueLoop
 		chkShieldStatus()
+		If $g_bRestart = True Then ContinueLoop
+		checkObstacles() ; trap common error messages also check for reconnecting animation
 		If $g_bRestart = True Then ContinueLoop
 
 		If $g_bQuicklyFirstStart = True Then
@@ -754,9 +780,9 @@ Func runBot() ;Bot that runs everything in order
 			If $g_bRunState = False Then Return
 			If $g_bRestart = True Then ContinueLoop
 			; Forecast - Team AiO MOD++ (#-17)
-			If $iChkForecastBoost = 1 Then
+			If $g_bChkForecastBoost Then
 				$currentForecast = readCurrentForecast()
-					If $currentForecast >= Number($iTxtForecastBoost, 3) Then
+					If $currentForecast >= Number($g_iTxtForecastBoost, 3) Then
 						If _GUICtrlComboBox_GetCurSel($g_hCmbBoostBarracks) > 0 Then
 							SetLog("Boost Time !", $COLOR_GREEN)
 						Else
@@ -766,7 +792,7 @@ Func runBot() ;Bot that runs everything in order
 					SetLog("Forecast index is below the required value, no boost !", $COLOR_RED)
 					EndIf
  			EndIf
-			If $iChkForecastPause = 1 Then
+			If $g_bChkForecastPause Then
 				$currentForecast = readCurrentForecast()
 			EndIf
 			If IsSearchAttackEnabled() Then ; if attack is disabled skip reporting, requesting, donating, training, and boosting
@@ -792,6 +818,9 @@ Func runBot() ;Bot that runs everything in order
 				EndIf
 			EndIf
 			MainSuperXPHandler() ; Goblin XP - Team AiO MOD++ (#-19)
+			If ($g_iCommandStop = 3 Or $g_iCommandStop = 0) Then ; Train Donate only - force a donate cc everytime, Ignore any SkipDonate Near Full Values
+				If BalanceDonRec(True) Then DonateCC()
+			EndIf
 			Local $aRndFuncList = ['Laboratory', 'UpgradeHeroes', 'UpgradeBuilding', 'BuilderBase']
 			While 1
 				If $g_bRunState = False Then Return
@@ -900,17 +929,15 @@ Func _Idle() ;Sequence that runs until Full Army
 		If $g_iCommandStop = -1 Then SetLog("====== Waiting for full army ======", $COLOR_SUCCESS)
 
 		; Chatbot - Team AiO MOD++ (#-23)
-;~		If $g_iGlobalChat Or $g_iClanChat Then
-;~			ChatbotMessage()
-;~		EndIf
+		If $g_iGlobalChat Or $g_iClanChat Then
+			ChatbotMessage()
+		EndIf
 
 		Local $hTimer = __TimerInit()
 		Local $iReHere = 0
-		;PrepareDonateCC()
 
 		If $g_ichkUseBotHumanization = 1 Then BotHumanization() ; Bot Humanization - Team AiO MOD++ (#-15)
 
-		;If $g_bDonateSkipNearFullEnable = True Then getArmyCapacity(true,true)
 		If $g_iActiveDonate And $g_bChkDonate Then
 			Local $aHeroResult = CheckArmyCamp(True, True, True, False)
 			While $iReHere < 7
@@ -1038,7 +1065,7 @@ Func AttackMain() ;Main control for attack functions
 		Return
 	EndIf
 	If checkForecastPause($currentForecast) = True Then Return
-	getArmyCapacity(True, True)
+	getArmyTroopCapacity(True, True)
 	If IsSearchAttackEnabled() Then
 		If (IsSearchModeActive($DB) And checkCollectors(True, False)) Or IsSearchModeActive($LB) Or IsSearchModeActive($TS) Then
 
@@ -1063,9 +1090,9 @@ Func AttackMain() ;Main control for attack functions
 				;Setlog("BullyMode: " & $g_abAttackTypeEnable[$TB] & ", Bully Hero: " & BitAND($g_aiAttackUseHeroes[$g_iAtkTBMode], $g_aiSearchHeroWaitEnable[$g_iAtkTBMode], $g_iHeroAvailable) & "|" & $g_aiSearchHeroWaitEnable[$g_iAtkTBMode] & "|" & $g_iHeroAvailable, $COLOR_DEBUG)
 			EndIf
 			; Chatbot - Team AiO MOD++ (#-23)
-;~			If $g_iGlobalChat = True Or $g_iClanChat = True Then
-;~				ChatbotMessage()
-;~			EndIf
+			If $g_iGlobalChat Or $g_iClanChat Then
+				ChatbotMessage()
+			EndIf
 			PrepareSearch()
 			If $g_bOutOfGold = True Then Return ; Check flag for enough gold to search
 			If $g_bRestart = True Then Return
@@ -1122,7 +1149,7 @@ Func QuickAttack()
 	Local $quicklymilking = 0
 	Local $quicklythsnipe = 0
 
-	getArmyCapacity(True, True)
+	getArmyTroopCapacity(True, True)
 
 	If ($g_aiAttackAlgorithm[$DB] = 2 And IsSearchModeActive($DB)) Or (IsSearchModeActive($TS)) Then
 		VillageReport()
@@ -1184,7 +1211,6 @@ Func _RunFunction($action)
 			; ClanHop - Team AiO MOD++ (#-20)
 			If $g_bChkClanHop Then Return
 			If $g_iActiveDonate And $g_bChkDonate Then
-				;If $g_bDonateSkipNearFullEnable = True and $g_bFirstStart = False Then getArmyCapacity(True, True)
 				If SkipDonateNearFullTroops(True) = False And BalanceDonRec(True) Then DonateCC()
 				If _Sleep($DELAYRUNBOT1) = False Then checkMainScreen(False)
 			EndIf
@@ -1193,7 +1219,7 @@ Func _RunFunction($action)
 			If $g_bChkClanHop Then Return
 			If $g_iActiveDonate And $g_bChkDonate Then
 				If $g_bFirstStart Then
-					getArmyCapacity(True, False)
+					getArmyTroopCapacity(True, False)
 					getArmySpellCapacity(False, True)
 				EndIf
 				If SkipDonateNearFullTroops(True) = False And BalanceDonRec(True) Then DonateCC()
@@ -1211,7 +1237,7 @@ Func _RunFunction($action)
 						$g_iActualTrainSkip = 0
 					EndIf
 					CheckOverviewFullArmy(True, False) ; use true parameter to open train overview window
-					If ISArmyWindow(False, $ArmyTAB) Then CheckExistentArmy("Spells") ; Imgloc Method
+					getArmySpells()
 					getArmyHeroCount(False, True)
 				EndIf
 			Else
@@ -1259,7 +1285,7 @@ Func _RunFunction($action)
  			AutoUpgrade()
 			_Sleep($DELAYRUNBOT3)
 		Case "BuilderBase"
-			If isOnBuilderIsland() Or (($g_bChkCollectBuilderBase Or $g_bChkStartClockTowerBoost) And SwitchBetweenBases()) Then
+			If isOnBuilderIsland() Or (($g_bChkCollectBuilderBase Or $g_bChkStartClockTowerBoost Or $g_iChkBBSuggestedUpgrades) And SwitchBetweenBases()) Then
 				CollectBuilderBase()
 				BuilderBaseReport()
 				StartClockTowerBoost()

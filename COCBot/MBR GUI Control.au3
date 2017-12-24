@@ -19,6 +19,7 @@
 Global $g_bRedrawBotWindow[3] = [True, False, False] ; [0] = window redraw enabled, [1] = window redraw required, [2] = window redraw requird by some controls, see CheckRedrawControls()
 Global $g_hFrmBot_WNDPROC = 0
 Global $g_hFrmBot_WNDPROC_ptr = 0
+Global $iSldTransLevel = 0 ; pedroleon99 Pedro&Tony MOD
 
 ;~ ------------------------------------------------------
 ;~ Control Tab Files
@@ -31,6 +32,7 @@ Global $g_hFrmBot_WNDPROC_ptr = 0
 #include "GUI\MBR GUI Control Tab Village.au3"
 #include "GUI\MBR GUI Control Tab Search.au3"
 #include "GUI\MBR GUI Control Child Attack.au3"
+#include "GUI\MBR GUI Control Tab DropOrder.au3"
 #include "GUI\MBR GUI Control Tab EndBattle.au3"
 #include "GUI\MBR GUI Control Tab SmartZap.au3"
 #include "GUI\MBR GUI Control Tab Stats.au3"
@@ -49,7 +51,32 @@ Global $g_hFrmBot_WNDPROC_ptr = 0
 #include "MBR GUI Action.au3"
 ; Team AiO MOD++ (2017)
 #include "Team__AiO__MOD++\GUI\MOD GUI Control.au3"
-#include "Team__AiO__MOD++\GUI\MOD GUI Control - Forecast.au3"
+
+; GTFO - Pedro&Tony MOD
+Global $DonationWindowY, $bDonate, $GTFOcheck, $hGUI_GTFOMode
+Global $iTotalDonateCapacity, $iTotalDonateSpellCapacity
+Global $iDonTroopsLimit, $iDonSpellsLimit, $iDonTroopsAv, $iDonSpellsAv
+Global $iDonTroopsQuantityAv, $iDonTroopsQuantity, $iDonSpellsQuantityAv, $iDonSpellsQuantity, $ChatIdleDelay=15
+Global $bSkipDonTroops, $bSkipDonSpells ,$chkKickMode,$cmbTroopIdleTime,$chkMassKick,$chkSetTrophies,$cmbGtfoTrophies,$cmbGtfoDonationCap,$cmbGtfoKickCap
+Global $GTFOcheck, $hGUI_DONATE, $hGUI_GTFOMode, $grpGtfo, $cmbGtfo, $btnGtfoStart, $btnGtfoPause, $btnGtfoStop, $chkMassDonate, $chkClanOpen, $chkWaitForTroops, $chkGtfoStats
+Global $cmbGtfoTroop, $cmbGtfoTroopBoost, $cmbGtfoSpell, $cmbGtfoSpellBoost, $chkGtfoProfileSwitch, $cmbGtfoProfiles, $btnGtfoProfileAdd,$lblGtfoFriend, $cmbFriendRequest
+Global $btnGtfoProfileRemove, $SliderGtfoIdleTime, $chkGtfoNote, $txtGtfoNote, $chkGtfoClip, $txtGtfoChat, $btnGtfoSendChat, $lstGtfoChatTemplates
+Global $btnGtfoChatAdd, $btnGtfoChatRemove, $chkGtfoChatAuto, $chkGtfoChatRandom, $lblGtfoTroop, $lblGtfoHelp, $lblGtfoIdle, $lblGtfoSpell
+Global $lblGtfoTroopBoost, $lblGtfoChat, $lblGtfoSpellBoost, $lblKick, $txtGtfoIdleTime, $chkChatStatus,$lblGtfoChatIdleDelay,$cmbGtfoChatIdleDelay
+Global $lblStartXp, $lblCurrentXP,$lblStartXpVal, $lblCurrentXPVal, $lblGtfoDonationCap,$lblGtfoKickCap, $lblGTFOdisabled
+Global $GtfoModStatus = $GtfoIdle
+Global $GtfoTroopType, $GtfoSpellType, $GtfoChatCount = 0, $FirstStart = True
+Global $GtfoHours = 0, $GtfoMins = 0, $GtfoSecs = 0, $GtfoTroopTrainCount = 0, $GtfoSpellBrewCount = 0
+Global $GtfoIdleTime = 5, $GtfoReceiveCap = 20, $GtfoDonationCap = 1 , $GtfoTopEnd = -1, $GtfoMassKickMode = False
+Global $aIsGoldBar[4] = [822,22,0xFFFF55, 20] ; 0xFFF448
+Global $aIsElixirBar[4] = [822,72,0xFF19FF, 20];0x761476
+Global $sLastkickedFile = "lastkicked_0_0_85.png"
+Global $aGtfoCanTrophies[37] = [0,200,400,600,800,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,3000,3100,3200,3300,3400,3500,3600,3700,3800,3900,4000,4100,4200]
+Global $bSetTrophies = False, $aUpdateTrophies = -1, $currClanTrophies = -1
+Global $GtfoTrainCount = 0
+Global $GtfoTroopTrainCount = 0
+Global $GtfoSpellBrewCount = 0
+Global $DonateCount = 0
 
 Func InitializeMainGUI($bGuiModeUpdate = False)
 	InitializeControlVariables()
@@ -78,7 +105,7 @@ Func InitializeMainGUI($bGuiModeUpdate = False)
 	EndIf
 
 	; Developer mode controls
-	If $g_bDevMode = True Then
+	If $g_bDevMode Then
 		GUICtrlSetState($g_hChkDebugSetlog, $GUI_SHOW + $GUI_ENABLE)
 		GUICtrlSetState($g_hChkDebugDisableZoomout, $GUI_SHOW + $GUI_ENABLE)
 		GUICtrlSetState($g_hChkDebugDisableVillageCentering, $GUI_SHOW + $GUI_ENABLE)
@@ -198,7 +225,9 @@ Func GUIControl_WM_SHELLHOOK($hWin, $iMsg, $wParam, $lParam)
 		Select
 			Case $lParam = $g_hAndroidWindow
 				; show bot without activating
-				BotToFront()
+				;BotToFront($lParam)
+				BotMinimizeRestore(False, "GUIControl_WM_SHELLHOOK", False, 0, $g_hAndroidWindow)
+				;If Not $g_bIsHidden Then HideAndroidWindow(False, False, Default, "GUIControl_WM_SHELLHOOK") ; Android can be hidden
 			#cs moved to GUIControl_WM_ACTIVATEAPP as it enters here without activating the bot
 			Case Not $g_bIsHidden And $lParam = $g_hFrmBot ;And WinActive($g_hFrmBot)
 				; show Android without activating
@@ -215,8 +244,8 @@ Func GUIControl_WM_ACTIVATEAPP($hWin, $iMsg, $wParam, $lParam)
 	If $wParam Then
 		; bot activated
 		;If BitAND($g_iBotDesignFlags, 2) And $g_bAndroidEmbedded And $g_bBotDockedShrinked Then BotShrinkExpandToggle() ; auto expand bot again
-		; show Android without activating
-		If Not $g_bIsHidden And Not AndroidEmbedded() Then HideAndroidWindow(False, False, Default, "GUIControl_WM_ACTIVATEAPP")
+		; show Android behind bot without activating it
+		If Not $g_bFlushGuiLogActive And Not $g_bIsHidden And Not AndroidEmbedded() And $g_bChkBackgroundMode Then ShowAndroidWindow($g_hFrmBot, False, Default, "GUIControl_WM_ACTIVATEAPP")
 	Else
 		; bot deactivated
 		If BitAND($g_iBotDesignFlags, 2) And $g_bAndroidEmbedded And Not $g_bBotDockedShrinked Then BotShrinkExpandToggle() ; auto shrink bot again ;
@@ -450,7 +479,7 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 			; Clean up resources
 			BotCloseRequest()
 		Case $g_hLblBotMiniGUI, $g_hLblBotNormalGUI
-			BotGuiModeToggle()
+			BotGuiModeToggleRequest()
 		Case $g_hLblCreditsBckGrnd
 			; Handle open URL clicks when label of link is over another background label
 			Local $CursorInfo = GUIGetCursorInfo($g_hFrmBot)
@@ -476,8 +505,6 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 			btnResume()
 		Case $g_hBtnHide
 			btnHide()
-			;Case $g_hBtnEmbed
-			;	btnEmbed()
 		Case $btnResetStats
 			btnResetStats()
 		Case $g_hBtnAttackNowDB
@@ -486,8 +513,6 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 			btnAttackNowLB()
 		Case $g_hBtnAttackNowTS
 			btnAttackNowTS()
-		Case $g_hBtnSupportMOD ; Support MOD Button - Team AiO MOD++ (#-02)
-			ShellExecute($g_sModSupportUrl)
 			;Case $idMENU_DONATE_SUPPORT
 			;	ShellExecute("https://mybot.run/forums/index.php?/donate/make-donation/")
 		Case $g_hBtnNotifyDeleteMessages
@@ -560,8 +585,6 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 			btnTestDeadBaseFolder()
 		Case $g_hBtnTestTHimgloc
 			imglocTHSearch()
-		Case $g_hBtnTestQuickTrainsimgloc
-			imglocTestQuickTrain(1)
 		Case $g_hBtnTestimglocTroopBar
 			TestImglocTroopBar()
 		Case $g_hBtnTestAttackCSV
@@ -578,12 +601,33 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 			saveConfig()
 		Case $g_hBtnTestConfigRead
 			readConfig()
+;~ 		Case $btnTestEmulatorBar
+;~ 			AndroidBotStartEvent()
+;~ 		Case $btnTestAttackNowLB
+;~ 			btnTestAttackNowLB()
 		Case $g_hBtnTestConfigApply
 			applyConfig()
+;~ 		Case $btnTestCheckArmySpellCastel
+;~ 			btnTestCheckArmySpellCastel()
+		Case $btnGtfoStart
+			GTFOStart()
+		Case $btnGtfoPause
+			GTFOPause()
+		Case $btnGtfoStop
+			GTFOStop()
+        Case $lstGtfoChatTemplates
+            Switch $nNotifyCode
+                Case $LBN_DBLCLK
+                    GtfoTemplate_DoubleClick()
+			EndSwitch
 		Case $g_hBtnTestWeakBase
 			btnTestWeakBase()
 		Case $g_hBtnTestClickAway
 			btnTestClickAway()
+		Case $g_hBtnTestAutoUpgrade
+			AutoUpgrade(True)
+		Case $g_hBtnTestUpgradeWindow
+			btnTestUpgradeWindow()
 	EndSwitch
 
 	If $lParam = $g_hCmbGUILanguage Then
@@ -726,7 +770,7 @@ Func GUIControl_WM_NOTIFY($hWind, $iMsg, $wParam, $lParam)
 			tabBot()
 		Case $g_hGUI_MOD_TAB
 			; Forecast - Team AiO MOD++ (#-17)
-			If GUICtrlRead($g_hGUI_MOD_TAB, 1) = $g_hGUI_MOD_TAB_ITEM5 Then
+			If GUICtrlRead($g_hGUI_MOD_TAB, 1) = $g_hGUI_MOD_TAB_ITEM6 Then
 				Local $tTag  = DllStructCreate("hwnd;int;int;int;int;int;int;ptr;int;int;int;int;int;int;int;int;int;int;int;int", $lParam)
 				Local $hFrom = DllStructGetData($tTag, 1)
 				Local $iID   = DllStructGetData($tTag, 2)
@@ -734,7 +778,7 @@ Func GUIControl_WM_NOTIFY($hWind, $iMsg, $wParam, $lParam)
 				Local $iPos  = DllStructGetData($tTag, 4)
 
 				If $iCode = -551 Then ;tab selected
-					GUICtrlSetState($g_hGUI_MOD_TAB_ITEM5, $GUI_SHOW)
+					GUICtrlSetState($g_hGUI_MOD_TAB_ITEM6, $GUI_SHOW)
 					Sleep(100)
 					If TimerDiff($TimerForecast) > (1 * 10000) Then ; 1 Refresh Graphique toutes les 5 mn maxi, faut pas abuser
 						setForecast()
@@ -745,7 +789,7 @@ Func GUIControl_WM_NOTIFY($hWind, $iMsg, $wParam, $lParam)
 			tabMod()
 			tabMain()
 
-			If GUICtrlRead($g_hGUI_MOD_TAB, 1) = $g_hGUI_MOD_TAB_ITEM5 Then
+			If GUICtrlRead($g_hGUI_MOD_TAB, 1) = $g_hGUI_MOD_TAB_ITEM6 Then
 				Local $tTag  = DllStructCreate("hwnd;int;int;int;int;int;int;ptr;int;int;int;int;int;int;int;int;int;int;int;int", $lParam)
 				Local $hFrom = DllStructGetData($tTag, 1)
 				Local $iID   = DllStructGetData($tTag, 2)
@@ -753,7 +797,7 @@ Func GUIControl_WM_NOTIFY($hWind, $iMsg, $wParam, $lParam)
 				Local $iPos  = DllStructGetData($tTag, 4)
 
 				If $iCode = -551 Then ;tab selected
-					GUICtrlSetState($g_hGUI_MOD_TAB_ITEM5, $GUI_SHOW)
+					GUICtrlSetState($g_hGUI_MOD_TAB_ITEM6, $GUI_SHOW)
 					Sleep(100)
 					If TimerDiff($TimerForecast) > (1 * 10000) Then ; 1 Refresh Graphique toutes les 5 mn maxi, faut pas abuser
 						cmbSwLang()
@@ -841,9 +885,9 @@ Func BotMinimizeRequest()
 	BotMinimize("MinimizeButton", False, 500)
 EndFunc   ;==>BotMinimizeRequest
 
-Func BotToFront()
-	WinMove2($g_hFrmBot, "", -1, -1, -1, -1, $HWND_TOPMOST, 0, False)
-	WinMove2($g_hFrmBot, "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
+Func BotToFront($hHWndAfter = $HWND_TOPMOST)
+	WinMove2($g_hFrmBot, "", -1, -1, -1, -1, $hHWndAfter, 0, False)
+	If $hHWndAfter = $HWND_TOPMOST Or $hHWndAfter = $HWND_TOP Then WinMove2($g_hFrmBot, "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
 EndFunc   ;==>BotToFront
 
 Func CheckBotZOrder($bCheckOnly = False, $bForceZOrder = False)
@@ -1032,7 +1076,7 @@ Func BotShrinkExpandToggleExecute()
 	$aPos[3] = $g_aFrmBotPosInit[3] + $g_iFrmBotAddH + $g_aFrmBotPosInit[7]
 	Local $bAndroidShieldEnabled = $g_bAndroidShieldEnabled
 	$g_bAndroidShieldEnabled = False ; disable should to prevent flickering
-	$g_bBotDockedShrinked = (($g_bBotDockedShrinked) ? (False) : (True)) ; set new shrink mode
+	$g_bBotDockedShrinked = Not $g_bBotDockedShrinked ; set new shrink mode
 	If Not $g_bBotDockedShrinked Then GUISetState(@SW_HIDE, $g_hFrmBotLogoUrlSmall)
 
 	Local $aBtnSize = $_GUI_MAIN_BUTTON_SIZE
@@ -1045,11 +1089,7 @@ Func BotShrinkExpandToggleExecute()
 	EndIf
 	Local $iMode = (($g_bBotDockedShrinked) ? (1) : (-1))
 	Local $aPosBtn = ControlGetPos($g_hFrmBot, "", $g_hFrmBotButtons)
-	If $bAndroidShieldEnabled And $g_bAndroidShieldPreWin8 Then
-		; disable should to prevent flickering
-		If $g_hFrmBotEmbeddedShield Then GUISetState(@SW_HIDE, $g_hFrmBotEmbeddedShield)
-		If $g_hFrmBotEmbeddedMouse Then GUISetState(@SW_HIDE, $g_hFrmBotEmbeddedMouse)
-	EndIf
+	Local $bAnimate = $bAndroidShieldEnabled And Not $g_bAndroidShieldPreWin8 And $g_bChkBackgroundMode
 	;_SendMessage($g_hFrmBotEx, $WM_SETREDRAW, False, 0)
 	;_SendMessage($g_hFrmBotBottom, $WM_SETREDRAW, False, 0)
 	GUISetState(@SW_HIDE, $g_hFrmBotEx)
@@ -1058,21 +1098,24 @@ Func BotShrinkExpandToggleExecute()
 	Local $fStep = $_GUI_MAIN_WIDTH / $iSteps
 	Local $bGetAnimationSpeed = True
 	Local $iAnimationDelay = 0
-	For $i = 1 To $iSteps
-		Local $iWidth = Round($aPos[2] - $i * $fStep * $iMode, 0)
-		Local $iChange = $iWidth - $aPos[2]
-		If $bGetAnimationSpeed Then Local $hTimer = __TimerInit()
-		WinMove2($g_hFrmBot, "", -1, -1, $iWidth, $aPos[3], 0, 0, False)
-		WinMove2($g_hFrmBotButtons, "", $iAndroidWidth + 2 - $aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT + $iChange + (($g_bBotDockedShrinked) ? ($_GUI_MAIN_WIDTH) : (0)), $aPosBtn[1], -1, -1, 0, 0, False)
-		If $bGetAnimationSpeed Then
-			$iAnimationDelay = 100 / $iSteps - __TimerDiff($hTimer)
-		EndIf
-		If $iAnimationDelay > 0 Then _SleepMilli($iAnimationDelay)
-	Next
+	If $bAnimate Then
+		For $i = 1 To $iSteps
+			Local $iWidth = Round($aPos[2] - $i * $fStep * $iMode, 0)
+			Local $iChange = $iWidth - $aPos[2]
+			If $bGetAnimationSpeed Then Local $hTimer = __TimerInit()
+			WinMove2($g_hFrmBot, "", -1, -1, $iWidth, $aPos[3], 0, 0, False)
+			WinMove2($g_hFrmBotButtons, "", $iAndroidWidth + 2 - $aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT + $iChange + (($g_bBotDockedShrinked) ? ($_GUI_MAIN_WIDTH) : (0)), $aPosBtn[1], -1, -1, 0, 0, False)
+			If $bGetAnimationSpeed Then
+				$iAnimationDelay = 100 / $iSteps - __TimerDiff($hTimer)
+			EndIf
+			If $iAnimationDelay > 0 Then _SleepMilli($iAnimationDelay)
+		Next
+	EndIf
 	; update buttons
 	GUICtrlSetState($g_hLblBotShrink, (($g_bBotDockedShrinked) ? ($GUI_HIDE) : ($GUI_SHOW)))
 	GUICtrlSetState($g_hLblBotExpand, (($g_bBotDockedShrinked) ? ($GUI_SHOW) : ($GUI_HIDE)))
 	WinSetTrans($g_hFrmBotButtons, "", (($g_bBotDockedShrinked) ? (210) : (254))) ; trick to hide buttons from Android Screen that is not always refreshing
+	WinMove2($g_hFrmBot, "", -1, -1, $aPos[2] - $_GUI_MAIN_WIDTH * $iMode, $aPos[3], 0, 0, False)
 	WinMove2($g_hFrmBotButtons, "", $iAndroidWidth + 2 + (($g_bBotDockedShrinked) ? (-$aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT) : ($_GUI_MAIN_WIDTH - $aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT)), $aPosBtn[1], -1, -1, 0, 0, False)
 	If $g_bBotDockedShrinked Then
 		WinMove2($g_hFrmBotLogoUrlSmall, "", $iAndroidWidth + 2 + (($g_bBotDockedShrinked) ? (-$aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT) : ($_GUI_MAIN_WIDTH - $aBtnSize[0] * $_GUI_MAIN_BUTTON_COUNT)) - 290, $aPosBtn[1], -1, -1, 0, 0, False)
@@ -1086,10 +1129,6 @@ Func BotShrinkExpandToggleExecute()
 	;_WinAPI_UpdateWindow($g_hFrmBotBottom)
 	GUISetState(@SW_SHOWNOACTIVATE, $g_hFrmBotEx)
 	GUISetState(@SW_SHOWNOACTIVATE, $g_hFrmBotBottom)
-	If $bAndroidShieldEnabled And $g_bAndroidShieldPreWin8 Then
-		If $g_hFrmBotEmbeddedShield Then GUISetState(@SW_SHOWNOACTIVATE, $g_hFrmBotEmbeddedShield)
-		If $g_hFrmBotEmbeddedMouse Then GUISetState(@SW_SHOWNOACTIVATE, $g_hFrmBotEmbeddedMouse)
-	EndIf
 	If $g_bBotDockedShrinked Then CheckBotShrinkExpandButton()
 	SetDebugLog("BotShrinkExpandToggle: Bot " & (($g_bBotDockedShrinked) ? ("collapsed") : ("expanded")))
 	$g_bAndroidShieldEnabled = $bAndroidShieldEnabled
@@ -1097,8 +1136,17 @@ Func BotShrinkExpandToggleExecute()
 	Return True
 EndFunc   ;==>BotShrinkExpandToggleExecute
 
-Func BotGuiModeToggle()
+Func BotGuiModeToggleRequest()
+	If Not $g_bRunState Then
+		BotGuiModeToggle()
+		Return False
+	EndIf
+	$g_bBotGuiModeToggleRequested = True
+	Return True
+EndFunc
 
+Func BotGuiModeToggle()
+	$g_bBotGuiModeToggleRequested = False
 	If $g_iGuiMode = 0 Then Return False
 	If $g_iBotAction = $eBotClose Then Return False
 
@@ -1203,14 +1251,25 @@ Func BotGuiModeToggle()
 
 			InitializeMainGUI(True)
 
+			; update stats
+			UpdateStats(True)
+
 			DestroySplashScreen()
 
 			; apply config
 			applyConfig(False)
 
-			If $g_bRunState Then DisableGuiControls()
+			If Not $g_bGuiControlsEnabled Then DisableGuiControls()
 
 			SetRedrawBotWindow(False, Default, Default, Default, "BotGuiModeToggle")
+
+			; now refresh the logs
+			_GUICtrlRichEdit_SetSel($g_hTxtLog, 0, 0) ; select top
+			_GUICtrlRichEdit_SetSel($g_hTxtLog, -1, -1) ; select end
+			_GUICtrlRichEdit_SetSel($g_hTxtAtkLog, 0, 0) ; select top
+			_GUICtrlRichEdit_SetSel($g_hTxtAtkLog, -1, -1) ; select end
+			; avoid the cursor in attack log by selecting tab
+			GUICtrlSetState($g_hTabMain, $GUI_FOCUS)
 
 	EndSwitch
 
@@ -1261,6 +1320,7 @@ Func CheckBotRequests()
 		_WinAPI_PostMessage($g_hFrmBot, $WM_SYSCOMMAND, 0xF012, 0) ; SC_DRAGMOVE = 0xF012
 	Else
 		If $g_bBotShrinkExpandToggleRequested Then BotShrinkExpandToggleExecute()
+		If $g_bBotGuiModeToggleRequested Then BotGuiModeToggle()
 	EndIf
 EndFunc   ;==>CheckBotMoveRequests
 
@@ -1286,17 +1346,31 @@ Func BotClose($SaveConfig = Default, $bExit = True)
 	$g_bRunState = False
 	$g_bBotPaused = False
 	ResumeAndroid()
+	GtfoSaveSettings(); GTFO - Pedro&Tony MOD
 	SetLog("Closing " & $g_sBotTitle & " now ...")
 	LockBotSlot(False)
-	AndroidEmbed(False) ; detach Android Window
-	AndroidShieldDestroy() ; destroy Shield Hooks
-	AndroidBotStopEvent() ; signal android that bot is now stoppting
 
 	If $SaveConfig = True Then
 		setupProfile()
 		SaveConfig()
 	EndIf
-	AndroidAdbTerminateShellInstance()
+
+	; ensure windows are not top anymore
+	$g_bChkBackgroundMode = True
+
+	AndroidEmbed(False) ; detach Android Window
+	AndroidShieldDestroy() ; destroy Shield Hooks
+
+	If $g_bAndroidCloseWithBot And $g_hAndroidWindow Then
+		$g_bRunState = True
+		CloseAndroid("BotClose")
+		$g_bRunState = False
+	Else
+		AndroidBotStopEvent() ; signal android that bot is now stoppting
+		AndroidToFront(Default, "BotClose")
+		AndroidAdbTerminateShellInstance()
+	EndIf
+
 	; Close Mutexes
 	If $g_hMutex_BotTitle <> 0 Then ReleaseMutex($g_hMutex_BotTitle)
 	If $g_hMutex_Profile <> 0 Then ReleaseMutex($g_hMutex_Profile)
@@ -1321,7 +1395,7 @@ Func BotClose($SaveConfig = Default, $bExit = True)
 	If $bExit = True Then Exit
 EndFunc   ;==>BotClose
 
-Func BotMinimizeRestore($bMinimize, $sCaller, $iForceUpdatingWhenMinimized = False, $iStayMinimizedMillis = 0)
+Func BotMinimizeRestore($bMinimize, $sCaller, $iForceUpdatingWhenMinimized = False, $iStayMinimizedMillis = 0, $hHWndAfter = $HWND_TOP)
 
 	Static $siStayMinimizedMillis = 0
 	Static $shStayMinimizedTimer = 0
@@ -1348,7 +1422,7 @@ Func BotMinimizeRestore($bMinimize, $sCaller, $iForceUpdatingWhenMinimized = Fal
 			EndIf
 			If _WinAPI_IsIconic($g_hFrmBot) Then WinSetState($g_hFrmBot, "", @SW_RESTORE)
 			If _WinAPI_IsIconic($g_hAndroidWindow) Then WinSetState($g_hAndroidWindow, "", @SW_RESTORE)
-			WinMove2($g_hFrmBot, "", -32000, -32000, -1, -1, 0, $SWP_SHOWWINDOW, False)
+			WinMove2($g_hFrmBot, "", -32000, -32000, -1, -1, 0, BitOR($SWP_SHOWWINDOW, $SWP_NOACTIVATE), False)
 		Else
 			If $g_bHideWhenMinimized Then
 				WinMove2($g_hFrmBot, "", -1, -1, -1, -1, 0, $SWP_HIDEWINDOW, False)
@@ -1358,7 +1432,7 @@ Func BotMinimizeRestore($bMinimize, $sCaller, $iForceUpdatingWhenMinimized = Fal
 			;WinSetState($g_hAndroidWindow, "", @SW_MINIMIZE)
 		EndIf
 		; Hide also Android
-		If Not $g_bIsHidden Then HideAndroidWindow(True, Default, Default, "BotMinimizeRestore")
+		If $g_bChkBackgroundMode And Not $g_bIsHidden Then HideAndroidWindow(True, False, Default, "BotMinimizeRestore")
 		;ReleaseMutex($hMutex)
 		Return True
 	EndIf
@@ -1386,14 +1460,17 @@ Func BotMinimizeRestore($bMinimize, $sCaller, $iForceUpdatingWhenMinimized = Fal
 	EndIf
 	If _WinAPI_IsIconic($g_hFrmBot) Then WinSetState($g_hFrmBot, "", @SW_RESTORE)
 	If $g_bAndroidAdbScreencap = False And $g_bRunState = True And $g_bBotPaused = False And _WinAPI_IsIconic($g_hAndroidWindow) Then WinSetState($g_hAndroidWindow, "", @SW_RESTORE)
-	WinMove2($g_hFrmBot, "", $botPosX, $botPosY, -1, -1, $HWND_TOP, $SWP_SHOWWINDOW)
-	_WinAPI_SetActiveWindow($g_hFrmBot)
-	_WinAPI_SetFocus($g_hFrmBot)
+	WinMove2($g_hFrmBot, "", $botPosX, $botPosY, -1, -1, $hHWndAfter, BitOR($SWP_SHOWWINDOW, $SWP_NOACTIVATE))
+	;_WinAPI_SetActiveWindow($g_hFrmBot)
+	;_WinAPI_SetFocus($g_hFrmBot)
 	If _CheckWindowVisibility($g_hFrmBot, $aPos) Then
 		SetDebugLog("Bot Window '" & $g_sAndroidTitle & "' not visible, moving to position: " & $aPos[0] & ", " & $aPos[1])
 		WinMove2($g_hFrmBot, "", $aPos[0], $aPos[1])
 	EndIf
 	WinSetTrans($g_hFrmBot, "", 255) ; is set to 1 when "Hide when minimized" is enabled after some time, so restore it
+	BotToFront($hHWndAfter)
+	; Show also Android
+	If $g_bChkBackgroundMode And Not $g_bIsHidden And $hHWndAfter <> $g_hAndroidWindow Then HideAndroidWindow(False, False, Default, "BotMinimizeRestore", $g_hFrmBot)
 	;ReleaseMutex($hMutex)
 	Return True
 
@@ -1618,7 +1695,7 @@ Func SetTime($bForceUpdate = False)
 	If $DisplayLoop >= 3 Then ; Conserve Clock Cycles on Updating times
 		$DisplayLoop = 0
 		If $g_bChkSwitchAcc Then
-			If GUICtrlRead($g_hGUI_MOD_TAB, 1) = $g_hGUI_MOD_TAB_ITEM4 Then
+			If GUICtrlRead($g_hGUI_MOD_TAB, 1) = $g_hGUI_MOD_TAB_ITEM5 Then
 				For $i = 0 To $g_iTotalAcc;  Update time for all Accounts
 					; Troop Time (include spell and hero if needed)
 					If $g_abAccountNo[$i] And Not $g_abDonateOnly[$i] And $g_aiTimerStart[$i] <> 0 Then
@@ -1893,17 +1970,35 @@ EndFunc   ;==>tabSEARCH
 Func tabDONATE()
 	Local $tabidx = GUICtrlRead($g_hGUI_DONATE_TAB)
 	Local $tabdonx = _GUICtrlTab_GetItemRect($g_hGUI_DONATE_TAB, 1)
+	Local $tabdomx = _GUICtrlTab_GetItemRect($g_hGUI_DONATE_TAB, 2)
 
 	Select
 		Case $tabidx = 0 ; RequestCC
 			GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_RequestCC)
 			GUISetState(@SW_HIDE, $g_hGUI_DONATECC)
 			GUISetState(@SW_HIDE, $g_hGUI_ScheduleCC)
-			GUICtrlSetPos($g_hChkDonate, $tabdonx[2] - 15, $tabdonx[3] - 15)
+			GUICtrlSetPos($g_hChkDonate, $tabdomx[2] - 15, $tabdomx[3] - 15)
 
-		Case $tabidx = 1 ; Donate CC
+			GUISetState(@SW_HIDE, $hGUI_GTFOMode)
+			GUICtrlSetPos($GTFOcheck, $tabdonx[2] - 15, $tabdonx[3] - 15)
+		Case $tabidx = 1 ; GTFO
+			GUISetState(@SW_HIDE, $g_hGUI_DONATECC)
+			GUISetState(@SW_HIDE, $g_hGUI_ScheduleCC)
+			GUICtrlSetPos($g_hChkDonate, $tabdomx[2] - 15, $tabdomx[3] - 15)
+
+			GUICtrlSetPos($GTFOcheck, $tabdonx[2] - 15, $tabdonx[3] - 17)
+			If GUICtrlRead($GTFOcheck) = $GUI_CHECKED Then
+				GUISetState(@SW_SHOW, $hGUI_GTFOMode)
+				GUICtrlSetState($lblGTFOdisabled, $GUI_HIDE)
+			Else
+				GUISetState(@SW_HIDE, $hGUI_GTFOMode)
+				GUICtrlSetState($lblGTFOdisabled, $GUI_SHOW)
+			EndIf
+			GUISetState(@SW_HIDE, $g_hGUI_RequestCC)
+		Case $tabidx = 2 ; Donate CC
 			GUISetState(@SW_HIDE, $g_hGUI_RequestCC)
 			GUISetState(@SW_HIDE, $g_hGUI_ScheduleCC)
+			GUISetState(@SW_HIDE, $hGUI_GTFOMode)
 			If GUICtrlRead($g_hChkDonate) = $GUI_CHECKED Then
 				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_DONATECC)
 				GUICtrlSetState($g_hLblDonateDisabled, $GUI_HIDE)
@@ -1911,11 +2006,12 @@ Func tabDONATE()
 				GUISetState(@SW_HIDE, $g_hGUI_DONATECC)
 				GUICtrlSetState($g_hLblDonateDisabled, $GUI_SHOW)
 			EndIf
-			GUICtrlSetPos($g_hChkDonate, $tabdonx[2] - 15, $tabdonx[3] - 15)
-
-		Case $tabidx = 2 ; Schedule
+			GUICtrlSetPos($g_hChkDonate, $tabdomx[2] - 15, $tabdomx[3] - 17)
+			GUICtrlSetPos($GTFOcheck, $tabdonx[2] - 15, $tabdonx[3] - 15)
+		Case $tabidx = 3; Schedule
 			GUISetState(@SW_HIDE, $g_hGUI_RequestCC)
 			GUISetState(@SW_HIDE, $g_hGUI_DONATECC)
+			GUISetState(@SW_HIDE, $hGUI_GTFOMode)
 			If GUICtrlRead($g_hChkDonate) = $GUI_CHECKED Then
 				GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_ScheduleCC)
 				GUICtrlSetState($g_hLblScheduleDisabled, $GUI_HIDE)
@@ -1923,7 +2019,8 @@ Func tabDONATE()
 				GUISetState(@SW_HIDE, $g_hGUI_ScheduleCC)
 				GUICtrlSetState($g_hLblScheduleDisabled, $GUI_SHOW)
 			EndIf
-			GUICtrlSetPos($g_hChkDonate, $tabdonx[2] - 15, $tabdonx[3] - 15)
+			GUICtrlSetPos($g_hChkDonate, $tabdomx[2] - 15, $tabdomx[3] - 15)
+			GUICtrlSetPos($GTFOcheck, $tabdonx[2] - 15, $tabdonx[3] - 15)
 
 	EndSelect
 
@@ -1957,16 +2054,16 @@ Func tabMod()
 		Case $tabidx = 0 ; Profile tab
 			GUISetState(@SW_SHOWNOACTIVATE, $g_hGUI_MOD_PROFILES)
 			tabModProfiles()
-		Case $tabidx = 1 ; Humanization tab
+		Case $tabidx = 1 ; GoblinXP tab
 			GUISetState(@SW_HIDE, $g_hGUI_MOD_PROFILES)
-		Case $tabidx = 2 ; GoblinXP tab
+		Case $tabidx = 2 ; Humanization tab
 			GUISetState(@SW_HIDE, $g_hGUI_MOD_PROFILES)
-;~		Case $tabidx = 3 ; Chatbot tab
-;~			GUISetState(@SW_HIDE, $g_hGUI_MOD_PROFILES)
-		Case $tabidx = 3 ; Stats tab
+		Case $tabidx = 3 ; Chatbot tab
+			GUISetState(@SW_HIDE, $g_hGUI_MOD_PROFILES)
+		Case $tabidx = 4 ; Stats tab
 			GUISetState(@SW_HIDE, $g_hGUI_MOD_PROFILES)
 			If $g_bRunState = False Then UpdateMultiStats()
-		Case $tabidx = 4 ; Forecast tab
+		Case $tabidx = 5 ; Forecast tab
 			GUISetState(@SW_HIDE, $g_hGUI_MOD_PROFILES)
 		Case Else
 			GUISetState(@SW_HIDE, $g_hGUI_MOD_PROFILES)
@@ -2036,81 +2133,6 @@ Func tabTHSnipe()
 
 EndFunc   ;==>tabTHSnipe
 
-Func Doncheck()
-	tabDONATE() ; just call tabDONATE()
-EndFunc   ;==>Doncheck
-
-Func dbCheck()
-	$g_abAttackTypeEnable[$DB] = (GUICtrlRead($g_hChkDeadbase) = $GUI_CHECKED)
-
-	If $g_iBotLaunchTime > 0 Then _GUICtrlTab_SetCurFocus($g_hGUI_SEARCH_TAB, 0) ; activate deadbase tab
-	If BitAND(GUICtrlRead($g_hChkDBActivateSearches), GUICtrlRead($g_hChkDBActivateTropies), GUICtrlRead($g_hChkDBActivateCamps), GUICtrlRead($g_hChkDBSpellsWait)) = $GUI_UNCHECKED Then
-		GUICtrlSetState($g_hChkDBActivateSearches, $GUI_CHECKED)
-		chkDBActivateSearches() ; this includes a call to dbCheckall() -> tabSEARCH()
-	Else
-		tabSEARCH() ; just call tabSEARCH()
-	EndIf
-EndFunc   ;==>dbCheck
-
-Func dbCheckAll()
-	If BitAND(GUICtrlRead($g_hChkDBActivateSearches), GUICtrlRead($g_hChkDBActivateTropies), GUICtrlRead($g_hChkDBActivateCamps), GUICtrlRead($g_hChkDBSpellsWait)) = $GUI_UNCHECKED Then
-		GUICtrlSetState($g_hChkDeadbase, $GUI_UNCHECKED)
-	Else
-		GUICtrlSetState($g_hChkDeadbase, $GUI_CHECKED)
-	EndIf
-	tabSEARCH()
-EndFunc   ;==>dbCheckAll
-
-Func abCheck()
-	$g_abAttackTypeEnable[$LB] = (GUICtrlRead($g_hChkActivebase) = $GUI_CHECKED)
-
-	If $g_iBotLaunchTime > 0 Then _GUICtrlTab_SetCurFocus($g_hGUI_SEARCH_TAB, 1)
-	If BitAND(GUICtrlRead($g_hChkABActivateSearches), GUICtrlRead($g_hChkABActivateTropies), GUICtrlRead($g_hChkABActivateCamps), GUICtrlRead($g_hChkABSpellsWait)) = $GUI_UNCHECKED Then
-		GUICtrlSetState($g_hChkABActivateSearches, $GUI_CHECKED)
-		chkABActivateSearches() ; this includes a call to abCheckall() -> tabSEARCH()
-	Else
-		tabSEARCH() ; just call tabSEARCH()
-	EndIf
-EndFunc   ;==>abCheck
-
-Func abCheckAll()
-	If BitAND(GUICtrlRead($g_hChkABActivateSearches), GUICtrlRead($g_hChkABActivateTropies), GUICtrlRead($g_hChkABActivateCamps), GUICtrlRead($g_hChkABSpellsWait)) = $GUI_UNCHECKED Then
-		GUICtrlSetState($g_hChkActivebase, $GUI_UNCHECKED)
-	Else
-		GUICtrlSetState($g_hChkActivebase, $GUI_CHECKED)
-	EndIf
-	tabSEARCH()
-EndFunc   ;==>abCheckAll
-
-Func tsCheck()
-	$g_abAttackTypeEnable[$TS] = (GUICtrlRead($g_hChkTHSnipe) = $GUI_CHECKED)
-
-	If $g_iBotLaunchTime > 0 Then _GUICtrlTab_SetCurFocus($g_hGUI_SEARCH_TAB, 2)
-	If BitAND(GUICtrlRead($g_hChkTSActivateSearches), GUICtrlRead($g_hChkTSActivateTropies), GUICtrlRead($g_hChkTSActivateCamps)) = $GUI_UNCHECKED Then
-		GUICtrlSetState($g_hChkTSActivateSearches, $GUI_CHECKED)
-		chkTSActivateSearches() ; this includes a call to tsCheckall() -> tabSEARCH()
-	Else
-		tabSEARCH() ; just call tabSEARCH()
-	EndIf
-EndFunc   ;==>tsCheck
-
-Func tsCheckAll()
-	If BitAND(GUICtrlRead($g_hChkTSActivateSearches), GUICtrlRead($g_hChkTSActivateTropies), GUICtrlRead($g_hChkTSActivateCamps)) = $GUI_UNCHECKED Then
-		GUICtrlSetState($g_hChkTHSnipe, $GUI_UNCHECKED)
-	Else
-		GUICtrlSetState($g_hChkTHSnipe, $GUI_CHECKED)
-	EndIf
-	tabSEARCH()
-EndFunc   ;==>tsCheckAll
-
-Func bullyCheck()
-	$g_abAttackTypeEnable[$TB] = (GUICtrlRead($g_hChkBully) = $GUI_CHECKED)
-
-	If $g_iBotLaunchTime > 0 Then _GUICtrlTab_SetCurFocus($g_hGUI_SEARCH_TAB, 3)
-	tabSEARCH()
-EndFunc   ;==>bullyCheck
-
-
 ;---------------------------------------------------
 ; Extra Functions used on GUI Control
 ;---------------------------------------------------
@@ -2143,11 +2165,11 @@ Func Bind_ImageList($nCtrl, ByRef $hImageList)
 
 		Case $g_hGUI_DONATE_TAB
 			; the icons for donate tab
-			Local $aIconIndex = [$eIcnCCRequest, $eIcnCCDonate, $eIcnHourGlass]
+			Local $aIconIndex[4] = [$eIcnCCRequest,$eIcnCCDonate, $eIcnCCDonate, $eIcnHourGlass]
 
 		Case $g_hGUI_UPGRADE_TAB
 			; the icons for upgrade tab
-			Local $aIconIndex = [$eIcnLaboratory, $eIcnHeroes, $eIcnMortar, $eIcnBuilder, $eIcnWall]
+			Local $aIconIndex = [$eIcnLaboratory, $eIcnHeroes, $eIcnMortar, $eIcnWall, $eIcnBuilder]
 
 		Case $g_hGUI_NOTIFY_TAB
 			; the icons for NOTIFY tab
@@ -2185,7 +2207,7 @@ Func Bind_ImageList($nCtrl, ByRef $hImageList)
 		; Team AiO MOD++ (2017)
 		Case $g_hGUI_MOD_TAB
 			; the icons for Mods tab
-			Local $aIconIndex = [$eIcnSwitchOptions, $eIcnHumanization, $eIcnGoblinXP, $eIcnStats, $eIcnForecast]
+			Local $aIconIndex = [$eIcnSwitchOptions, $eIcnHumanization, $eIcnGoblinXP, $eIcnChatbot, $eIcnStats, $eIcnForecast]
 
 		Case $g_hGUI_MOD_PROFILES_TAB
 			; the icons for Profiles tab
@@ -2350,3 +2372,46 @@ Func IsGUICtrlHidden($hGUICtrl)
 	If BitAND(WinGetState(GUICtrlGetHandle($hGUICtrl), ""), 2) = 0 Then Return True
 	Return False
 EndFunc   ;==>IsGUICtrlHidden
+
+; Robot Transparency - Pedro&Tony MOD
+Func Slider()
+     $iSldTransLevel = GUICtrlRead($SldTransLevel)
+     GUICtrlSetData($SldTransLevel, $iSldTransLevel)
+	  Switch $iSldTransLevel
+                Case 0
+                    WinSetTrans($g_hFrmBot , "", 255)
+				Case 1
+                    WinSetTrans($g_hFrmBot , "", 235)
+                Case 2
+                    WinSetTrans($g_hFrmBot , "", 220)
+                Case 3
+                    WinSetTrans($g_hFrmBot , "", 205)
+                Case 4
+                    WinSetTrans($g_hFrmBot , "", 190)
+			    Case 5
+                    WinSetTrans($g_hFrmBot , "", 175)
+				Case 6
+                    WinSetTrans($g_hFrmBot , "", 160)
+				Case 7
+                    WinSetTrans($g_hFrmBot , "", 100)
+                Case 8
+                    WinSetTrans($g_hFrmBot , "", 50)
+      EndSwitch
+EndFunc
+
+; GTFO - Pedro&Tony MOD
+Func GTFOcheck()
+	If $g_iBotLaunchTime  > 0 Then _GUICtrlTab_SetCurFocus($g_hGUI_DONATE_TAB, 1)
+	If GUICtrlRead($GTFOcheck) = $GUI_CHECKED Then
+		GUISetState(@SW_SHOW, $hGUI_GTFOMode)
+		GUICtrlSetState($lblGTFOdisabled, $GUI_HIDE)
+;~ 		_GUICtrlEdit_SetText($g_hTxtLog, _PadStringCenter(" GTFO LOG ", 70, "="))
+	Else
+		GUISetState(@SW_HIDE, $hGUI_GTFOMode)
+		GUICtrlSetState($lblGTFOdisabled, $GUI_SHOW)
+;~ 		_GUICtrlEdit_SetText($g_hTxtLog, _PadStringCenter(" BOT LOG ", 71, "="))
+	EndIf
+;~ 	_GUICtrlRichEdit_SetFont($g_hTxtLog, 6, "Lucida Console")
+;~ 	_GUICtrlRichEdit_AppendTextColor($g_hTxtLog, "" & @CRLF, _ColorConvert($Color_Black))
+	tabDONATE()
+EndFunc

@@ -14,19 +14,15 @@
 ; ===============================================================================================================================
 #include-once
 
-Global $g_sLastVersion = "" ;latest version from GIT
-Global $g_sLastMessage = "" ;message for last version
-Global $g_sOldVersionMessage = "" ;warning message for old bot
-; Check Version
-Global $g_sLastModversion = "" ;latest version from GIT
-Global $g_sLastModmessage = "" ;message for last version
-Global $g_sOldModversmessage = "" ;warning message for old bot
+;~ Global $g_sLastVersion = "" ;latest version from GIT
+;~ Global $g_sLastMessage = "" ;message for last version
+;~ Global $g_sOldVersionMessage = "" ;warning message for old bot
 
+; Check Version - Pedro&Tony MOD
 Func CheckVersion()
 	If $g_bCheckVersion Then
 		CheckVersionHTML()
 		If $g_sLastModversion = "" Then
-			SetLog("WE CANNOT OBTAIN MOD VERSION AT THIS TIME", $COLOR_ACTION)
 			CheckModVersion()
 		ElseIf VersionNumFromVersionTXT($g_sModversion) < VersionNumFromVersionTXT($g_sLastModversion) Then
 			SetLog("WARNING, YOUR MOD VERSION (" & $g_sModversion & ") IS OUT OF DATE.", $COLOR_ERROR)
@@ -36,44 +32,17 @@ Func CheckVersion()
 			_PrintLogVersion($g_sOldModversmessage)
 			CheckModVersion()
 		ElseIf VersionNumFromVersionTXT($g_sModversion) > VersionNumFromVersionTXT($g_sLastModversion) Then
-			SetLog("YOU ARE USING A FUTURE PEDRO&TONY MOD VERSION CHIEF!", $COLOR_SUCCESS)
+			SetLog("YOU ARE USING A FUTURE MOD BY Pedro&Tony MOD VERSION CHIEF!", $COLOR_SUCCESS)
 			SetLog("YOUR MOD VERSION: " & $g_sModversion, $COLOR_SUCCESS)
 			SetLog("OFFICIAL MOD VERSION: " & $g_sLastModversion, $COLOR_SUCCESS)
 			SetLog(" ")
 		Else
-			SetLog("WELCOME CHIEF, YOU HAVE THE LATEST MOD VERSION", $COLOR_SUCCESS)
-			SetLog("__________________" & " PEDRO&TONY MOD " & "__________________", $COLOR_ORANGE)
-			SetLog("CHEEERS..", $COLOR_SUCCESS)
-			_PrintLogVersion($g_sLastModmessage)
+			SetLog("WELCOME CHIEF, YOU HAVE THE LATEST Pedro&Tony MOD VERSION", $COLOR_SUCCESS)
+			SetLog(" ")
+;~ 			_PrintLogVersion($g_sLastModmessage)
 		EndIf
 	EndIf
 EndFunc   ;==>CheckVersion
-
-;~ Func CheckVersionTXT()
-;~ 	;download page from site contains last bot version
-;~ 	$hLastVersion = InetGet("https://mybot.run/lastversion.txt", @ScriptDir & "\LastVersion.txt")
-;~ 	InetClose($hLastVersion)
-
-;~ 	;search version into downloaded page
-;~ 	Local $f, $line, $Casesense = 0
-;~ 	$g_sLastVersion = ""
-;~ 	If FileExists(@ScriptDir & "\LastVersion.txt") Then
-;~ 		$f = FileOpen(@ScriptDir & "\LastVersion.txt", 0)
-;~ 		; Read in lines of text until the EOF is reached
-;~ 		While 1
-;~ 			$line = FileReadLine($f)
-;~ 			If @error = -1 Then ExitLoop
-;~ 			If StringInStr($line, "version=", $Casesense) Then
-;~ 				$g_sLastVersion = StringMid($line, 9, -1)
-;~ 			EndIf
-;~ 			If StringInStr($line, "message=", $Casesense) Then
-;~ 				$g_sLastMessage = StringMid($line, 9, -1)
-;~ 			EndIf
-;~ 		WEnd
-;~ 		FileClose($f)
-;~ 		FileDelete(@ScriptDir & "\LastVersion.txt")
-;~ 	EndIf
-;~ EndFunc   ;==>CheckVersionTXT
 
 
 Func CheckVersionHTML()
@@ -82,7 +51,7 @@ Func CheckVersionHTML()
 		FileCopy(@ScriptDir & "\TestVersion.txt", $versionfile, 1)
 	Else
 		;download page from site contains last bot version
-		Local $hDownload = InetGet("https://raw.githubusercontent.com/pedroleon99/MyBot-PedroTony-Mod/master/LastVersion.txt", $versionfile, 0, 1)
+		Local $hDownload = InetGet("https://raw.githubusercontent.com/pedroleon99/MyBot-PedroTony-Mod/master/LastVersion.txt", $versionfile, 0, 1) ; Check Version - Pedro&Tony MOD
 
 		; Wait for the download to complete by monitoring when the 2nd index value of InetGetInfo returns True.
 		Local $i = 0
@@ -97,17 +66,17 @@ Func CheckVersionHTML()
 	;search version into downloaded page
 	Local $line, $line2, $Casesense = 0, $chkvers = False, $chkmsg = False, $chkmsg2 = False, $i = 0
 	;$g_sLastVersion = ""
-	$g_sLastModversion = ""
+	$g_sLastModversion = "" ; Check Version - Pedro&Tony MOD
 	If FileExists($versionfile) Then
 		;$g_sLastVersion = IniRead($versionfile, "general", "version", "")
-		$g_sLastModversion = IniRead($versionfile, "mod", "version", "")
+		$g_sLastModversion = IniRead($versionfile, "mod", "version", "") ; Check Version - Pedro&Tony MOD
 		;look for localized messages for the new and old versions
 		Local $versionfilelocalized = @ScriptDir & "\LastVersion_" & $g_sLanguage & ".txt" ;
 		If FileExists(@ScriptDir & "\TestVersion_" & $g_sLanguage & ".txt") Then
 			FileCopy(@ScriptDir & "\TestVersion_" & $g_sLanguage & ".txt", $versionfilelocalized, 1)
 		Else
 			;download page from site contains last bot version localized messages
-			$hDownload = InetGet("https://raw.githubusercontent.com/pedroleon99/MyBot-PedroTony-Mod/master/LastVersion_" & $g_sLanguage & ".txt", $versionfilelocalized, 0, 1)
+			$hDownload = InetGet("https://raw.githubusercontent.com/pedroleon99/MyBot-PedroTony-Mod/master/LastVersion_" & $g_sLanguage & ".txt", $versionfilelocalized, 0, 1) ; Check Version - Pedro&Tony MOD
 
 			; Wait for the download to complete by monitoring when the 2nd index value of InetGetInfo returns True.
 			Local $i = 0
@@ -121,12 +90,14 @@ Func CheckVersionHTML()
 		If FileExists($versionfilelocalized) Then
 			;$g_sLastMessage = IniRead($versionfilelocalized, "general", "messagenew", "")
 			;$g_sOldVersionMessage = IniRead($versionfilelocalized, "general", "messageold", "")
+			; Check Version - Pedro&Tony MOD
 			$g_sLastModmessage = IniRead($versionfilelocalized, "mod", "messagenew", "")
 			$g_sOldModversmessage = IniRead($versionfilelocalized, "mod", "messageold", "")
 			FileDelete($versionfilelocalized)
 		Else
 			;$g_sLastMessage = IniRead($versionfile, "general", "messagenew", "")
 			;$g_sOldVersionMessage = IniRead($versionfile, "general", "messageold", "")
+			; Check Version - Pedro&Tony MOD
 			$g_sLastModmessage = IniRead($versionfilelocalized, "mod", "messagenew", "")
 			$g_sOldModversmessage = IniRead($versionfilelocalized, "mod", "messageold", "")
 		EndIf
@@ -200,10 +171,10 @@ Func GetVersionNormalized($VersionString, $Chars = 5)
 	Return _ArrayToString($a, ".")
 EndFunc   ;==>GetVersionNormalized
 
+; Check Version - Pedro&Tony MOD
 Func CheckModVersion()
 	If $g_sLastModversion = "" Then
-		MsgBox($MB_ICONWARNING, "", "WE CANNOT OBTAIN MOD VERSION AT THIS TIME" & @CRLF & _
-				"BAD CONNECTION", 10) ;10s timeout
+		SetLog("WE CANNOT OBTAIN MOD VERSION AT THIS TIME" & @CRLF & "BAD CONNECTION", $COLOR_ACTION)
 	ElseIf VersionNumFromVersionTXT($g_sModversion) < VersionNumFromVersionTXT($g_sLastModversion) Then
 		PushMsg("Update")
 		If MsgBox(BitOR($MB_ICONWARNING, $MB_YESNO), "BOT Update Detected", "Chief, there is a new version of the bot available (" & $g_sLastModversion & ")" & @CRLF & @CRLF & _
@@ -212,7 +183,6 @@ Func CheckModVersion()
 			Return False
 		EndIf
 	Else
-		MsgBox($MB_ICONINFORMATION, "Notify", "You Are Using The Latest Version Of Pedro&Tony MOD" & @CRLF & _
-				"Thanks..", 15) ;15s timeout
+		SetLog("You Are Using The Latest Version Of Pedro&Tony MOD" & @CRLF & "Thanks..", $COLOR_SUCCESS)
 	EndIf
 EndFunc   ;==>CheckModVersion

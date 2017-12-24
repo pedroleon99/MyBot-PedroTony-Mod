@@ -13,7 +13,7 @@
 ; Example .......: No
 ; ===============================================================================================================================
 
-; Check Version - Team AiO MOD++ (#-03)
+; Check Version - Pedro&Tony MOD
 Global $g_sLastModversion = "" ;latest version from GIT
 Global $g_sLastModmessage = "" ;message for last version
 Global $g_sOldModversmessage = "" ;warning message for old bot
@@ -29,32 +29,6 @@ Global Const $g_aaiEdgeDropPoints[4] = [$g_aaiBottomRightDropPoints, $g_aaiTopLe
 Global $g_iChkGiantSlot = 0, $g_iChkUnitFactor = 0, $g_iChkWaveFactor = 0
 Global $g_iCmbGiantSlot = 0, $g_iTxtUnitFactor = 10, $g_iTxtWaveFactor = 100
 Global $g_iSlotsGiants = 1, $g_aiSlotsGiants = 1
-
-; Drop Order Troops - Team AiO MOD++ (#-06)
-Global Enum $eTroopBarbarianS, $eTroopArcherS, $eTroopGiantS, $eTroopGoblinS, $eTroopWallBreakerS, $eTroopBalloonS, _
-		$eTroopWizardS, $eTroopHealerS, $eTroopDragonS, $eTroopPekkaS, $eTroopBabyDragonS, $eTroopMinerS, _
-		$eTroopMinionS, $eTroopHogRiderS, $eTroopValkyrieS, $eTroopGolemS, $eTroopWitchS, _
-		$eTroopLavaHoundS, $eTroopBowlerS, $eHeroeS, $eCCS, $eTroopCountDrop
-Global $icmbDropTroops[$eTroopCountDrop] = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
-Global Const $g_asTroopNamesPluralDrop[$eTroopCountDrop] = ["Barbarians", "Archers", "Giants", "Goblins", "Wall Breakers", "Balloons", "Wizards", "Healers", "Dragons", "Pekkas", "Baby Dragons", "Miners", "Minions", "Hog Riders", "Valkyries", "Golems", "Witches", "Lava Hounds", "Bowlers", "Clan Castle", "Heroes"]
-
-Global Const $g_aiTroopOrderDropIcon[23] = [ _
-		$eIcnOptions, $eIcnBarbarian, $eIcnArcher, $eIcnGiant, $eIcnGoblin, $eIcnWallBreaker, $eIcnBalloon, _
-		$eIcnWizard, $eIcnHealer, $eIcnDragon, $eIcnPekka, $eIcnBabyDragon, $eIcnMiner, $eIcnMinion, _
-		$eIcnHogRider, $eIcnValkyrie, $eIcnGolem, $eIcnWitch, $eIcnLavaHound, $eIcnBowler, $eIcnCC, $eIcnHeroes]
-
-Global $g_hChkCustomTrainDropOrderEnable = 0
-Global $g_bCustomTrainDropOrderEnable = False
-Global $g_hBtnRemoveTroops2, $g_hBtnTroopOrderSet2
-Global $g_ahImgTroopDropOrderSet = 0
-Global $g_ahImgTroopDropOrder[$eTroopCountDrop] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Global $cmbDropTroops = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Global Const $g_asTroopDropList[] = ["", _
-		"Barbarians", "Archers", "Giants", "Goblins", _
-		"Wall Breakers", "Balloons", "Wizards", "Healers", _
-		"Dragons", "Pekkas", "Baby Dragons", "Miners", _
-		"Minions", "Hog Riders", "Valkyries", "Golems", _
-		"Witches", "Lava Hounds", "Bowlers", "Clan Castle", "Heroes"]
 
 ; Auto Dock, Hide Emulator & Bot - Team AiO MOD++ (#-07)
 Global $g_bEnableAuto = False, $g_iChkAutoDock = False, $g_iChkAutoHideEmulator = True, $g_iChkAutoMinimizeBot = False
@@ -127,15 +101,17 @@ Global $g_iLastLayout = 0
 Global Const $COLOR_DEEPPINK = 0xFF1493
 Global Const $COLOR_DARKGREEN = 0x006400
 Global $oIE = ObjCreate("Shell.Explorer.2")
-Global $ieForecast
 Global $dtStamps[0], $lootMinutes[0]
 Global $timeOffset = 0, $TimerForecast = 0
 Global $lootIndexScaleMarkers, $currentForecast
-Global $iChkForecastBoost = 0, $iTxtForecastBoost = 6
-Global $iChkForecastPause = 0, $iTxtForecastPause = 2
-Global $ichkForecastHopingSwitchMax = 0, $icmbForecastHopingSwitchMax = 0, $itxtForecastHopingSwitchMax = 2
-Global $ichkForecastHopingSwitchMin = 0, $icmbForecastHopingSwitchMin = 0, $itxtForecastHopingSwitchMin = 2
-Global $icmbSwLang = 0
+
+Global $g_bChkForecastBoost = False, $g_iTxtForecastBoost = 6
+Global $g_bChkForecastPause = False, $g_iTxtForecastPause = 2
+
+Global $g_bChkForecastHopingSwitchMax = False, $g_iCmbForecastHopingSwitchMax = 0, $g_iTxtForecastHopingSwitchMax = 2
+Global $g_bChkForecastHopingSwitchMin = False, $g_iCmbForecastHopingSwitchMin = 0, $g_iTxtForecastHopingSwitchMin = 2
+
+Global $g_iCmbSwLang = 0
 
 ; Request CC Troops at first - Team AiO MOD++ (#-18)
 Global $g_bReqCCFirst = False
@@ -153,6 +129,7 @@ Global $g_canGainXP = False
 
 ; ClanHop - Team AiO MOD++ (#-20)
 Global $g_bChkClanHop = False
+Global $g_iTxtCheckingtraine = 5
 
 ; Max logout time - Team AiO MOD++ (#-21)
 Global $g_bTrainLogoutMaxTime = False, $g_iTrainLogoutMaxTime = 4
@@ -162,13 +139,13 @@ Global $g_hChkExtendedAttackBarLB, $g_hChkExtendedAttackBarDB, $g_abChkExtendedA
 Global $g_iTotalAttackSlot = 10, $g_bDraggedAttackBar = False ; flag if AttackBar is dragged or not
 
 ; Chatbot - Team AiO MOD++ (#-23)
-;~ Global $chatIni = ""
-;~ Global $GlobalMessages1 = "", $GlobalMessages2 = "", $GlobalMessages3 = "", $GlobalMessages4 = ""
-;~ Global $ClanMessages = "", $ClanResponses = ""
-;~ Global $g_iGlobalChat = False, $g_iGlobalScramble = False, $g_iSwitchLang = False, $g_iCmbLang = 1
-;~ Global $g_iClanChat = False, $g_iRusLang = 0, $g_iUseResponses = False, $g_iUseGeneric = False, $g_iChatPushbullet = False, $g_iPbSendNewChats = False
-;~ Global $ChatbotStartTime
-;~ Global $ChatbotQueuedChats[0], $ChatbotReadQueued = False, $ChatbotReadInterval = 0, $ChatbotIsOnInterval = False
+Global $chatIni = ""
+Global $GlobalMessages1 = "", $GlobalMessages2 = "", $GlobalMessages3 = "", $GlobalMessages4 = ""
+Global $ClanMessages = "", $ClanResponses = ""
+Global $g_iGlobalChat = False, $g_iGlobalScramble = False, $g_iSwitchLang = False, $g_iCmbLang = 1
+Global $g_iClanChat = False, $g_iRusLang = 0, $g_iUseResponses = False, $g_iUseGeneric = False, $g_iChatPushbullet = False, $g_iPbSendNewChats = False
+Global $ChatbotStartTime
+Global $ChatbotQueuedChats[0], $ChatbotReadQueued = False, $ChatbotReadInterval = 0, $ChatbotIsOnInterval = False
 
 ; CheckCC Troops - Team AiO MOD++ (#-24)
 Global $g_aiCCTroops[$eTroopCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -178,6 +155,14 @@ Global $g_aiCCSpellsExpected[$eSpellCount] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 Global $g_bChkCC, $g_bChkCCTroops
 Global $g_aiCmbCCSlot[5], $g_aiTxtCCSlot[5]
 Global $g_iCmbCastleCapacityT, $g_iCmbCastleCapacityS
+
+; Attack Log New Style - Added By Eloy
+Global $eLootPerc = "---"
+Global $starsearned = 0
+Global $eTHLevel = "-"
+
+; Additional Notifactions - Added By Eloy
+Global $eWinlose = "-"
 
 ; Switch Profile - Team AiO MOD++ (#-25)
 Global $g_abChkSwitchMax[4], $g_abChkSwitchMin[4], $g_aiCmbSwitchMax[4], $g_aiCmbSwitchMin[4]
@@ -198,11 +183,28 @@ Global $g_bIsSearchTimeout = False, $g_iSearchTimeout = 10, $g_iTotalSearchTime 
 ; Stop on Low battery - Team AiO MOD++ (#-30)
 Global $g_bStopOnBatt = False, $g_iStopOnBatt = 10
 
+; Robot Transparency - Pedro&Tony MOD
+Global $SldTransLevel = 0
+
+; SWIPE - Pedro&Tony MOD
+Global $SWIPE = ""
+
+;xbenk ~ legend league
+Global $g_iTotalSearchTime = 0
+
+; Multi Finger - Pedro&Tony MOD
+Global Enum $directionLeft, $directionRight
+Global Enum $sideBottomRight, $sideTopLeft, $sideBottomLeft, $sideTopRight
+Global Enum $mfRandom, $mfFFStandard, $mfFFSpiralLeft, $mfFFSpiralRight, $mf8FBlossom, $mf8FImplosion, $mf8FPinWheelLeft, $mf8FPinWheelRight
+
+Global $iMultiFingerStyle = 0
+
+Global Enum  $eCCSpell = $eSkSpell + 1
+Global $lblDBMultiFinger, $cmbDBMultiFinger
+
 ; ================= Team AiO MOD++ (2017) ================= ;
 ; Enable/Disable GUI while botting (#-01)
 ; Support MOD Button (#-02)
-; Check Version (#-03)
-; Classic Four Finger (#-04)
 ; Unit/Wave Factor (#-05)
 ; Drop Order Troops (#-06)
 ; Auto Dock, Hide Emulator & Bot (#-07)
@@ -229,3 +231,12 @@ Global $g_bStopOnBatt = False, $g_iStopOnBatt = 10
 ; Restart Search Legend league (#-29)
 ; Stop on Low battery (#-30)
 ; ================= Team AiO MOD++ (2017) ================= ;
+
+; ================= Pedro&Tony MOD (@pedroleon99) ================ ;
+; Check Version (#-03)
+; Multi Finger (#-04)
+; GTFO (#-31)
+; CSV Downloader (#-32)
+; SWIPE (#-33)
+; Robot Transparency (#-34)
+; ================= Pedro&Tony MOD (@pedroleon99) ================ ;

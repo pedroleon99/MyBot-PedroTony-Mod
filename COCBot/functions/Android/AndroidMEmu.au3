@@ -106,14 +106,18 @@ Func GetMEmuBackgroundMode()
 	Local $aRegExResult = StringRegExp($__VBoxGuestProperties, "Name: graphics_render_mode, value: (.+), timestamp:", $STR_REGEXPARRAYMATCH)
 	If @error = 0 Then
 		Local $graphics_render_mode = $aRegExResult[0]
+		SetDebugLog($g_sAndroidEmulator & " instance " & $g_sAndroidInstance & " rendering mode is " & $graphics_render_mode)
 		Switch $graphics_render_mode
-			Case "1"
+			Case "1" ; DirectX
 				Return $g_iAndroidBackgroundModeDirectX
-			Case Else
+			Case "2" ; DirectX+ available in version 3.6.7.0
+				Return $g_iAndroidBackgroundModeDirectX
+			Case Else ; fallback to OpenGL
 				Return $g_iAndroidBackgroundModeOpenGL
 		EndSwitch
 	EndIf
 
+	; fallback to OpenGL
 	Return $g_iAndroidBackgroundModeOpenGL
 EndFunc   ;==>GetMEmuBackgroundMode
 
@@ -137,7 +141,8 @@ Func InitMEmu($bCheckOnly = False)
 		Return False
 	EndIf
 
-	If FileExists($MEmu_Path & "adb.exe") = 0 Then
+	Local $sPreferredADB = FindPreferredAdbPath()
+	If $sPreferredADB = "" And FileExists($MEmu_Path & "adb.exe") = 0 Then
 		If Not $bCheckOnly Then
 			SetLog("Serious error has occurred: Cannot find " & $g_sAndroidEmulator & ":", $COLOR_ERROR)
 			SetLog($MEmu_Path & "adb.exe", $COLOR_ERROR)
@@ -168,7 +173,7 @@ Func InitMEmu($bCheckOnly = False)
 		EndIf
 		; update global variables
 		$g_sAndroidProgramPath = $MEmu_Path & "MEmu.exe"
-		$g_sAndroidAdbPath = FindPreferredAdbPath()
+		$g_sAndroidAdbPath = $sPreferredADB
 		If $g_sAndroidAdbPath = "" Then $g_sAndroidAdbPath = $MEmu_Path & "adb.exe"
 		$g_sAndroidVersion = $MEmuVersion
 		$__MEmu_Path = $MEmu_Path

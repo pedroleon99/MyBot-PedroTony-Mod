@@ -20,7 +20,7 @@ Func QuickMIS($ValueReturned, $directory, $Left = 0, $Top = 0, $Right = $g_iGAME
 	EndIf
 
 	If $bNeedCapture Then _CaptureRegion2($Left, $Top, $Right, $Bottom)
-	Local $Res = DllCall($g_hLibMyBot,"str", "SearchMultipleTilesBetweenLevels", "handle", $g_hHBitmap2, "str", $directory, "str", "FV", "Int", 0, "str", "FV", "Int", 0, "Int", 1000)
+	Local $Res = DllCallMyBot("SearchMultipleTilesBetweenLevels", "handle", $g_hHBitmap2, "str", $directory, "str", "FV", "Int", 0, "str", "FV", "Int", 0, "Int", 1000)
 	If @error Then _logErrorDLLCall($g_sLibImgLocPath, @error)
 
 	If IsArray($Res) Then
@@ -59,9 +59,11 @@ Func QuickMIS($ValueReturned, $directory, $Left = 0, $Top = 0, $Right = $g_iGAME
 						$Result &= $DLLRes[0] & "|"
 					Next
 					If StringRight($Result, 1) = "|" Then $Result = StringLeft($Result, (StringLen($Result) - 1))
-					Local $CoordsInArray = StringSplit($Result, ",", $STR_NOCOUNT)
-					$g_iQuickMISX = $CoordsInArray[0]
-					$g_iQuickMISY = $CoordsInArray[1]
+					Local $aCords = decodeMultipleCoords($Result, 60, 10, 1)
+					Local $aCord = $aCords[0] ; sorted by Y
+					$g_iQuickMISX = $aCord[0]
+					$g_iQuickMISY = $aCord[1]
+					If $g_bDebugSetlog = 1 Then SetLog($ValueReturned & " Found: " & $Result & ", using " & $g_iQuickMISX & "," & $g_iQuickMISY, $COLOR_PURPLE)
 					Return True
 
 				Case "CX" ; coordinates of each image found - eg: $Array[0] = [X1, Y1] ; $Array[1] = [X2, Y2]
@@ -73,6 +75,7 @@ Func QuickMIS($ValueReturned, $directory, $Left = 0, $Top = 0, $Right = $g_iGAME
 						$Result &= $DLLRes[0] & "|"
 					Next
 					If StringRight($Result, 1) = "|" Then $Result = StringLeft($Result, (StringLen($Result) - 1))
+					If $g_bDebugSetlog = 1 Then SetLog($ValueReturned & " Found: " & $Result, $COLOR_PURPLE)
 					Local $CoordsInArray = StringSplit($Result, "|", $STR_NOCOUNT)
 					Return $CoordsInArray
 
@@ -102,6 +105,7 @@ Func QuickMIS($ValueReturned, $directory, $Left = 0, $Top = 0, $Right = $g_iGAME
 						$Result &= $DLLRes[0] & "|"
 					Next
 					If StringRight($Result, 1) = "|" Then $Result = StringLeft($Result, (StringLen($Result) - 1))
+					If $g_bDebugSetlog = 1 Then SetLog($ValueReturned & " Found: " & $Result, $COLOR_PURPLE)
 					Local $QuantityInArray = StringSplit($Result, "|", $STR_NOCOUNT)
 					Return $QuantityInArray[0]
 

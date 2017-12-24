@@ -33,7 +33,7 @@ Func Initiate()
 		If $g_bDebugSetlog Or $g_bDebugOcr Or $g_bDebugRedArea Or $g_bDebugImageSave Or $g_bDebugBuildingPos Or $g_bDebugOCRdonate Or $g_bDebugAttackCSV Or $g_bDebugAndroid Then ;Or $g_bDevMode
 			SetLogCentered(" Warning Debug Mode Enabled! ", "-", $COLOR_ERROR)
 			SetLog("      SetLog : " & $g_bDebugSetlog, $COLOR_ERROR, "Lucida Console", 8)
-			SetLog("      Android : " & $g_bDebugAndroid, $COLOR_ERROR, "Lucida Console", 8)
+			SetLog("     Android : " & $g_bDebugAndroid, $COLOR_ERROR, "Lucida Console", 8)
 			SetLog("         OCR : " & $g_bDebugOcr, $COLOR_ERROR, "Lucida Console", 8)
 			SetLog("     RedArea : " & $g_bDebugRedArea, $COLOR_ERROR, "Lucida Console", 8)
 			SetLog("   ImageSave : " & $g_bDebugImageSave, $COLOR_ERROR, "Lucida Console", 8)
@@ -134,6 +134,14 @@ Func InitiateLayout()
 EndFunc   ;==>InitiateLayout
 
 Func chkBackground()
+	If IsDeclared("g_hChkBackgroundMode") Then
+		UpdateChkBackground()
+		; update Android Window always on top
+		AndroidToFront(Default, "chkBackground")
+	EndIf
+EndFunc   ;==>chkBackground
+
+Func UpdateChkBackground()
 	If GUICtrlRead($g_hChkBackgroundMode) = $GUI_CHECKED Then
 		$g_bChkBackgroundMode = True
 		updateBtnHideState($GUI_ENABLE)
@@ -144,7 +152,7 @@ Func chkBackground()
 	If CheckDpiAwareness() Then
 		; DPI awareness changed
 	EndIf
-EndFunc   ;==>chkBackground
+EndFunc   ;==>UpdateChkBackground
 
 Func IsStopped()
 	If $g_bRunState Then Return False
@@ -162,7 +170,6 @@ Func btnStart()
 		$g_iBotAction = $eBotStart
 	EndIf
 	$g_iActualTrainSkip = 0
-	GUICtrlSetState($g_hBtnSupportMOD, $GUI_SHOW) ; Support MOD Button - Team AiO MOD++ (#-02)
 EndFunc   ;==>btnStart
 
 Func btnStop()
@@ -173,7 +180,6 @@ Func btnStop()
 		$g_iBotAction = $eBotStop
 		ReduceBotMemory()
 	EndIf
-	GUICtrlSetState($g_hBtnSupportMOD, $GUI_SHOW) ; Support MOD Button - Team AiO MOD++ (#-02)
 EndFunc   ;==>btnStop
 
 Func btnSearchMode()
@@ -191,9 +197,9 @@ Func btnPause($bRunNow = True)
 	TogglePause()
 	GUICtrlSetState($g_hBtnDisableGUI, $GUI_HIDE) ; Enable/Disable GUI while botting - Team AiO MOD++ (#-01)
 	GUICtrlSetState($g_hBtnEnableGUI, $GUI_SHOW) ; Enable/Disable GUI while botting - Team AiO MOD++ (#-01)
-	GUICtrlSetState($g_hBtnSupportMOD, $GUI_HIDE) ; Support MOD Button - Team AiO MOD++ (#-02)
 	; Stop on Low battery - Team AiO MOD++ (#-30)
 	GUICtrlSetState($g_hLblBatteryAC, $GUI_HIDE)
+
 	GUICtrlSetState($g_hLblBatteryStatus, $GUI_HIDE)
 EndFunc   ;==>btnPause
 
@@ -201,7 +207,6 @@ Func btnResume()
 	TogglePause()
 	GUICtrlSetState($g_hBtnDisableGUI, $GUI_HIDE) ; Enable/Disable GUI while botting - Team AiO MOD++ (#-01)
 	GUICtrlSetState($g_hBtnEnableGUI, $GUI_HIDE) ; Enable/Disable GUI while botting - Team AiO MOD++ (#-01)
-	GUICtrlSetState($g_hBtnSupportMOD, $GUI_SHOW) ; Support MOD Button - Team AiO MOD++ (#-02)
 	; Stop on Low battery - Team AiO MOD++ (#-30)
 	GUICtrlSetState($g_hLblBatteryAC, $GUI_SHOW)
 	GUICtrlSetState($g_hLblBatteryStatus, $GUI_SHOW)
@@ -256,27 +261,34 @@ Func reHide()
 	WinGetAndroidHandle()
 	If $g_bIsHidden And $g_hAndroidWindow <> 0 And Not $g_bAndroidEmbedded Then
 		SetDebugLog("Hide " & $g_sAndroidEmulator & " Window after restart")
-		Return WinMove($g_hAndroidWindow, "", -32000, -32000)
+		Local $Result = HideAndroidWindow(True, Default, Default, "reHide") ;WinMove($g_hAndroidWindow, "", -32000, -32000)
+		updateBtnHideState()
+		Return $Result
 	EndIf
 	Return 0
 EndFunc   ;==>reHide
 
 Func updateBtnHideState($newState = $GUI_ENABLE)
+	If $g_hBtnHide = 0 Then Return
 	Local $hideState = GUICtrlGetState($g_hBtnHide)
 	Local $newHideState = ($g_bAndroidEmbedded = True ? $GUI_DISABLE : $newState)
 	If $hideState <> $newHideState Then GUICtrlSetState($g_hBtnHide, $newHideState)
+	Local $sText
+	If $g_bIsHidden Then
+		$sText = GetTranslatedFileIni("MBR GUI Control Bottom", "Func_btnHide_False", "Show")
+	Else
+		$sText = GetTranslatedFileIni("MBR GUI Control Bottom", "Func_btnHide_True", "Hide")
+	EndIf
+	If GUICtrlRead($g_hBtnHide) <> $sText Then
+		; update text
+		GUICtrlSetData($g_hBtnHide, $sText)
+	EndIf
 EndFunc   ;==>updateBtnHideState
 
 Func btnHide()
-	If Not $g_bIsHidden Then
-		GUICtrlSetData($g_hBtnHide, GetTranslatedFileIni("MBR GUI Control Bottom", "Func_btnHide_False", "Show"))
-		HideAndroidWindow(True, Default, Default, "btnHide")
-		$g_bIsHidden = True
-	ElseIf $g_bIsHidden Then
-		GUICtrlSetData($g_hBtnHide, GetTranslatedFileIni("MBR GUI Control Bottom", "Func_btnHide_True", "Hide"))
-		HideAndroidWindow(False, Default, Default, "btnHide")
-		$g_bIsHidden = False
-	EndIf
+	$g_bIsHidden = Not $g_bIsHidden
+	HideAndroidWindow($g_bIsHidden, Default, Default, "btnHide")
+	updateBtnHideState()
 EndFunc   ;==>btnHide
 
 Func updateBtnEmbed()
@@ -399,6 +411,7 @@ Func DisableGuiControls($bOptimizedRedraw = True)
 EndFunc   ;==>DisableGuiControls
 
 Func ToggleGuiControls($bEnabled, $bOptimizedRedraw = True)
+	$g_bGuiControlsEnabled = $bEnabled
 	If $g_iGuiMode <> 1 Then Return
 	If $bOptimizedRedraw Then Local $bWasRedraw = SetRedrawBotWindow(False, Default, Default, Default, "ToggleGuiControls")
 	If Not $bEnabled Then

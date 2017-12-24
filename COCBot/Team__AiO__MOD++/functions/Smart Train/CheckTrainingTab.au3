@@ -24,9 +24,14 @@ Func CheckTrainingTab($sText = "troop")
 		$iTopUp = $ichkFillEQ ; (0 or 1)
 	EndIf
 
-	OpenTrainTabNumber($Tab, "CheckTrainingTab()")
+	If $sText = "troop" Then
+		OpenTroopsTab()
+	Else
+		OpenSpellsTab()
+	EndIf
+
 	If _Sleep(1000) Then Return
-	If ISArmyWindow(False, $Tab) = False Then Return
+	If Not ISArmyWindow(False, $Tab) Then Return
 
 	Local $ArmyCamp = GetOCRCurrent(43, 160)
 
@@ -104,7 +109,7 @@ EndFunc   ;==>CheckTrainingTab
 Func ClearTrainingTroops($eOpenTrainTab = -1)
 	If $g_bQuickTrainEnable Then Return False ;	not applicable for quick-train mode
 
-	If $eOpenTrainTab > 0 Then OpenTrainTabNumber($eOpenTrainTab, "ClearTrainingTroops()")
+	If $eOpenTrainTab > 0 Then OpenArmyTab()
 
 	If _ColorCheck(_GetPixelColor(820, 220, True), Hex(0xCFCFC8, 6), 15) Then Return False ; Gray background found, no troop is training
 
@@ -136,7 +141,7 @@ EndFunc   ;==>TopUpCamp
 
 Func ForceBrewSpells($iRemainQueue)
 	For $i = 0 To ($eSpellCount - 1)
-		If $g_bRunState = False Then Return
+		If Not $g_bRunState Then Return
 		If $g_aiArmyCompSpells[$i] > 0 And $iRemainQueue - $g_aiSpellSpace[$i] >= 0 Then
 			Local $iBrewedCount = 0
 			While $iRemainQueue - $g_aiSpellSpace[$i] >= 0

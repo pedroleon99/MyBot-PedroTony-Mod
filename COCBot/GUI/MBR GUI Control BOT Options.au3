@@ -171,7 +171,7 @@ Func txtSinglePBTimeForced()
 EndFunc   ;==>txtSinglePBTimeForced
 
 Func chkAutoResume()
-	$g_bAutoResumeEnable = (GUICtrlRead($g_hChkAutoResume) = $GUI_CHECKED)
+	GUICtrlSetState($g_hTxtAutoResumeTime, GUICtrlRead($g_hChkAutoResume) = $GUI_CHECKED ? $GUI_ENABLE : $GUI_DISABLE)
 EndFunc   ;==>chkAutoResume
 
 Func txtGlobalActiveBotsAllowed()
@@ -201,10 +201,10 @@ EndFunc   ;==>txtGlobalThreads
 Func txtThreads()
 	Local $iValue = Int(GUICtrlRead($g_hTxtThreads))
 	If $g_iThreads <> $iValue Then
-		; value changed... for globally changed values, save immediately
+		; value changed...
 		SetDebugLog("Threading: Using " & $g_iThreads & " threads for parallelism changedd to " & $iValue)
 		$g_iThreads = $iValue
-		SaveProfileConfig(Default, True)
+		setMaxDegreeOfParallelism($g_iThreads)
 	EndIf
 EndFunc   ;==>txtThreads
 
@@ -216,7 +216,7 @@ Func chkDebugClick()
 EndFunc   ;==>chkDebugClick
 
 Func chkDebugSetlog()
-	$g_bDebugSetlog = (GUICtrlRead($g_hChkDebugSetlog))
+	$g_bDebugSetlog = (GUICtrlRead($g_hChkDebugSetlog) = $GUI_CHECKED)
 	SetDebugLog("DebugSetlog " & ($g_bDebugSetlog ? "enabled" : "disabled"))
 EndFunc   ;==>chkDebugSetlog
 
@@ -280,14 +280,30 @@ Func btnTestTrain()
 	SetLog("Testing checkArmyCamp()", $COLOR_INFO)
 	$result = checkArmyCamp()
 	If @error Then $result = "Error " & @error & ", " & @extended & ", " & ((IsArray($result)) ? (_ArrayToString($result, ",")) : ($result))
-	SetLog("Result checkArmyCamp() = " & $result, $COLOR_INFO)
+	SetLog("Result checkArmyCamp() = " & ((IsArray($result)) ? ("Array: " & _ArrayToString($result, ",")) : ($result)), $COLOR_INFO)
 
 	SetLog("Testing getArmyHeroTime()", $COLOR_INFO)
 	$result = getArmyHeroTime("all")
 	If @error Then $result = "Error " & @error & ", " & @extended & ", " & ((IsArray($result)) ? (_ArrayToString($result, ",")) : ($result))
-	SetLog("Result getArmyHeroTime() = " & $result, $COLOR_INFO)
-	SetLog("Testing Train DONE", $COLOR_INFO)
+	SetLog("Result getArmyHeroTime() = " & ((IsArray($result)) ? ("Array: " & _ArrayToString($result, ",")) : ($result)), $COLOR_INFO)
 
+	$result = "";
+	SetLog("Testing ArmyHeroStatus()", $COLOR_INFO)
+	For $i = 0 To 2
+		$result &= " " & ArmyHeroStatus($i)
+	Next
+	If @error Then $result = "Error " & @error & ", " & @extended & ", " & ((IsArray($result)) ? (_ArrayToString($result, ",")) : ($result))
+	SetLog("Result ArmyHeroStatus(0, 1, 2) = " & ((IsArray($result)) ? ("Array: " & _ArrayToString($result, ",")) : ($result)), $COLOR_INFO)
+
+	SetLog("Testing GetCurCCSpell()", $COLOR_INFO)
+	$result = GetCurCCSpell(1)
+	If @error Then $result = "Error " & @error & ", " & @extended & ", " & ((IsArray($result)) ? ("Array: " & _ArrayToString($result, ",")) : ($result))
+	SetLog("Result GetCurCCSpell(1) = " & ((IsArray($result)) ? ("Array: " & _ArrayToString($result, ",")) : ($result)), $COLOR_INFO)
+	$result = GetCurCCSpell(2)
+	If @error Then $result = "Error " & @error & ", " & @extended & ", " & ((IsArray($result)) ? ("Array: " & _ArrayToString($result, ",")) : ($result))
+	SetLog("Result GetCurCCSpell(2) = " & ((IsArray($result)) ? ("Array: " & _ArrayToString($result, ",")) : ($result)), $COLOR_INFO)
+
+	SetLog("Testing Train DONE", $COLOR_INFO)
 	EndImageTest()
 
 	$g_bDebugOcr = $currentOCR
@@ -351,6 +367,7 @@ Func btnTestSendText()
 EndFunc   ;==>btnTestSendText
 
 Func btnTestAttackBar()
+	BeginImageTest() ; get image for testing
 	Local $currentOCR = $g_bDebugOcr
 	Local $currentRunState = $g_bRunState
 	_GUICtrlTab_ClickTab($g_hTabMain, 0)
@@ -361,7 +378,7 @@ Func btnTestAttackBar()
 	SetLog(_PadStringCenter(" Test Attack Bar begin (" & $g_sBotVersion & ")", 54, "="), $COLOR_INFO)
 
 	_CaptureRegion2(0, 571 + $g_iBottomOffsetY, 859, 671 + $g_iBottomOffsetY)
-	Local $result = DllCall($g_hLibMyBot, "str", "searchIdentifyTroop", "ptr", $g_hHBitmap2)
+	Local $result = DllCallMyBot("searchIdentifyTroop", "ptr", $g_hHBitmap2)
 	Setlog("DLL Troopsbar list: " & $result[0], $COLOR_DEBUG)
 	If $g_bForceClanCastleDetection Then $result[0] = FixClanCastle($result[0])
 	Local $aTroopDataList = StringSplit($result[0], "|")
@@ -388,6 +405,8 @@ Func btnTestAttackBar()
 	$debugfile = "Test_Attack_Bar_" & $g_sBotVersion & "_" & $Date & "_" & $Time & ".png"
 	_GDIPlus_ImageSaveToFile($g_hBitmap, $savefolder & $debugfile)
 	;make snapshot end
+
+	EndImageTest() ; clear test image handle
 
 	SetLog(_PadStringCenter(" Test Attack Bar end ", 54, "="), $COLOR_INFO)
 	ShellExecute($savefolder)
@@ -417,22 +436,8 @@ EndFunc   ;==>btnTestClickDrag
 
 Func btnTestImage()
 
-	Local $hBMP = 0, $hHBMP = 0
-	Local $sImageFile = FileOpenDialog("Select CoC screenshot to test, cancel to use live screenshot", $g_sProfileTempPath, "Image (*.png)", $FD_FILEMUSTEXIST, "", $g_hFrmBot)
-	If @error <> 0 Then
-		SetLog("Testing image cancelled, taking screenshot from " & $g_sAndroidEmulator, $COLOR_INFO)
-		_CaptureRegion()
-		$hHBMP = $g_hHBitmap
-		TestCapture($hHBMP)
-	Else
-		SetLog("Testing image " & $sImageFile, $COLOR_INFO)
-		; load test image
-		$hBMP = _GDIPlus_BitmapCreateFromFile($sImageFile)
-		$hHBMP = _GDIPlus_BitmapCreateDIBFromBitmap($hBMP)
-		_GDIPlus_BitmapDispose($hBMP)
-		TestCapture($hHBMP)
-		SetLog("Testing image hHBitmap = " & $hHBMP)
-	EndIf
+	Local $sImageFile = BeginImageTest() ; get image for testing
+	If $sImageFile = False Then $sImageFile = "Live Screenshot"
 
 	Local $i
 	Local $result
@@ -442,9 +447,9 @@ Func btnTestImage()
 
 	For $i = 0 To 0
 
-		SetLog("Testing image #" & $i & " " & $sImageFile, $COLOR_INFO)
-
-		_CaptureRegion()
+		SetLog("Testing isProblemAffect...", $COLOR_SUCCESS)
+		$result = isProblemAffect(False)
+		SetLog("Testing isProblemAffect DONE, $Result=" & $result, $COLOR_SUCCESS)
 
 		SetLog("Testing checkObstacles...", $COLOR_SUCCESS)
 		$result = checkObstacles()
@@ -462,6 +467,7 @@ Func btnTestImage()
 		SetLog("$aNoCloudsAttack pixel check: " & _CheckPixel($aNoCloudsAttack, $g_bCapturePixel))
 		SetLog("Testing WaitForClouds DONE", $COLOR_SUCCESS)
 
+		#cs
 		SetLog("Testing checkAttackDisable...", $COLOR_SUCCESS)
 		SetLog("Testing checkAttackDisable($g_iTaBChkAttack)...", $COLOR_SUCCESS)
 		SetLog("checkAttackDisable($g_iTaBChkAttack) = " & checkAttackDisable($g_iTaBChkAttack))
@@ -470,12 +476,12 @@ Func btnTestImage()
 		SetLog("Testing checkAttackDisable($g_iTaBChkTime)...", $COLOR_SUCCESS)
 		SetLog("checkAttackDisable($g_iTaBChkTime) = " & checkAttackDisable($g_iTaBChkTime))
 		SetLog("Testing checkAttackDisable DONE", $COLOR_SUCCESS)
+		#ce
 	Next
 
 	SetLog("Testing finished", $COLOR_INFO)
 
-	_WinAPI_DeleteObject($hHBMP)
-	TestCapture(0)
+	EndImageTest() ; clear test image handle
 
 	$g_bRunState = $currentRunState
 
@@ -861,7 +867,7 @@ Func BeginImageTest($directory = $g_sProfileTempPath)
 	_GDIPlus_BitmapDispose($hBMP)
 	TestCapture($hHBMP)
 	SetLog("Testing image hHBitmap = " & $hHBMP)
-	Return True
+	Return $sImageFile
 EndFunc   ;==>BeginImageTest
 
 Func EndImageTest()
@@ -898,7 +904,7 @@ Func btnTestOcrMemory()
 	_CaptureRegion2(162, 200, 162 + 120, 200 + 27)
 
 	For $i = 1 To 5000
-		DllCall($g_hLibMyBot, "str", "ocr", "ptr", $g_hHBitmap2, "str", "coc-DonTroops", "int", $g_bDebugOcr ? 1 : 0)
+		DllCallMyBot("ocr", "ptr", $g_hHBitmap2, "str", "coc-DonTroops", "int", $g_bDebugOcr ? 1 : 0)
 		;getOcr($g_hHBitmap2, "coc-DonTroops")
 		;getOcrAndCapture("coc-DonTroops", 162, 200, 120, 27, True)
 
@@ -918,3 +924,20 @@ EndFunc   ;==>btnTestWeakBase
 Func btnTestClickAway()
 	ClickP($aAway, 2, 0)
 EndFunc   ;==>btnTestClickAway
+
+Func btnTestUpgradeWindow()
+	Local $currentRunState = $g_bRunState
+	Local $iCurrFreeBuilderCount = $g_iFreeBuilderCount
+	$g_iTestFreeBuilderCount = 5
+	$g_bRunState = True
+	BeginImageTest()
+	Local $result
+	SetLog("Testing LocateUpgrade", $COLOR_INFO)
+	;$result = UpgradeNormal(0, True)
+	SetLog("Result = " & $result, $COLOR_INFO)
+	EndImageTest()
+	; restore original state
+	$g_iTestFreeBuilderCount = -1
+	$g_iFreeBuilderCount = $iCurrFreeBuilderCount
+	$g_bRunState = $currentRunState
+EndFunc

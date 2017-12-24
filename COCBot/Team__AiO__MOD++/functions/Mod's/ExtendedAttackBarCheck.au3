@@ -22,15 +22,13 @@ Func ExtendedAttackBarCheck($aTroop1stPage, $Remaining)
 	Local $iCCSpell = 0
 	; Setup arrays, including default return values for $return
 	Local $aResult[1][6], $aCoordArray[1][2], $aCoords, $aCoordsSplit, $aValue
-	Local $redLines = "FV"
-	Local $directory = @ScriptDir & "\imgxml\AttackBar"
-	If $g_bRunState = False Then Return
+	If Not $g_bRunState Then Return
 	; Capture the screen for comparison
 	_CaptureRegion2($x, $y, $x1, $y1)
 
 	Local $strinToReturn = ""
 	; Perform the search
-	Local $res = DllCallMyBot("SearchMultipleTilesBetweenLevels", "handle", $g_hHBitmap2, "str", $directory, "str", "FV", "Int", 0, "str", $redLines, "Int", 0, "Int", 1000)
+	Local $res = DllCallMyBot("SearchMultipleTilesBetweenLevels", "handle", $g_hHBitmap2, "str", $g_sImgAttackBarDir, "str", "FV", "Int", 0, "str", "FV", "Int", 0, "Int", 1000)
 
 	If IsArray($res) Then
 		If $res[0] = "0" Or $res[0] = "" Then
@@ -124,7 +122,7 @@ Func ExtendedAttackBarCheck($aTroop1stPage, $Remaining)
 						ContinueLoop
 					EndIf
 
-					$Slottemp = SlotAttack(Number($aResult[$i][1]), False, False)
+					$Slottemp = SlotAttack(Number($aResult[$i][1]), False, False, False, TroopIndexLookup($aResult[$i][0]))
 					$Slottemp[0] += 18
 					If $iFirstExtendedSlot = 0 Then $iFirstExtendedSlot = $Slottemp[1]	; flag only once
 					$iSlotExtended = $Slottemp[1] - $iFirstExtendedSlot + 1
@@ -147,7 +145,7 @@ Func ExtendedAttackBarCheck($aTroop1stPage, $Remaining)
 						$aResult[$i][3] = -1
 						$aResult[$i][4] = -1
 					EndIf
-					$strinToReturn &= "|" & TroopIndexLookup($aResult[$i][0]) & "#" & $aResult[$i][4] & "#" & $aResult[$i][3]
+					$strinToReturn &= "|" & TroopIndexLookup($aResult[$i][0]) & "#" & $aResult[$i][4] & "#" & $aResult[$i][3] & "#" & $aResult[$i][1] ; SWIPE - Pedro&Tony MOD
 				EndIf
 			Next
 			If Not $Remaining Then

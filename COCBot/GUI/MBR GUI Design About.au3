@@ -50,7 +50,7 @@ Func CreateAboutTab()
 	GUICtrlCreateLabel($sText, $x - 5, $y, 410, 20, BitOR($WS_VISIBLE, $ES_AUTOVSCROLL, $SS_LEFT), 0)
 	GUICtrlSetFont(-1, 9.5, $FW_BOLD, Default, "Arial")
 	GUICtrlSetColor(-1, $COLOR_NAVY)
-	$sText = "Cosote, Fliegerfaust, MMHK, Trlopes"
+	$sText = "Cosote, Fliegerfaust, NguyenAnhHD"
 	GUICtrlCreateLabel($sText, $x + 5, $y + 15, 410, 50, BitOR($WS_VISIBLE, $ES_AUTOVSCROLL, $SS_LEFT), 0)
 	GUICtrlSetFont(-1, 9, $FW_MEDIUM, Default, "Arial")
 
@@ -59,7 +59,7 @@ Func CreateAboutTab()
 	GUICtrlCreateLabel($sText, $x - 5, $y, 410, 20, BitOR($WS_VISIBLE, $ES_AUTOVSCROLL, $SS_LEFT), 0)
 	GUICtrlSetFont(-1, 9.5, $FW_BOLD, Default, "Arial")
 	GUICtrlSetColor(-1, $COLOR_NAVY)
-	$sText = "Boju, Codeslinger69, Ezeck0001, Hervidero, IceCube, Kaganus, MR.ViPeR, Sardo, TheRevenor, TripleM"
+	$sText = "Boju, Codeslinger69, Ezeck0001, Hervidero, IceCube, Kaganus, MMHK, MR.ViPeR, Sardo, TheRevenor, TripleM, Trlopes"
 	GUICtrlCreateLabel($sText, $x + 5, $y + 15, 410, 50, BitOR($WS_VISIBLE, $ES_AUTOVSCROLL, $SS_LEFT), 0)
 	GUICtrlSetFont(-1, 9, $FW_MEDIUM, Default, "Arial")
 
@@ -107,7 +107,15 @@ Func ShowCommandLineHelp()
 
 	; add controls
 	Local $hRichEdit = _GUICtrlRichEdit_Create($g_hGUI_CommandLineHelp, "", 2, 0, 646, 667, $WS_VSCROLL + $ES_MULTILINE)
-	_GUICtrlRichEdit_StreamFromFile($hRichEdit, @ScriptDir & "\Help\CommandLineParameter.rtf")
+	Local $sHelpFile = @ScriptDir & "\Help\CommandLineParameter"
+	If $g_sLanguage <> $g_sDefaultLanguage Then
+		If FileExists($sHelpFile & "_" & $g_sLanguage & ".rtf") Then
+			$sHelpFile &= "_" & $g_sLanguage
+		Else
+			SetDebugLog("Help file not available: " & $sHelpFile & "_" & $g_sLanguage & ".rtf")
+		EndIf
+	EndIf
+	_GUICtrlRichEdit_StreamFromFile($hRichEdit, $sHelpFile & ".rtf")
 	_GUICtrlRichEdit_SetReadOnly($hRichEdit)
 	_GUICtrlRichEdit_SetScrollPos($hRichEdit, 0, 0) ; scroll to top
 	Local $hClose = GUICtrlCreateButton("Close", 300, 670, 50)

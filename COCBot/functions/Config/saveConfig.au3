@@ -35,6 +35,7 @@ Func saveConfig()
 	;SetDebugLog("SaveRegularConfig(), time = " & Round(__TimerDiff($t)/1000, 2) & " sec")
 
 	SetDebugLog("SaveConfig(), time = " & Round(__TimerDiff($t) / 1000, 2) & " sec")
+	GtfoSaveSettings() ; GTFO - Pedro&Tony MOD
 EndFunc   ;==>saveConfig
 
 Func SaveProfileConfig($sIniFile = Default, $bForceWrite = False)
@@ -46,7 +47,13 @@ Func SaveProfileConfig($sIniFile = Default, $bForceWrite = False)
 	If $bForceWrite Or IniRead($sIniFile, "general", "globalthreads", "-") = "-" Then
 		IniWrite($sIniFile, "general", "globalthreads", $g_iGlobalThreads)
 	EndIf
+	SaveProfileConfigAdbPath($sIniFile)
 EndFunc   ;==>SaveProfileConfig
+
+Func SaveProfileConfigAdbPath($sIniFile = Default, $sAdbPath = $g_sAndroidAdbPath)
+	If $sIniFile = Default Then $sIniFile = $g_sProfilePath & "\profile.ini"
+	IniWrite($sIniFile, "general", "adb.path", $sAdbPath)
+EndFunc   ;==>SaveProfileConfigAdbPath
 
 Func SaveWeakBaseStats()
 	_Ini_Clear()
@@ -200,11 +207,13 @@ Func SaveRegularConfig()
 	SaveConfig_600_31()
 	; <><><><> Attack Plan / Search & Attack / Options / Trophy Settings <><><><>
 	SaveConfig_600_32()
+	; <><><><> Attack Plan / Search & Attack / Drop Order Troops <><><><>
+	SaveConfig_600_33()
 	; <><><><> Bot / Options <><><><>
 	SaveConfig_600_35()
 	; <><><> Attack Plan / Train Army / Troops/Spells <><><>
 	; Quick train
- 	SaveConfig_600_52_1()
+	SaveConfig_600_52_1()
 	; troop/spell levels and counts
 	SaveConfig_600_52_2()
 	; <><><> Attack Plan / Train Army / Train Order <><><>
@@ -218,7 +227,6 @@ Func SaveRegularConfig()
 
 	;  <><><> Team AiO MOD++ (2017) <><><>
 	SaveConfig_MOD()
-	SaveConfig_Forecast()
 
 	; <><><><> Attack Plan / Strategies <><><><>
 	; <<< nothing here >>>
@@ -264,6 +272,7 @@ Func SaveConfig_Android()
 	_Ini_Add("android", "emulator", $g_sAndroidEmulator)
 	_Ini_Add("android", "instance", $g_sAndroidInstance)
 	_Ini_Add("android", "reboot.hours", $g_iAndroidRebootHours)
+	_Ini_Add("android", "close", ($g_bAndroidCloseWithBot ? "1" : "0"))
 
 EndFunc   ;==>SaveConfig_Android
 
@@ -323,12 +332,12 @@ Func SaveConfig_600_6()
 	_Ini_Add("other", "ChkCollectBuildersBase", $g_bChkCollectBuilderBase ? 1 : 0)
 	_Ini_Add("other", "ChkStartClockTowerBoost", $g_bChkStartClockTowerBoost ? 1 : 0)
 	_Ini_Add("other", "ChkCTBoostBlderBz", $g_bChkCTBoostBlderBz ? 1 : 0)
-	_Ini_Add("other", "g_chkBBSuggestedUpgrades", $g_ichkBBSuggestedUpgrades)
-	_Ini_Add("other", "g_chkBBSuggestedUpgradesIgnoreGold", $g_ichkBBSuggestedUpgradesIgnoreGold)
-	_Ini_Add("other", "g_chkBBSuggestedUpgradesIgnoreElixir", $g_ichkBBSuggestedUpgradesIgnoreElixir)
-	_Ini_Add("other", "g_chkBBSuggestedUpgradesIgnoreHall", $g_ichkBBSuggestedUpgradesIgnoreHall)
+	_Ini_Add("other", "ChkBBSuggestedUpgrades", $g_iChkBBSuggestedUpgrades)
+	_Ini_Add("other", "ChkBBSuggestedUpgradesIgnoreGold", $g_iChkBBSuggestedUpgradesIgnoreGold)
+	_Ini_Add("other", "ChkBBSuggestedUpgradesIgnoreElixir", $g_iChkBBSuggestedUpgradesIgnoreElixir)
+	_Ini_Add("other", "ChkBBSuggestedUpgradesIgnoreHall", $g_iChkBBSuggestedUpgradesIgnoreHall)
 
-	_Ini_Add("other", "g_chkPlacingNewBuildings", $g_ichkPlacingNewBuildings)
+	_Ini_Add("other", "ChkPlacingNewBuildings", $g_iChkPlacingNewBuildings)
 EndFunc   ;==>SaveConfig_600_6
 
 Func SaveConfig_600_9()
@@ -447,17 +456,17 @@ EndFunc   ;==>SaveConfig_600_16
 
 Func SaveConfig_auto()
 	ApplyConfig_auto(GetApplyConfigSaveAction())
-; Auto Upgrade
-	_Ini_Add("Auto Upgrade", "chkAutoUpgrade", $g_ichkAutoUpgrade)
+	; Auto Upgrade
+	_Ini_Add("Auto Upgrade", "ChkAutoUpgrade", $g_iChkAutoUpgrade)
 	For $i = 0 To 12
-		_Ini_Add("Auto Upgrade", "chkUpgradesToIgnore[" & $i & "]", $g_ichkUpgradesToIgnore[$i])
+		_Ini_Add("Auto Upgrade", "ChkUpgradesToIgnore[" & $i & "]", $g_iChkUpgradesToIgnore[$i])
 	Next
 	For $i = 0 To 2
-		_Ini_Add("Auto Upgrade", "chkResourcesToIgnore[" & $i & "]", $g_ichkResourcesToIgnore[$i])
+		_Ini_Add("Auto Upgrade", "ChkResourcesToIgnore[" & $i & "]", $g_iChkResourcesToIgnore[$i])
 	Next
-	_Ini_Add("Auto Upgrade", "SmartMinGold", GUICtrlRead($g_SmartMinGold))
-	_Ini_Add("Auto Upgrade", "SmartMinElixir", GUICtrlRead($g_SmartMinElixir))
-	_Ini_Add("Auto Upgrade", "SmartMinDark", GUICtrlRead($g_SmartMinDark))
+	_Ini_Add("Auto Upgrade", "SmartMinGold", $g_iTxtSmartMinGold)
+	_Ini_Add("Auto Upgrade", "SmartMinElixir", $g_iTxtSmartMinElixir)
+	_Ini_Add("Auto Upgrade", "SmartMinDark", $g_iTxtSmartMinDark)
 EndFunc   ;==>SaveConfig_auto
 
 Func SaveConfig_600_17()
@@ -688,10 +697,12 @@ EndFunc   ;==>SaveConfig_600_28_TS
 Func SaveConfig_600_29()
 	; <><><><> Attack Plan / Search & Attack / Options / Attack <><><><>
 	ApplyConfig_600_29(GetApplyConfigSaveAction())
-	_Ini_Add("attack", "ActivateKQ", $g_iActivateKQCondition)
-	_Ini_Add("attack", "delayActivateKQ", $g_iDelayActivateKQ)
-	_Ini_Add("attack", "ActivateWarden", $g_bActivateWardenCondition ? 1 : 0)
-	_Ini_Add("attack", "delayActivateW", $g_iDelayActivateW)
+	_Ini_Add("attack", "ActivateQueen", $g_iActivateQueen)
+	_Ini_Add("attack", "ActivateKing", $g_iActivateKing)
+	_Ini_Add("attack", "ActivateWarden", $g_iActivateWarden)
+	_Ini_Add("attack", "delayActivateQueen", $g_iDelayActivateQueen)
+	_Ini_Add("attack", "delayActivateKing", $g_iDelayActivateKing)
+	_Ini_Add("attack", "delayActivateWarden", $g_iDelayActivateWarden)
 	_Ini_Add("planned", "chkAttackPlannerEnable", $g_bAttackPlannerEnable ? 1 : 0)
 	_Ini_Add("planned", "chkAttackPlannerCloseCoC", $g_bAttackPlannerCloseCoC ? 1 : 0)
 	_Ini_Add("planned", "chkAttackPlannerCloseAll", $g_bAttackPlannerCloseAll ? 1 : 0)
@@ -980,6 +991,14 @@ Func SaveConfig_600_32()
 	_Ini_Add("search", "chkTrophyAtkDead", $g_bDropTrophyAtkDead ? 1 : 0)
 	_Ini_Add("search", "DTArmyMin", $g_iDropTrophyArmyMinPct)
 EndFunc   ;==>SaveConfig_600_32
+
+Func SaveConfig_600_33()
+	; <><><><> Attack Plan / Search & Attack / Drop Order Troops <><><><>
+	_Ini_Add("DropOrder", "chkDropOrder", $g_bCustomDropOrderEnable ? 1 : 0)
+	For $p = 0 To UBound($g_aiCmbCustomDropOrder) - 1
+		_Ini_Add("DropOrder", "cmbDropOrder" & $p, $g_aiCmbCustomDropOrder[$p])
+	Next
+EndFunc   ;==>SaveConfig_600_33
 
 Func SaveConfig_600_35()
 	; <><><><> Bot / Options <><><><>

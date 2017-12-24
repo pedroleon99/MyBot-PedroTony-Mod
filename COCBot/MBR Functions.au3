@@ -14,6 +14,7 @@
 ; ===============================================================================================================================
 ;#include-once
 #include "functions\Other\SetLog.au3"
+#include "functions\Other\StopWatch.au3"
 ;#include "functions\Other\Synchronization.au3" ; now included in LaunchConsole.au3
 #include "functions\Other\OnAutoItErrorRegisterBot.au3"
 
@@ -84,6 +85,7 @@
 #include "functions\Attack\Troops\dropHeroes.au3"
 #include "functions\Attack\Troops\DropOnEdge.au3"
 #include "functions\Attack\Troops\DropOnEdges.au3"
+#include "functions\Attack\Troops\DropOrderTroops.au3"
 #include "functions\Attack\Troops\GetXPosOfArmySlot.au3"
 #include "functions\Attack\Troops\GetSlotIndexFromXPos.au3"
 #include "functions\Attack\Troops\LaunchTroop.au3"
@@ -97,29 +99,38 @@
 #include "functions\Attack\SmartZap\easyPreySearch.au3"
 #include "functions\Attack\SmartZap\smartZap.au3"
 
+#Region CreateArmy / Train
 #include "functions\CreateArmy\CheckFullArmy.au3"
 #include "functions\CreateArmy\CheckArmyCamp.au3"
-#include "functions\CreateArmy\getArmyCapacity.au3"
-#include "functions\CreateArmy\getArmyCCStatus.au3"
-#include "functions\CreateArmy\getArmyHeroCount.au3"
-#include "functions\CreateArmy\getArmyHeroTime.au3"
-#include "functions\CreateArmy\getArmySpellCapacity.au3"
-#include "functions\CreateArmy\getArmyCCSpellCapacity.au3"
-#include "functions\CreateArmy\getArmySpellCount.au3"
-#include "functions\CreateArmy\getArmySpellTime.au3"
-#include "functions\CreateArmy\getArmyTroopTime.au3"
 #include "functions\CreateArmy\OpenArmyOverview.au3"
 #include "functions\CreateArmy\SmartWait4Train.au3"
 #include "functions\CreateArmy\TrainClick.au3"
 #include "functions\CreateArmy\TrainRevamp.au3"
 #include "functions\CreateArmy\TrainIt.au3"
 
+#include "functions\CreateArmy\getArmyTroops\getArmyTroopTime.au3"
+#include "functions\CreateArmy\getArmyTroops\getArmyTroopCapacity.au3"
+#include "functions\CreateArmy\getArmyTroops\getArmyTroops.au3"
+
+#include "functions\CreateArmy\getArmyHeroes\getArmyHeroCount.au3"
+#include "functions\CreateArmy\getArmyHeroes\getArmyHeroTime.au3"
+
+#include "functions\CreateArmy\getArmySpells\getArmySpellTime.au3"
+#include "functions\CreateArmy\getArmySpells\getArmySpells.au3"
+#include "functions\CreateArmy\getArmySpells\getArmySpellCapacity.au3"
+#include "functions\CreateArmy\getArmySpells\getArmySpellCount.au3"
+
+#include "functions\CreateArmy\getArmyCCTroops\getArmyCCStatus.au3"
+;#include "functions\CreateArmy\getArmyCCTroops\getArmyCCTroops.au3" Not in use yet, soonish hopefully
+
+#include "functions\CreateArmy\getArmyCCSpells\getArmyCCSpellCapacity.au3"
+#include "functions\CreateArmy\getArmyCCSpells\getArmyCCSpell.au3"
+#EndRegion
+
 #include "functions\Image Search\ImageSearch.au3"
 #include "functions\Image Search\checkDeadBase.au3"
 #include "functions\Image Search\CheckTombs.au3"
 #include "functions\Image Search\imglocAuxiliary.au3"
-#include "functions\Image Search\imglocScreens.au3"
-#include "functions\Image Search\imglocTrainHelper.au3"
 #include "functions\Image Search\imglocCheckWall.au3"
 #include "functions\Image Search\imglocTHSearch.au3"
 #include "functions\Image Search\imglocAttackBar.au3"

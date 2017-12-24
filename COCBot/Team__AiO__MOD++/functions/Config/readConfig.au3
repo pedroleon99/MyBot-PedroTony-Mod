@@ -26,12 +26,6 @@ Func ReadConfig_MOD()
 	IniReadS($g_iChkWaveFactor, $g_sProfileConfigPath, "SetSleep", "EnableWaveFactor", $g_iChkWaveFactor, "int")
 	IniReadS($g_iTxtWaveFactor, $g_sProfileConfigPath, "SetSleep", "WaveFactor", $g_iTxtWaveFactor, "int")
 
-	; Drop Order Troops - Team AiO MOD++ (#-06)
-	IniReadS($g_bCustomTrainDropOrderEnable, $g_sProfileConfigPath, "DropOrder", "chkTroopDropOrder", $g_bCustomTrainDropOrderEnable, "Bool")
-	For $p = 0 To UBound($icmbDropTroops) - 1
-		IniReadS($icmbDropTroops[$p], $g_sProfileConfigPath, "DropOrder", "cmbDropTroops[" & $p & "]", $icmbDropTroops[$p] , "int")
-	Next
-
 	; Auto Dock, Hide Emulator & Bot - Team AiO MOD++ (#-07)
 	IniReadS($g_bEnableAuto, $g_sProfileConfigPath, "general", "EnableAuto", $g_bEnableAuto, "Bool")
 	IniReadS($g_iChkAutoDock, $g_sProfileConfigPath, "general", "AutoDock", $g_iChkAutoDock, "Bool")
@@ -92,6 +86,21 @@ Func ReadConfig_MOD()
 	IniReadS($g_icmbMaxActionsNumber, $g_sProfileConfigPath, "Bot Humanization", "cmbMaxActionsNumber", $g_icmbMaxActionsNumber, "int")
 	IniReadS($g_ichallengeMessage, $g_sProfileConfigPath, "Bot Humanization", "challengeMessage", $g_ichallengeMessage)
 
+	; Forecast - Team AiO MOD++ (#-17)
+	IniReadS($g_bChkForecastBoost, $g_sProfileConfigPath, "forecast", "ChkForecastBoost", False, "Bool")
+	IniReadS($g_iTxtForecastBoost, $g_sProfileConfigPath, "forecast", "TxtForecastBoost", 6, "int")
+	IniReadS($g_bChkForecastPause, $g_sProfileConfigPath, "forecast", "ChkForecastPause", False, "Bool")
+	IniReadS($g_iTxtForecastPause, $g_sProfileConfigPath, "forecast", "TxtForecastPause", 2, "int")
+
+	IniReadS($g_bChkForecastHopingSwitchMax, $g_sProfileConfigPath, "forecast", "ChkForecastHopingSwitchMax", False, "Bool")
+	IniReadS($g_bChkForecastHopingSwitchMin, $g_sProfileConfigPath, "forecast", "ChkForecastHopingSwitchMin", False, "Bool")
+	IniReadS($g_iCmbForecastHopingSwitchMax, $g_sProfileConfigPath, "forecast", "CmbForecastHopingSwitchMax", 0, "int")
+	IniReadS($g_iCmbForecastHopingSwitchMin, $g_sProfileConfigPath, "forecast", "CmbForecastHopingSwitchMin", 0, "int")
+	IniReadS($g_iTxtForecastHopingSwitchMax, $g_sProfileConfigPath, "forecast", "TxtForecastHopingSwitchMax", 2, "int")
+	IniReadS($g_iTxtForecastHopingSwitchMin, $g_sProfileConfigPath, "forecast", "TxtForecastHopingSwitchMin", 2, "int")
+
+	IniReadS($g_iCmbSwLang, $g_sProfileConfigPath, "forecast", "CmbSwLang", 0, "int")
+
 	; Request CC Troops at first - Team AiO MOD++ (#-18)
 	$g_bReqCCFirst = (IniRead($g_sProfileConfigPath, "planned", "ReqCCFirst", 0) = 1)
 
@@ -106,6 +115,7 @@ Func ReadConfig_MOD()
 
 	; ClanHop - Team AiO MOD++ (#-20)
 	$g_bChkClanHop = (IniRead($g_sProfileConfigPath, "donate", "chkClanHop", "0") = "1")
+	IniReadS($g_iTxtCheckingtraine, $g_sProfileConfigPath, "donate", "txtCheckingtraine", 5, "int")
 
 	; Max logout time - Team AiO MOD++ (#-21)
 	IniReadS($g_bTrainLogoutMaxTime, $g_sProfileConfigPath, "TrainLogout", "TrainLogoutMaxTime", False, "Bool")
@@ -192,6 +202,15 @@ Func ReadConfig_MOD()
 	$g_bStopOnBatt = (IniRead($g_sProfileConfigPath, "other", "ChkStopOnBatt", "0") = "1")
 	$g_iStopOnBatt = Int(IniRead($g_sProfileConfigPath, "other", "StopOnBatt", 10))
 
+	; Robot Transparency - Pedro&Tony MOD
+	GUICtrlSetData($SldTransLevel, IniRead($g_sProfileConfigPath, "other", "Decor", 0))
+	Slider()
+
+	Global $iMultiFingerStyle = 0
+
+	; Multi Finger - Pedro&Tony MOD
+	IniReadS($iMultiFingerStyle, $g_sProfileConfigPath, "MultiFinger", "Select", "1")
+
 EndFunc   ;==>ReadConfig_MOD
 
 ; Switch Accounts - Team AiO MOD++ (#-12)
@@ -206,18 +225,3 @@ Func ReadConfig_SwitchAcc()
 	Next
 	IniReadS($g_iTrainTimeToSkip, $g_sProfilePath & "\Profile.ini", "SwitchAcc", "Train Time To Skip", 1, "int")
 EndFunc   ;==>ReadConfig_SwitchAcc
-
-; Forecast - Team AiO MOD++ (#-17)
-Func ReadConfig_Forecast()
-	IniReadS($iChkForecastBoost, $g_sProfileConfigPath, "forecast", "chkForecastBoost", 0, "int")
-	IniReadS($iChkForecastPause, $g_sProfileConfigPath, "forecast", "chkForecastPause", 0, "int")
-	IniReadS($iTxtForecastBoost, $g_sProfileConfigPath, "forecast", "txtForecastBoost", 6, "int")
-	IniReadS($iTxtForecastPause, $g_sProfileConfigPath, "forecast", "txtForecastPause", 2, "int")
-	IniReadS($ichkForecastHopingSwitchMax, $g_sProfileConfigPath, "profiles", "chkForecastHopingSwitchMax", 0, "int")
-	IniReadS($icmbForecastHopingSwitchMax, $g_sProfileConfigPath, "profiles", "cmbForecastHopingSwitchMax", 0, "int")
-	IniReadS($itxtForecastHopingSwitchMax, $g_sProfileConfigPath, "profiles", "txtForecastHopingSwitchMax", 2, "int")
-	IniReadS($ichkForecastHopingSwitchMin, $g_sProfileConfigPath, "profiles", "chkForecastHopingSwitchMin", 0, "int")
-	IniReadS($icmbForecastHopingSwitchMin, $g_sProfileConfigPath, "profiles", "cmbForecastHopingSwitchMin", 0, "int")
-	IniReadS($itxtForecastHopingSwitchMin, $g_sProfileConfigPath, "profiles", "txtForecastHopingSwitchMin", 2, "int")
-	IniReadS($icmbSwLang, $g_sProfileConfigPath, "Lang", "cmbSwLang", 1, "int")
-EndFunc ;==>ReadConfig_Forecast

@@ -13,7 +13,7 @@
 ; Example .......: No
 ; ===============================================================================================================================
 
-Func decodeMultipleCoords($coords)
+Func decodeMultipleCoords($coords, $iDedupX = -1, $iDedupY = -1, $iSorted = -1)
 	;returns array of N coordinates [0=x, 1=y][0=x1, 1=y1]
 	Local $retCoords[1] = [""]
 	Local $p, $pOff = 0
@@ -29,7 +29,48 @@ Func decodeMultipleCoords($coords)
 		$retCoords[$p] = decodeSingleCoord($aCoordsSplit[$p + $pOff])
 	Next
 
-	Return $retCoords
+	If UBound($retCoords) = 1 Or ($iDedupX < 1 And $iDedupY < 1 And $iSorted = -1) Then Return $retCoords ; no dedup, return array
+
+	; dedup coords
+	If $iDedupX > 0 Or $iDedupY > 0 Then
+		Local $aFinalCoords[1] = [$retCoords[0]]
+		Local $c1, $c2, $k, $inX, $inY
+		For $i = 1 To UBound($retCoords) - 1
+			$c1 = $retCoords[$i]
+			$k = UBound($aFinalCoords) - 1
+			For $j = 0 To $k
+				$c2 = $aFinalCoords[$j]
+				$inX = Abs($c1[0] - $c2[0]) < $iDedupX
+				$inY = Abs($c1[1] - $c2[1]) < $iDedupY
+				If ($iDedupY < 1 And $inX) Or ($iDedupX < 1 And $inY) Or ($inX And $inY) Then
+					; duplicate coord
+					ContinueLoop 2
+				EndIf
+			Next
+			; add coord
+			ReDim $aFinalCoords[$k + 2]
+			$aFinalCoords[$k + 1] = $c1
+		Next
+	Else
+		Local $aFinalCoords = $retCoords
+	EndIf
+	If $iSorted = 0 Or $iSorted = 1 Then
+		Local $a[UBound($aFinalCoords)][2]
+		For $i = 0 To UBound($aFinalCoords) - 1
+			$c1 = $aFinalCoords[$i]
+			$a[$i][0] = $c1[0]
+			$a[$i][1] = $c1[1]
+		Next
+		_ArraySort($a, 0, 0, 0, $iSorted)
+		For $i = 0 To UBound($a) - 1
+			$c1 = $aFinalCoords[$i]
+			$c1[0] = $a[$i][0]
+			$c1[1] = $a[$i][1]
+			$aFinalCoords[$i] = $c1
+		Next
+	EndIf
+
+	Return $aFinalCoords
 EndFunc   ;==>decodeMultipleCoords
 
 Func decodeSingleCoord($coords)
@@ -45,7 +86,7 @@ EndFunc   ;==>decodeSingleCoord
 Func RetrieveImglocProperty($key, $property)
 	; Get the property
 	Local $aValue = DllCall($g_hLibImgLoc, "str", "GetProperty", "str", $key, "str", $property)
-	If @error Then _logErrorDLLCall($g_sLibImgLocPath, @error)  ; check for error with DLL call
+	If @error Then _logErrorDLLCall($g_sLibImgLocPath, @error) ; check for error with DLL call
 	If UBound($aValue) = 0 Then
 		Return ""
 	EndIf
@@ -94,9 +135,9 @@ Func findButton($sButtonName, $buttonTileArrayOrPatternOrFullPath = Default, $ma
 	If IsString($buttonTileArrayOrPatternOrFullPath) Then
 		$sButtons = $buttonTileArrayOrPatternOrFullPath
 		If StringInStr($buttonTileArrayOrPatternOrFullPath, "*") > 0 Then
-			Local $aFiles = _FileListToArray(@ScriptDir & "\imgxml\imglocbuttons", $sButtons, $FLTA_FILES, True)
+			Local $aFiles = _FileListToArray($g_sImgImgLocButtons, $sButtons, $FLTA_FILES, True)
 			If UBound($aFiles) < 2 Or $aFiles[0] < 1 Then
-				Return SetError(1, 1, "No files in " & @ScriptDir & "\imgxml\imglocbuttons") ; Set external error code = 1 for bad input values
+				Return SetError(1, 1, "No files in " & $g_sImgImgLocButtons) ; Set external error code = 1 for bad input values
 			EndIf
 			Local $a[0], $j
 			$j = 0
@@ -212,7 +253,12 @@ Func GetButtonDiamond($sButtonName)
 			$btnDiamond = "282,85|306,85|306,130|282,130"
 		Case "DownDonation" ;mainwindow - only when chat window is visible
 			$btnDiamond = "282,635|306,635|306,680|282,680"
-
+		Case "Treasury"
+			$btnDiamond = "125,610|740,610|740,715|125,715"
+		Case "Collect"
+			$btnDiamond = "350,450|505,450|505,521|350,521"
+		Case "BoostBarrack", "BarrackBoosted"
+			$btnDiamond = GetDiamondFromRect("630,280,850,360")
 		Case Else
 			$btnDiamond = "FV" ; use full image to locate button
 	EndSwitch
@@ -408,13 +454,13 @@ Func GetDiamondFromRect($rect)
 			SetDebugLog("GetDiamondFromRect : Bad Input Values : " & $rect, $COLOR_ERROR)
 			Return SetError(1, 1, $returnvalue)
 		EndIf
-		$RectValues[3] = $RectValues[1] + StringLeft($RectValues[2], $i - 1) - 1
+		$RectValues[3] = $RectValues[1] + StringLeft($RectValues[2], $i - 1)
 		$i = StringInStr($RectValues[1], "(")
 		If $i = 0 Then
 			SetDebugLog("GetDiamondFromRect : Bad Input Values : " & $rect, $COLOR_ERROR)
 			Return SetError(1, 2, $returnvalue)
 		EndIf
-		$RectValues[2] = $RectValues[0] + StringMid($RectValues[1], $i + 1) - 1
+		$RectValues[2] = $RectValues[0] + StringMid($RectValues[1], $i + 1)
 		$RectValues[1] = StringLeft($RectValues[1], $i - 1)
 	EndIf
 	If UBound($RectValues) < 4 Then
@@ -709,9 +755,96 @@ Func decodeTroopName($sName)
 
 EndFunc   ;==>decodeTroopName
 
+Func Slot($iX, $iY) ; Return Slots for Quantity Reading on Army Window
+	If $iY < 490 Then
+		Switch $iX ; Troops & Spells Slots
+			Case 0 To 94 ; Slot 1
+				If $iY < 315 Then Return 35 ; Troops
+				If $iY > 315 Then Return 40 ; Spells
+
+			Case 95 To 170 ; Slot 2
+				If $iY < 315 Then Return 111 ; Troops
+				If $iY > 315 Then Return 120 ; Spell
+
+			Case 171 To 243 ; Slot 3
+				If $iY < 315 Then Return 184 ; Troops
+				If $iY > 315 Then Return 195 ; Spell
+
+			Case 244 To 307 ; Slot 4
+				If $iY < 315 Then Return 255 ; Troops
+				If $iY > 315 Then Return 272 ; Spell
+
+			Case 308 To 392 ; Slot 5
+				If $iY < 315 Then Return 330 ; Troops
+				If $iY > 315 Then Return 341 ; Spell
+
+			Case 393 To 464 ; Slot 6
+				If $iY < 315 Then Return 403 ; Troops
+				If $iY > 315 Then Return 415 ; Spell
+
+			Case 465 To 537 ; Slot 7
+				If $iY < 315 Then Return 477 ; Troops
+				If $iY > 315 Then Return 485 ; Spell
+			Case 538 To 610 ; Slot 8
+				Return 551  ; Troops
+
+			Case 611 To 682 ; Slot 9
+				If $iY < 315 Then Return 625 ; Troops
+				If $iY > 315 Then Return 619 ; Heroes
+
+			Case 683 To 752 ; Slot 10
+				If $iY < 315 Then Return 694 ; Troops
+				If $iY > 315 Then Return 691 ; Heroes
+
+			Case 753 To 825 ; Slot 11
+				Return 764 ; Troops
+
+		EndSwitch
+	Else ;CC Troops & Spells
+		Switch $iX
+			Case 0 To 94 ; CC Troops Slot 1
+				Return 35
+
+			Case 95 To 170 ; CC Troops Slot 2
+				Return 111
+
+			Case 171 To 243 ; CC Troops Slot 3
+				Return 184
+
+			Case 244 To 307 ; CC Troops Slot 4
+				Return 255
+
+			Case 308 To 392 ; CC Troops Slot 5
+				Return 330
+
+			Case 393 To 464 ; CC Troops Slot 6
+				Return 403
+
+			Case 510 To 580 ; CC Spell Slot 1
+				Return 533
+			Case 581 To 599 ; CC Spell Middle ( Happens with Clan Castles with the max. Capacity of 1!)
+				Return 578
+			Case 600 To 660 ; CC Spell Slot 2
+				Return 610
+		EndSwitch
+	EndIf
+EndFunc   ;==>Slot
 
 Func GetDummyRectangle($sCoords, $ndistance)
 	;creates a dummy rectangle to be used by Reduced Image Capture
 	Local $aCoords = StringSplit($sCoords, ",", $STR_NOCOUNT)
 	Return Number($aCoords[0]) - $ndistance & "," & Number($aCoords[1]) - $ndistance & "," & Number($aCoords[0]) + $ndistance & "," & Number($aCoords[1]) + $ndistance
 EndFunc   ;==>GetDummyRectangle
+
+
+Func ImgLogDebugProps($result)
+	If UBound($result) < 1 Then Return False
+	Local $resultArr = StringSplit($result[0], "|", $STR_NOCOUNT)
+	Local $returnData = StringSplit("objectname,objectlevel,objectpoints", ",", $STR_NOCOUNT)
+	For $rs = 0 To UBound($resultArr) - 1
+		For $rD = 0 To UBound($returnData) - 1 ; cycle props
+			Local $returnLine = RetrieveImglocProperty($resultArr[$rs], $returnData[$rD])
+			SetLog("ImgLogDebugProps : " & $resultArr[$rs] & "->" & $returnData[$rD] & " -> " & $returnLine)
+		Next
+	Next
+EndFunc

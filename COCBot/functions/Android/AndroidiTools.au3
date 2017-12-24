@@ -137,7 +137,8 @@ Func InitiTools($bCheckOnly = False)
 		Return False
 	EndIf
 
-	If FileExists($iTools_Path & "tools\adb.exe") = 0 Then
+	Local $sPreferredADB = FindPreferredAdbPath()
+	If $sPreferredADB = "" And FileExists($iTools_Path & "tools\adb.exe") = 0 Then
 		If Not $bCheckOnly Then
 			SetLog("Serious error has occurred: Cannot find " & $g_sAndroidEmulator & ":", $COLOR_ERROR)
 			SetLog($iTools_Path & "tools\adb.exe", $COLOR_ERROR)
@@ -174,7 +175,7 @@ Func InitiTools($bCheckOnly = False)
 
 		; update global variables
 		$g_sAndroidProgramPath = $iTools_Path & "iToolsAVM.exe"
-		$g_sAndroidAdbPath = FindPreferredAdbPath()
+		$g_sAndroidAdbPath = $sPreferredADB
 		If $g_sAndroidAdbPath = "" Then $g_sAndroidAdbPath = $iTools_Path & "tools\adb.exe"
 		$g_sAndroidVersion = ""
 		$__iTools_Path = $iTools_Path
@@ -298,13 +299,14 @@ Func CheckScreeniTools($bSetLog = True)
 
 EndFunc   ;==>CheckScreeniTools
 
-Func HideiToolsWindow($bHide = True)
-	Return EmbediTools($bHide)
+Func HideiToolsWindow($bHide = True, $hHWndAfter = Default)
+	Return EmbediTools($bHide, $hHWndAfter)
 EndFunc   ;==>HideiToolsWindow
 
-Func EmbediTools($bEmbed = Default)
+Func EmbediTools($bEmbed = Default, $hHWndAfter = Default)
 
 	If $bEmbed = Default Then $bEmbed = $g_bAndroidEmbedded
+	If $hHWndAfter = Default Then $hHWndAfter = $HWND_TOPMOST
 
 	; Find QTool Parent Window
 	Local $aWin = _WinAPI_EnumProcessWindows(GetAndroidPid(), False)
@@ -340,22 +342,20 @@ Func EmbediTools($bEmbed = Default)
 		Next
 	Else
 		SetDebugLog("EmbediTools(" & $bEmbed & "): $hToolbar=" & $hToolbar, Default, True)
-		WinMove2($hToolbar, "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
+		If $bEmbed Then WinMove2($hToolbar, "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
 		_WinAPI_ShowWindow($hToolbar, ($bEmbed ? @SW_HIDE : @SW_SHOWNOACTIVATE))
+		If Not $bEmbed Then
+			WinMove2($hToolbar, "", -1, -1, -1, -1, $hHWndAfter, 0, False)
+			If $hHWndAfter = $HWND_TOPMOST Then WinMove2($hToolbar, "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
+		EndIf
 		For $i = 0 To UBound($hAddition) - 1
-			WinMove2($hAddition[$i], "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
+			If $bEmbed Then WinMove2($hAddition[$i], "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
 			_WinAPI_ShowWindow($hAddition[$i], ($bEmbed ? @SW_HIDE : @SW_SHOWNOACTIVATE))
+			If Not $bEmbed Then
+				WinMove2($hAddition[$i], "", -1, -1, -1, -1, $hHWndAfter, 0, False)
+				If $hHWndAfter = $HWND_TOPMOST Then WinMove2($hAddition[$i], "", -1, -1, -1, -1, $HWND_NOTOPMOST, 0, False)
+			EndIf
 		Next
 	EndIf
 
 EndFunc   ;==>EmbediTools
-
-#cs
-	Func iToolsBotStartEvent()
-	Return AndroidCloseSystemBar()
-	EndFunc   ;==>iToolsBotStartEvent
-
-	Func iToolsBotStopEvent()
-	Return AndroidOpenSystemBar()
-	EndFunc   ;==>iToolsBotStopEvent
-#ce

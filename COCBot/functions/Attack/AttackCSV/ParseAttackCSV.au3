@@ -17,6 +17,8 @@ Func ParseAttackCSV($debug = False)
 	Local $bForceSideExist = False
 	Local $sErrorText, $sTargetVectors = ""
 	Local $iTroopIndex, $bWardenDrop = False
+	; SWIPE - Pedro&Tony MOD
+	$SWIPE = ""
 
 	For $v = 0 To 25 ; Zero all 26 vectors from last atttack in case here is error MAKE'ing new vectors
 		Assign("ATTACKVECTOR_" & Chr(65 + $v), "", $ASSIGN_EXISTFAIL) ; start with character "A" = ASCII 65
@@ -456,6 +458,41 @@ Func ParseAttackCSV($debug = False)
 					Case "RECALC"
 						ReleaseClicks()
 						PrepareAttack($g_iMatchMode, True)
+
+					; SWIPE - Pedro&Tony MOD
+					Case "SWIPE"
+						ReleaseClicks()
+						$value1 = StringStripWS($value1, $STR_STRIPALL)
+						$value2 = Int(StringStripWS($value2, $STR_STRIPALL))
+						$value3 = Int(StringStripWS($value3, $STR_STRIPALL))
+						$value4 = Int(StringStripWS($value4, $STR_STRIPALL))
+
+						If $value3 = 0 Then $value3 = 400
+						If $value4 = 0 Then $value4 = 250
+
+						Local $iDragPixelDistance = 700
+						If $value2 <> 0 Then
+							$iDragPixelDistance	= Random($value2 - 5, $value2 + 5, 1)
+						Else
+							$iDragPixelDistance = Random(695 - 5, 705, 1)
+						EndIf
+						Select
+							Case $value1 = "RIGHT"
+								$SWIPE = "RIGHT"
+								SetLog("SWIPE RIGHT")
+								Local $iStartX = Random(770,780,1)
+								ClickDrag($iStartX,Random(680,690,1),$iStartX - $iDragPixelDistance,Random(680,690,1),$value4)
+								If _Sleep($value3) Then Return
+								PrepareAttack($g_iMatchMode, True)
+							Case $value1 = "LEFT"
+								$SWIPE = "LEFT"
+								SetLog("SWIPE LEFT")
+								Local $iStartX = Random(35,45,1)
+								ClickDrag($iStartX,Random(680,690,1),$iStartX + $iDragPixelDistance,Random(680,690,1),$value4)
+								If _Sleep($value3) Then Return
+								PrepareAttack($g_iMatchMode, True)
+						EndSelect
+
 					Case "SIDE"
 						ReleaseClicks()
 						Setlog("Calculate main side... ")
@@ -807,7 +844,13 @@ Func ParseAttackCSV($debug = False)
 						EndSwitch
 
 					Case Else
-						Setlog("attack row bad, discard: row " & $iLine + 1, $COLOR_ERROR)
+						Switch StringLeft($command, 1)
+							Case ";", "#", "'"
+								; also comment
+								debugAttackCSV("comment line")
+							Case Else
+							Setlog("attack row bad, discard: row " & $iLine + 1, $COLOR_ERROR)
+						EndSwitch
 				EndSwitch
 			Else
 				If StringLeft($line, 7) <> "NOTE  |" And StringLeft($line, 7) <> "      |" And StringStripWS(StringUpper($line), 2) <> "" Then Setlog("attack row error, discard: row " & $iLine + 1, $COLOR_ERROR)

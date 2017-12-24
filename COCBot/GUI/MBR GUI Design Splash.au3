@@ -25,7 +25,6 @@ Global $g_hSplashMutex = 0
 #include "MBR GUI Control Splash.au3"
 
 #Region Splash
-
 Func CreateSplashScreen($iSteps = Default)
 
 	Local $iGuiState = @SW_SHOWNOACTIVATE
@@ -41,10 +40,10 @@ Func CreateSplashScreen($iSteps = Default)
 		$g_hSplashTimer = 0
 	EndIf
 
-	Local $sSplashImg = $g_sLogoPath2
+	Local $sSplashImg = $g_sLogoPath
 	Local $hImage, $iX, $iY
-	Local $iT = 20 ; Top of logo (additional space)
-	Local $iB = 10 ; Bottom of logo (additional space)
+	Local $iT = 4 ; Top of logo (additional space)
+	Local $iB = 0 ; Bottom of logo (additional space)
 
 	Switch $g_iGuiMode ; in Mini GIU or GUI less mode we have less steps
 		Case 0 ; No GUI
@@ -96,5 +95,4 @@ Func CreateSplashScreen($iSteps = Default)
 	EndIf
 
 EndFunc   ;==>CreateSplashScreen
-
 #EndRegion Splash
