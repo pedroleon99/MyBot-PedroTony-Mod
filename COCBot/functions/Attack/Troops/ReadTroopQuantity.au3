@@ -7,7 +7,7 @@
 ; Return values .: None
 ; Author ........:
 ; Modified ......:
-; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2017
+; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2018
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
@@ -24,7 +24,7 @@ Func ReadTroopQuantity($Troop, $CheckSelectedSlot = False, $bNeedNewCapture = Tr
 		Case Else
 			Local $rGetXPosOfArmySlot = GetXPosOfArmySlot($Troop, 40, $bNeedNewCapture)
 			Local $isTheSlotSelected = IsSlotSelected($Troop, $bNeedNewCapture)
-			If $isTheSlotSelected = False Then
+			If Not $isTheSlotSelected Then
 				$iAmount = Number(getTroopCountSmall($rGetXPosOfArmySlot, 641, $bNeedNewCapture))
 			Else
 				$iAmount = Number(getTroopCountBig($rGetXPosOfArmySlot, 636, $bNeedNewCapture))
@@ -43,7 +43,7 @@ Func UpdateTroopQuantity($sTroop, $bNeedNewCapture = Default)
 	Local $troopName = $sTroop
 	Local $iTroopIndex = TroopIndexLookup($troopName)
 	If $iTroopIndex = -1 Then
-		Setlog("'UpdateTroopQuantity' troop name '" & $troopName & "' is unrecognized.")
+		SetLog("'UpdateTroopQuantity' troop name '" & $troopName & "' is unrecognized.")
 		Return
 	EndIf
 
